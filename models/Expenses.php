@@ -32,10 +32,10 @@ class Expenses extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'created_at', 'updated_at'], 'required'],
+            [['user_id', 'created_at', 'updated_at', 'amount', 'purpose'], 'required'],
             [['user_id', 'is_deleted'], 'integer'],
             [['purpose'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at', 'amount'], 'safe'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'user_id']],
         ];
     }
@@ -49,6 +49,7 @@ class Expenses extends \yii\db\ActiveRecord
             'expense_id' => 'Expense ID',
             'user_id' => 'User ID',
             'purpose' => 'Purpose',
+            'amount' => 'Amount',
             'is_deleted' => 'Is Deleted',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
