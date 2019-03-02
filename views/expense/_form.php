@@ -15,6 +15,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'user_id')->textInput() ?>
 
     <?= $form->field($model, 'purpose')->textarea(['rows' => 6]) ?>
+    
+    <?= $form->field($model, 'amount')->textInput() ?>
 
     <?= $form->field($model, 'is_deleted')->textInput() ?>
 
