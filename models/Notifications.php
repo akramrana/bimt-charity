@@ -33,7 +33,7 @@ class Notifications extends \yii\db\ActiveRecord
             [['type', 'comments'], 'string'],
             [['type_id', 'is_deleted'], 'integer'],
             [['comments', 'created_at'], 'required'],
-            [['created_at'], 'safe'],
+            [['created_at','added_by'], 'safe'],
         ];
     }
 
@@ -46,9 +46,18 @@ class Notifications extends \yii\db\ActiveRecord
             'notification_id' => 'Notification ID',
             'type' => 'Type',
             'type_id' => 'Type ID',
-            'comments' => 'Comments',
-            'created_at' => 'Created At',
+            'comments' => 'Log Message',
+            'created_at' => 'Time',
             'is_deleted' => 'Is Deleted',
+            'added_by' => 'Added By',
         ];
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(Users::className(), ['user_id' => 'added_by']);
     }
 }

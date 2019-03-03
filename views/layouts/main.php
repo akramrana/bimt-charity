@@ -35,6 +35,10 @@ if (Yii::$app->controller->action->id === 'login') {
         <?= Html::csrfMetaTags() ?>
         <title><?= Html::encode($this->title) ?></title>
         <?php $this->head() ?>
+        <script type="application/javascript">
+            var baseUrl = '<?php echo yii\helpers\BaseUrl::home(); ?>';
+            var _csrf = '<?php echo Yii::$app->request->getCsrfToken() ?>';
+        </script>
     </head>
     <body class="hold-transition skin-purple-light sidebar-mini">
     <?php $this->beginBody() ?>

@@ -7,32 +7,26 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\NotificationSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Notifications';
+$this->title = 'Activity Log';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="notifications-index">
+<div class="box box-primary">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <div class="box-body">
 
-    <p>
-        <?= Html::a('Create Notifications', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+        <?=
+        GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+                'comments:ntext',
+                'created_at',
+                //'is_deleted',
+                //['class' => 'yii\grid\ActionColumn'],
+            ],
+        ]);
+        ?>
+    </div>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'notification_id',
-            'type',
-            'type_id',
-            'comments:ntext',
-            'created_at',
-            //'is_deleted',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
 </div>

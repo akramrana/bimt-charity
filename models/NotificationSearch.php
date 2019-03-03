@@ -46,6 +46,7 @@ class NotificationSearch extends Notifications
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['notification_id' => SORT_DESC]],
         ]);
 
         $this->load($params);
@@ -61,7 +62,7 @@ class NotificationSearch extends Notifications
             'notification_id' => $this->notification_id,
             'type_id' => $this->type_id,
             'created_at' => $this->created_at,
-            'is_deleted' => $this->is_deleted,
+            'is_deleted' => 0,
         ]);
 
         $query->andFilterWhere(['like', 'type', $this->type])

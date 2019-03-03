@@ -36,6 +36,8 @@ use Yii;
  */
 class Users extends \yii\db\ActiveRecord
 {
+    public $password_hash;
+    public $confirm_password;
     /**
      * {@inheritdoc}
      */
@@ -52,11 +54,16 @@ class Users extends \yii\db\ActiveRecord
         return [
             [['fullname', 'email', 'phone', 'password', 'user_type', 'created_at', 'updated_at'], 'required'],
             [['address', 'user_type'], 'string'],
-            [['enable_login', 'password', 'is_active', 'is_deleted'], 'integer'],
+            [['enable_login', 'is_active', 'is_deleted'], 'integer'],
             [['recurring_amount'], 'number'],
             [['created_at', 'updated_at'], 'safe'],
             [['fullname', 'email', 'phone', 'alt_phone', 'batch', 'department'], 'string', 'max' => 50],
             [['image'], 'string', 'max' => 250],
+            ['email', 'email'],
+            ['email', 'checkUniqueEmail'],
+            [['password_hash', 'confirm_password'], 'required', 'on' => 'create'],
+            ['confirm_password', 'compare', 'compareAttribute' => 'password_hash', 'message' => Yii::t('yii', 'Confirm Password must be equal to "Password"')],
+            [['password_hash'], 'string', 'min' => 6],
         ];
     }
 
@@ -67,7 +74,7 @@ class Users extends \yii\db\ActiveRecord
     {
         return [
             'user_id' => 'User ID',
-            'fullname' => 'Fullname',
+            'fullname' => 'Name',
             'image' => 'Image',
             'email' => 'Email',
             'phone' => 'Phone',
@@ -77,9 +84,11 @@ class Users extends \yii\db\ActiveRecord
             'department' => 'Department',
             'enable_login' => 'Enable Login',
             'password' => 'Password',
+            'password_hash' => 'Password',
+            'confirm_password' => 'Confirm Password',
             'user_type' => 'User Type',
-            'recurring_amount' => 'Recurring Amount',
-            'is_active' => 'Is Active',
+            'recurring_amount' => 'Donation Amount Per Month',
+            'is_active' => 'Active Status',
             'is_deleted' => 'Is Deleted',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
@@ -148,5 +157,17 @@ class Users extends \yii\db\ActiveRecord
     public function getPaymentReleases()
     {
         return $this->hasMany(PaymentRelease::className(), ['release_by' => 'user_id']);
+    }
+    
+    public function checkUniqueEmail($attribute, $params) {
+        $query = Users::find()
+                ->where(['email' => $this->email, 'is_deleted' => 0]);
+        if (isset($this->user_id) && $this->user_id != "") {
+            $query->andWhere(['<>', 'user_id', $this->user_id]);
+        }
+        $model = $query->one();
+        if (!empty($model)) {
+            $this->addError($attribute, Yii::t('app', 'This email has already been taken.'));
+        }
     }
 }

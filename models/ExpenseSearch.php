@@ -18,7 +18,7 @@ class ExpenseSearch extends Expenses
     {
         return [
             [['expense_id', 'user_id', 'is_deleted'], 'integer'],
-            [['purpose', 'created_at', 'updated_at'], 'safe'],
+            [['purpose', 'created_at', 'updated_at','amount'], 'safe'],
         ];
     }
 
@@ -63,6 +63,7 @@ class ExpenseSearch extends Expenses
             'is_deleted' => $this->is_deleted,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'amount' => $this->amount,
         ]);
 
         $query->andFilterWhere(['like', 'purpose', $this->purpose]);

@@ -43,3 +43,10 @@ use dmstr\widgets\Alert;
     reserved.
 </footer>
 
+<div class="global-loader">
+    <div class="main-content">
+        <div class="loading">
+            <img src="<?php echo yii\helpers\BaseUrl::home() ?>images/loading-bars.svg" alt="loading"/>
+        </div>
+    </div>
+</div>

@@ -49,19 +49,19 @@ class NotificationController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
-     */
+     
     public function actionView($id)
     {
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
-    }
+    }*/
 
     /**
      * Creates a new Notifications model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
-     */
+     
     public function actionCreate()
     {
         $model = new Notifications();
@@ -73,7 +73,7 @@ class NotificationController extends Controller
         return $this->render('create', [
             'model' => $model,
         ]);
-    }
+    }*/
 
     /**
      * Updates an existing Notifications model.
@@ -81,7 +81,7 @@ class NotificationController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
-     */
+     
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
@@ -93,7 +93,7 @@ class NotificationController extends Controller
         return $this->render('update', [
             'model' => $model,
         ]);
-    }
+    }*/
 
     /**
      * Deletes an existing Notifications model.
@@ -101,13 +101,13 @@ class NotificationController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
-     */
+     
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
-    }
+    }*/
 
     /**
      * Finds the Notifications model based on its primary key value.

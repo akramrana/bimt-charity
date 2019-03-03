@@ -10,40 +10,63 @@ use yii\grid\GridView;
 $this->title = 'Users';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="users-index">
+<div class="box box-primary">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <div class="box-body">
+        <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <p>
-        <?= Html::a('Create Users', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+        <p>
+            <?= Html::a('Create Users', ['create'], ['class' => 'btn btn-success']) ?>
+        </p>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+        <?=
+        GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+                [
+                    'label' => 'Image',
+                    'value' => function($model) {
+                        return \yii\helpers\BaseUrl::home() . 'uploads/' . $model->image;
+                    },
+                    'format' => ['image', ['width' => '96']],
+                    'filter' => false,
+                ],
+                'fullname',
+                //'image',
+                'email:email',
+                'phone',
+                'alt_phone',
+                'address:ntext',
+                //'batch',
+                //'department',
+                //'enable_login',
+                //'password',
+                //'user_type',
+                'recurring_amount',
+                [
+                    'label' => 'Status',
+                    'attribute' => 'is_active',
+                    'format' => 'raw',
+                    'value' => function ($model, $url) {
+                        return '<div class="onoffswitch">'
+                                . Html::checkbox('onoffswitch', $model->is_active, [
+                                    'class' => "onoffswitch-checkbox",
+                                    'id' => "myonoffswitch" . $model->user_id,
+                                    'onclick' => 'app.changeStatus("user/activate",this,' . $model->user_id . ')',
+                                ])
+                                . '<label class="onoffswitch-label" for="myonoffswitch' . $model->user_id . '"></label></div>';
+                    },
+                    'filter' => Html::activeDropDownList($searchModel, 'is_active', [1 => 'Active', 0 => 'Inactive'], ['class' => 'form-control', 'prompt' => 'Filter']),
+                ],
+                //'is_deleted',
+                //'created_at',
+                //'updated_at',
+                ['class' => 'yii\grid\ActionColumn'],
+            ],
+        ]);
+        ?>
+    </div>
 
-            'user_id',
-            'fullname',
-            'image',
-            'email:email',
-            'phone',
-            //'alt_phone',
-            //'address:ntext',
-            //'batch',
-            //'department',
-            //'enable_login',
-            //'password',
-            //'user_type',
-            //'recurring_amount',
-            //'is_active',
-            //'is_deleted',
-            //'created_at',
-            //'updated_at',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
 </div>

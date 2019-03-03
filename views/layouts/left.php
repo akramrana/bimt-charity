@@ -14,7 +14,7 @@
                 'items' => [
                     ['label' => 'NAVIGATION', 'options' => ['class' => 'header']],
                     ['label' => 'Dashboard', 'icon' => 'dashboard', 'url' => ['site/index']],
-                    ['label' => 'Funds', 'icon' => 'fa fa-pie-chart', 'url' => ['fund-request/index']],
+                    ['label' => 'Fund Request', 'icon' => 'fa fa-pie-chart', 'url' => ['fund-request/index']],
                     [
                         'label' => 'Payments',
                         'icon' => 'share',
@@ -27,7 +27,7 @@
                     ['label' => 'Invoices', 'icon' => 'fa fa-book', 'url' => ['monthly-invoice/index']],
                     ['label' => 'Expenses', 'icon' => 'fa fa-money', 'url' => ['expense/index']],
                     ['label' => 'Users', 'icon' => 'fa fa-users', 'url' => ['user/index']],
-                    ['label' => 'Notifications', 'icon' => 'fa fa-bell', 'url' => ['notification/index']],
+                    ['label' => 'Activity Log', 'icon' => 'fa fa-bell', 'url' => ['notification/index']],
                 ],
             ]
         ) ?>

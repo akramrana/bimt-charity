@@ -18,7 +18,7 @@ class FundRequestSearch extends FundRequests
     {
         return [
             [['fund_request_id', 'request_user_id', 'is_active', 'is_deleted'], 'integer'],
-            [['fund_request_number', 'request_description', 'file', 'created_at', 'updated_at', 'amount'], 'safe'],
+            [['fund_request_number', 'request_description', 'file', 'created_at', 'updated_at', 'request_amount'], 'safe'],
             [['request_amount'], 'number'],
         ];
     }
@@ -66,7 +66,6 @@ class FundRequestSearch extends FundRequests
             'is_deleted' => $this->is_deleted,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'amount' => $this->amount,
         ]);
 
         $query->andFilterWhere(['like', 'fund_request_number', $this->fund_request_number])

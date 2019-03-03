@@ -60,6 +60,7 @@ class LoginForm extends Model
     public function login()
     {
         if ($this->validate()) {
+            \Yii::$app->session->set('_bimtCharityAuth', 1);
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0);
         }
         return false;
@@ -73,7 +74,24 @@ class LoginForm extends Model
     public function getUser()
     {
         if ($this->_user === false) {
-            $this->_user = User::findByUsername($this->username);
+            $user = User::findByUsername($this->username);
+            $role = 5;
+            if($user->user_type=="S"){
+                $role = 1;
+            }
+            else if($user->user_type=="A"){
+                $role = 2;
+            }
+            else if($user->user_type=="M"){
+                $role = 3;
+            }
+            else if($user->user_type=="G"){
+                $role = 4;
+            }
+            if (!empty($user)) {
+                \Yii::$app->session->set('__bimtCharityUserRole', $role);
+                $this->_user = $user;
+            }
         }
 
         return $this->_user;
