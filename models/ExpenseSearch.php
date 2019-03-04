@@ -46,6 +46,7 @@ class ExpenseSearch extends Expenses
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['expense_id' => SORT_DESC]],
         ]);
 
         $this->load($params);
@@ -60,7 +61,7 @@ class ExpenseSearch extends Expenses
         $query->andFilterWhere([
             'expense_id' => $this->expense_id,
             'user_id' => $this->user_id,
-            'is_deleted' => $this->is_deleted,
+            'is_deleted' => 0,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'amount' => $this->amount,

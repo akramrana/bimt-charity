@@ -30,4 +30,11 @@ class AppHelper {
         $model->created_at = date("Y-m-d H:i:s");
         $model->save();
     }
+    
+    static function getAllUsers()
+    {
+        $models = \app\models\User::find()->where(['is_deleted' => 0])->all();
+        $list = \yii\helpers\ArrayHelper::map($models, 'user_id', 'fullname');
+        return $list;
+    }
 }

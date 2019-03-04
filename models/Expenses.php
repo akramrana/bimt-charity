@@ -47,7 +47,7 @@ class Expenses extends \yii\db\ActiveRecord
     {
         return [
             'expense_id' => 'Expense ID',
-            'user_id' => 'User ID',
+            'user_id' => 'Added By',
             'purpose' => 'Purpose',
             'amount' => 'Amount',
             'is_deleted' => 'Is Deleted',

@@ -10,29 +10,33 @@ use yii\grid\GridView;
 $this->title = 'Expenses';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="expenses-index">
+<div class="box box-primary">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <div class="box-body">
 
-    <p>
-        <?= Html::a('Create Expenses', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+        <p>
+            <?= Html::a('Create Expenses', ['create'], ['class' => 'btn btn-success']) ?>
+        </p>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+        <?=
+        GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+                [
+                    'attribute' => 'user_id',
+                    'value' => function($model) {
+                        return ($model->user->fullname);
+                    },
+                    'filter' => Html::activeDropDownList($searchModel, 'user_id', \app\helpers\AppHelper::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter']),
+                ],
+                'amount',
+                'purpose:ntext',
+                ['class' => 'yii\grid\ActionColumn'],
+            ],
+        ]);
+        ?>
+    </div>
 
-            'expense_id',
-            'user_id',
-            'purpose:ntext',
-            'is_deleted',
-            'created_at',
-            //'updated_at',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
 </div>
