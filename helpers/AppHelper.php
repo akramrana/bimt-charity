@@ -51,6 +51,19 @@ class AppHelper {
             return 10000001;
         }
     }
+    
+    static function getReceivePayInvoiceNumber() {
+        $order = \app\models\PaymentReceived::find()
+                ->select(['MAX(SUBSTRING(`received_invoice_number`,4)) AS received_invoice_number'])
+                ->asArray()
+                ->one();
+
+        if (!empty($order['received_invoice_number'])) {
+            return 'RI-'.($order['received_invoice_number'] + 1);
+        } else {
+            return "RI-100001";
+        }
+    }
 
     static function monthList() {
         return [
@@ -79,4 +92,13 @@ class AppHelper {
         return $yearArray;
     }
 
+    static function getPaidInvoiceList()
+    {
+        $model = \app\models\MonthlyInvoice::find()
+                ->where(['is_deleted' => 0,'is_paid' => 1])
+                ->orderBy(['monthly_invoice_id' => SORT_DESC])
+                ->all();
+        $list = \yii\helpers\ArrayHelper::map($model, 'monthly_invoice_id', 'monthly_invoice_number');
+        return $list;
+    }
 }

@@ -8,22 +8,39 @@ use app\models\PaymentReceivedSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use yii\filters\AccessControl;
+use app\components\UserIdentity;
+use app\components\AccessRule;
 /**
  * PaymentReceivedController implements the CRUD actions for PaymentReceived model.
  */
-class PaymentReceivedController extends Controller
-{
+class PaymentReceivedController extends Controller {
+
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'ruleConfig' => [
+                    'class' => AccessRule::className(),
+                ],
+                'only' => ['index', 'view', 'create', 'update', 'delete'],
+                'rules' => [
+                    [
+                        'actions' => ['index', 'view', 'create', 'update', 'delete'],
+                        'allow' => true,
+                        'roles' => [
+                            UserIdentity::ROLE_SUPER_ADMIN,
+                        ]
+                    ],
                 ],
             ],
         ];
@@ -33,14 +50,13 @@ class PaymentReceivedController extends Controller
      * Lists all PaymentReceived models.
      * @return mixed
      */
-    public function actionIndex()
-    {
+    public function actionIndex() {
         $searchModel = new PaymentReceivedSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -50,10 +66,9 @@ class PaymentReceivedController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
-    {
+    public function actionView($id) {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+                    'model' => $this->findModel($id),
         ]);
     }
 
@@ -62,16 +77,32 @@ class PaymentReceivedController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
-    {
+    public function actionCreate() {
         $model = new PaymentReceived();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->payment_received_id]);
+        $model->created_at = date('Y-m-d H:i:s');
+        $model->updated_at = date('Y-m-d H:i:s');
+        $model->received_invoice_number = \app\helpers\AppHelper::getReceivePayInvoiceNumber();
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->has_invoice == 1 && !empty($model->monthly_invoice_id)) {
+                $invoice = \app\models\MonthlyInvoice::findOne($model->monthly_invoice_id);
+                $model->instalment_month = $invoice->instalment_month;
+                $model->instalment_year = $invoice->instalment_year;
+                $model->amount = $invoice->amount;
+            }
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', 'Payment Received invoice successfully added');
+                $msg = 'Invoice#' . $model->received_invoice_number . ' genearated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' Donated By ' . $model->donatedBy->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
+                \app\helpers\AppHelper::addActivity("PREC", $model->payment_received_id, $msg);
+                return $this->redirect(['view', 'id' => $model->payment_received_id]);
+            } else {
+                echo json_encode($model->errors);
+                return $this->render('create', [
+                            'model' => $model,
+                ]);
+            }
         }
-
         return $this->render('create', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -82,16 +113,30 @@ class PaymentReceivedController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
-    {
+    public function actionUpdate($id) {
         $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->payment_received_id]);
+        $model->updated_at = date('Y-m-d H:i:s');
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->has_invoice == 1 && !empty($model->monthly_invoice_id)) {
+                $invoice = \app\models\MonthlyInvoice::findOne($model->monthly_invoice_id);
+                $model->instalment_month = $invoice->instalment_month;
+                $model->instalment_year = $invoice->instalment_year;
+                $model->amount = $invoice->amount;
+            }
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', 'Payment Received invoice successfully updated');
+                $msg = 'Invoice#' . $model->received_invoice_number . ' updated by ' . Yii::$app->user->identity->fullname;
+                \app\helpers\AppHelper::addActivity("PREC", $model->payment_received_id, $msg);
+                return $this->redirect(['view', 'id' => $model->payment_received_id]);
+            } else {
+                return $this->render('update', [
+                            'model' => $model,
+                ]);
+            }
         }
 
         return $this->render('update', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -102,10 +147,13 @@ class PaymentReceivedController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
+    public function actionDelete($id) {
+        $model = $this->findModel($id);
+        $model->is_deleted = 1;
+        $model->save();
+        $msg = 'Invoice#' . $model->received_invoice_number . ' has been deleted by ' . Yii::$app->user->identity->fullname;
+        \app\helpers\AppHelper::addActivity("PREC", $model->payment_received_id, $msg);
+        Yii::$app->session->setFlash('success', 'Payment Received invoice successfully deleted');
         return $this->redirect(['index']);
     }
 
@@ -116,12 +164,12 @@ class PaymentReceivedController extends Controller
      * @return PaymentReceived the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
-    {
+    protected function findModel($id) {
         if (($model = PaymentReceived::findOne($id)) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
 }

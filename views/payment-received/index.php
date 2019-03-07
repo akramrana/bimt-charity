@@ -7,39 +7,63 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\PaymentReceivedSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Payment Receiveds';
+$this->title = 'Payment Received';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="payment-received-index">
+<div class="box box-primary">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <div class="box-body">
 
-    <p>
-        <?= Html::a('Create Payment Received', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+        <p>
+            <?= Html::a('Create Payment Received', ['create'], ['class' => 'btn btn-success']) ?>
+        </p>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+        <?=
+        GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+                'received_invoice_number',
+                [
+                    'attribute' => 'donated_by',
+                    'value' => function($model) {
+                        return $model->donatedBy->fullname;
+                    },
+                    'filter' => Html::activeDropDownList($searchModel, 'donated_by', app\helpers\AppHelper ::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter']),
+                ],
+                [
+                    'attribute' => 'received_by',
+                    'value' => function($model) {
+                        return $model->receivedBy->fullname;
+                    },
+                    'filter' => Html::activeDropDownList($searchModel, 'received_by', app\helpers\AppHelper ::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter']),
+                ],
+                'comments:ntext',
+                'amount',
+                [
+                    'attribute' => 'instalment_month',
+                    'filter' => Html::activeDropDownList($searchModel, 'instalment_month', app\helpers\AppHelper ::monthList(), ['class' => 'form-control', 'prompt' => 'Filter']),
+                ],
+                [
+                    'attribute' => 'instalment_year',
+                    'filter' => Html::activeDropDownList($searchModel, 'instalment_year', app\helpers\AppHelper ::YearsList(), ['class' => 'form-control', 'prompt' => 'Filter']),
+                ],
+                [
+                    'attribute' => 'has_invoice',
+                    'value' => function($model) {
+                        return ($model->has_invoice == '1') ? "Yes" : "No";
+                    },
+                    'filter' => Html::activeDropDownList($searchModel, 'has_invoice', [1 => 'Yes', 0 => 'No'], ['class' => 'form-control', 'prompt' => 'Filter']),
+                ],
+                //'monthly_invoice_id',
+                //'created_at',
+                //'updated_at',
+                //'is_deleted',
+                ['class' => 'yii\grid\ActionColumn'],
+            ],
+        ]);
+        ?>
+    </div>
 
-            'payment_received_id',
-            'received_invoice_number',
-            'donated_by',
-            'received_by',
-            'comments:ntext',
-            //'amount',
-            //'instalment_month',
-            //'instalment_year',
-            //'has_invoice',
-            //'monthly_invoice_id',
-            //'created_at',
-            //'updated_at',
-            //'is_deleted',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
 </div>

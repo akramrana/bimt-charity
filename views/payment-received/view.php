@@ -6,43 +6,60 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\PaymentReceived */
 
-$this->title = $model->payment_received_id;
+$this->title = $model->received_invoice_number;
 $this->params['breadcrumbs'][] = ['label' => 'Payment Receiveds', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
-<div class="payment-received-view">
+<div class="box box-primary">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <div class="box-body">
 
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->payment_received_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->payment_received_id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
+        <p>
+            <?= Html::a('Update', ['update', 'id' => $model->payment_received_id], ['class' => 'btn btn-primary']) ?>
+            <?=
+            Html::a('Delete', ['delete', 'id' => $model->payment_received_id], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Are you sure you want to delete this item?',
+                    'method' => 'post',
+                ],
+            ])
+            ?>
+        </p>
+
+        <?=
+        DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+                'received_invoice_number',
+                [
+                    'attribute' => 'donated_by',
+                    'value' => $model->donatedBy->fullname
+                ],
+                [
+                    'attribute' => 'received_by',
+                    'value' => $model->receivedBy->fullname
+                ],
+                'comments:ntext',
+                'amount',
+                'instalment_month',
+                'instalment_year',
+                //'has_invoice',
+                [
+                    'attribute' => 'has_invoice',
+                    'value' => ($model->has_invoice == 1) ? "Yes" : "No"
+                ],
+                [
+                    'attribute' => 'monthly_invoice_id',
+                    'value' => !empty($model->monthlyInvoice)?$model->monthlyInvoice->monthly_invoice_number:""
+                ],
+                'created_at',
+                'updated_at',
             ],
-        ]) ?>
-    </p>
+        ])
+        ?>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'payment_received_id',
-            'received_invoice_number',
-            'donated_by',
-            'received_by',
-            'comments:ntext',
-            'amount',
-            'instalment_month',
-            'instalment_year',
-            'has_invoice',
-            'monthly_invoice_id',
-            'created_at',
-            'updated_at',
-            'is_deleted',
-        ],
-    ]) ?>
+    </div>
 
 </div>

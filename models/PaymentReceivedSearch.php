@@ -47,6 +47,7 @@ class PaymentReceivedSearch extends PaymentReceived
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['payment_received_id' => SORT_DESC]],
         ]);
 
         $this->load($params);
@@ -67,7 +68,7 @@ class PaymentReceivedSearch extends PaymentReceived
             'monthly_invoice_id' => $this->monthly_invoice_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'is_deleted' => $this->is_deleted,
+            'is_deleted' => 0,
         ]);
 
         $query->andFilterWhere(['like', 'received_invoice_number', $this->received_invoice_number])
