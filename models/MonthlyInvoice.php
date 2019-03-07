@@ -55,11 +55,11 @@ class MonthlyInvoice extends \yii\db\ActiveRecord
         return [
             'monthly_invoice_id' => 'Monthly Invoice ID',
             'monthly_invoice_number' => 'Monthly Invoice Number',
-            'receiver_id' => 'Receiver ID',
+            'receiver_id' => 'Receiver',
             'amount' => 'Amount',
             'instalment_month' => 'Instalment Month',
             'instalment_year' => 'Instalment Year',
-            'is_paid' => 'Is Paid',
+            'is_paid' => 'Paid?',
             'is_deleted' => 'Is Deleted',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',

@@ -47,6 +47,7 @@ class MonthlyInvoiceSearch extends MonthlyInvoice
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['monthly_invoice_id' => SORT_DESC]],
         ]);
 
         $this->load($params);
@@ -63,7 +64,7 @@ class MonthlyInvoiceSearch extends MonthlyInvoice
             'receiver_id' => $this->receiver_id,
             'amount' => $this->amount,
             'is_paid' => $this->is_paid,
-            'is_deleted' => $this->is_deleted,
+            'is_deleted' => 0,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
