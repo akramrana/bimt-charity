@@ -31,5 +31,17 @@ var app = {
             }
         });
     },
+    showHideMonthlyInvoice:function()
+    {
+        if($("#paymentreceived-has_invoice").is(":checked")){
+            $("#monthly-invoice").removeClass("hidden");
+            $("#instalment-month-year").addClass("hidden");
+            $("#paymentreceived-amount").val("0");
+        }else{
+            $("#monthly-invoice").addClass("hidden");
+            $("#instalment-month-year").removeClass("hidden");
+            $("#paymentreceived-amount").val("");
+        }
+    }
 };
 
