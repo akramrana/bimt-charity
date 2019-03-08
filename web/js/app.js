@@ -42,6 +42,31 @@ var app = {
             $("#instalment-month-year").removeClass("hidden");
             $("#paymentreceived-amount").val("");
         }
+    },
+    addFundStatus:function(){
+        $(".global-loader").show();
+        $.ajax({
+            type: "POST",
+            url: baseUrl + 'fund-request/add-status',
+            data: $("#fund-request-status-form").serialize(),
+            success: function (response)
+            {
+                $(".global-loader").hide();
+                var result = JSON.parse(response);
+                if (result.status == 201) {
+                    $("#response").html('<div class="alert alert-danger">' + result.msg + '</div>');
+                }
+                if (result.status == 200) {
+                    $("#response").html('<div class="alert alert-success">' + result.msg + '</div>');
+                    $.pjax.reload({container: '#fund-status-pjax'});
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown)
+            {
+                $(".global-loader").hide();
+                alert(jqXHR.responseText);
+            }
+        })
     }
 };
 

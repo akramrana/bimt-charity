@@ -47,6 +47,7 @@ class FundRequestSearch extends FundRequests
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['fund_request_id' => SORT_DESC]],
         ]);
 
         $this->load($params);
@@ -63,7 +64,7 @@ class FundRequestSearch extends FundRequests
             'request_user_id' => $this->request_user_id,
             'request_amount' => $this->request_amount,
             'is_active' => $this->is_active,
-            'is_deleted' => $this->is_deleted,
+            'is_deleted' => 0,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);

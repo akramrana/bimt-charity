@@ -64,6 +64,20 @@ class AppHelper {
             return "RI-100001";
         }
     }
+    
+    static function getFundRequestInvoiceNumber()
+    {
+        $order = \app\models\FundRequests::find()
+                ->select(['MAX(SUBSTRING(`fund_request_number`,4)) AS fund_request_number'])
+                ->asArray()
+                ->one();
+
+        if (!empty($order['fund_request_number'])) {
+            return 'FR-'.($order['fund_request_number'] + 1);
+        } else {
+            return "FR-100001";
+        }
+    }
 
     static function monthList() {
         return [
@@ -99,6 +113,16 @@ class AppHelper {
                 ->orderBy(['monthly_invoice_id' => SORT_DESC])
                 ->all();
         $list = \yii\helpers\ArrayHelper::map($model, 'monthly_invoice_id', 'monthly_invoice_number');
+        return $list;
+    }
+    
+    static function getStatusList()
+    {
+        $model = \app\models\Status::find()
+                ->where(['is_deleted' => 0])
+                ->orderBy(['status_id' => SORT_ASC])
+                ->all();
+        $list = \yii\helpers\ArrayHelper::map($model, 'status_id', 'name');
         return $list;
     }
 }

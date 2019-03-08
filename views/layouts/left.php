@@ -14,17 +14,10 @@
                 'items' => [
                     ['label' => 'NAVIGATION', 'options' => ['class' => 'header']],
                     ['label' => 'Dashboard', 'icon' => 'dashboard', 'url' => ['site/index']],
-                    ['label' => 'Fund Request', 'icon' => 'fa fa-pie-chart', 'url' => ['fund-request/index']],
-                    [
-                        'label' => 'Payments',
-                        'icon' => 'share',
-                        'url' => '#',
-                        'items' => [
-                            ['label' => 'Receive', 'icon' => 'fa fa-circle-o', 'url' => ['payment-received/index'],],
-                            ['label' => 'Donation', 'icon' => 'fa fa-circle-o', 'url' => ['payment-release/index'],],
-                        ],
-                    ],
                     ['label' => 'Invoices', 'icon' => 'fa fa-book', 'url' => ['monthly-invoice/index']],
+                    ['label' => 'Receive', 'icon' => 'fa fa-circle-o', 'url' => ['payment-received/index'],],
+                    ['label' => 'Fund Request', 'icon' => 'fa fa-pie-chart', 'url' => ['fund-request/index']],
+                    ['label' => 'Donation', 'icon' => 'share', 'url' => ['payment-release/index']],
                     ['label' => 'Expenses', 'icon' => 'fa fa-money', 'url' => ['expense/index']],
                     ['label' => 'Users', 'icon' => 'fa fa-users', 'url' => ['user/index']],
                     ['label' => 'Activity Log', 'icon' => 'fa fa-bell', 'url' => ['notification/index']],
