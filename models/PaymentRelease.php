@@ -56,7 +56,7 @@ class PaymentRelease extends \yii\db\ActiveRecord
         return [
             'payment_release_id' => 'Payment Release ID',
             'release_invoice_number' => 'Release Invoice Number',
-            'fund_request_id' => 'Fund Request ID',
+            'fund_request_id' => 'Fund Request',
             'release_by' => 'Release By',
             'amount' => 'Amount',
             'note' => 'Note',

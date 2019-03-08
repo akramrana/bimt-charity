@@ -92,7 +92,7 @@ class FundRequestController extends Controller {
             $frs->created_at = date('Y-m-d H:i:s');
             $frs->save();
             //
-            $msg = 'Invoice#' . $model->fund_request_number . ' genearated for new fund request submitted by ' . $model->requestUser->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
+            $msg = 'Invoice#' . $model->fund_request_number . ' generated for new fund request submitted by ' . $model->requestUser->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
             \app\helpers\AppHelper::addActivity("FR", $model->fund_request_id, $msg);
             //
             Yii::$app->session->setFlash('success', 'Fund request successfully added');

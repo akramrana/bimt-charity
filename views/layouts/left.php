@@ -3,7 +3,7 @@
         <!-- Sidebar user panel -->
         <div class="user-panel" style="height: 60px;">
             <div class="pull-left info" style="left: 0px;">
-                <p>Akram Hossain</p>
+                <p><?=Yii::$app->user->identity->fullname;?></p>
                 <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
             </div>
         </div>

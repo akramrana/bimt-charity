@@ -91,7 +91,7 @@ class PaymentReceivedController extends Controller {
             }
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Payment Received invoice successfully added');
-                $msg = 'Invoice#' . $model->received_invoice_number . ' genearated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' Donated By ' . $model->donatedBy->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
+                $msg = 'Invoice#' . $model->received_invoice_number . ' generated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' Donated By ' . $model->donatedBy->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
                 \app\helpers\AppHelper::addActivity("PREC", $model->payment_received_id, $msg);
                 return $this->redirect(['view', 'id' => $model->payment_received_id]);
             } else {

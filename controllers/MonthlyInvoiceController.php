@@ -84,7 +84,7 @@ class MonthlyInvoiceController extends Controller {
         $model->monthly_invoice_number = \app\helpers\AppHelper::getNextMonthlyInvoiceNumber();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', 'Invoice successfully added');
-            $msg = 'Invoice#' . $model->monthly_invoice_number . ' genearated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' against receiver ' . $model->receiver->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
+            $msg = 'Invoice#' . $model->monthly_invoice_number . ' generated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' against receiver ' . $model->receiver->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
             \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
             return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
         }

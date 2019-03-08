@@ -10,32 +10,44 @@ use yii\grid\GridView;
 $this->title = 'Payment Releases';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="payment-release-index">
+<div class="box box-primary">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <div class="box-body">
 
-    <p>
-        <?= Html::a('Create Payment Release', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+        <p>
+            <?= Html::a('Create Payment Release', ['create'], ['class' => 'btn btn-success']) ?>
+        </p>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+        <?=
+        GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+                'release_invoice_number',
+                [
+                    'attribute' => 'fund_request_id',
+                    'value' => function($model) {
+                        return $model->fundRequest->fund_request_number;
+                    },
+                    'filter' => Html::activeDropDownList($searchModel, 'fund_request_id', app\helpers\AppHelper ::getApprovedFundRequest(), ['class' => 'form-control', 'prompt' => 'Filter']),
+                ],
+                [
+                    'attribute' => 'release_by',
+                    'value' => function($model) {
+                        return $model->releaseBy->fullname;
+                    },
+                    'filter' => Html::activeDropDownList($searchModel, 'release_by', app\helpers\AppHelper ::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter']),
+                ],
+                'amount',
+                'note:ntext',
+                //'is_deleted',
+                //'created_at',
+                //'updated_at',
+                ['class' => 'yii\grid\ActionColumn'],
+            ],
+        ]);
+        ?>
+    </div>
 
-            'payment_release_id',
-            'release_invoice_number',
-            'fund_request_id',
-            'release_by',
-            'amount',
-            //'note:ntext',
-            //'is_deleted',
-            //'created_at',
-            //'updated_at',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
 </div>

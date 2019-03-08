@@ -9,12 +9,16 @@ $this->title = 'Create Payment Release';
 $this->params['breadcrumbs'][] = ['label' => 'Payment Releases', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="payment-release-create">
+<div class="box box-primary">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <div class="box-body">
 
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+        <?=
+        $this->render('_form', [
+            'model' => $model,
+        ])
+        ?>
+
+    </div>
 
 </div>

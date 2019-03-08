@@ -12,26 +12,37 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'release_invoice_number')->textInput(['maxlength' => true]) ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($model, 'release_invoice_number')->textInput(['maxlength' => true, 'readonly' => 'readonly']) ?>
+        </div>
+        <span class="clearfix"></span>
+        <div class="col-md-6">
+            <?=
+            $form->field($model, 'fund_request_id')->dropDownList(app\helpers\AppHelper::getApprovedFundRequest(), [
+                'prompt' => 'Please Select'
+            ])
+            ?>
 
-    <?= $form->field($model, 'fund_request_id')->textInput() ?>
-
-    <?= $form->field($model, 'release_by')->textInput() ?>
-
-    <?= $form->field($model, 'amount')->textInput() ?>
-
-    <?= $form->field($model, 'note')->textarea(['rows' => 6]) ?>
-
-    <?= $form->field($model, 'is_deleted')->textInput() ?>
-
-    <?= $form->field($model, 'created_at')->textInput() ?>
-
-    <?= $form->field($model, 'updated_at')->textInput() ?>
-
-    <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+            <?= $form->field($model, 'amount')->textInput() ?>
+        </div>
+        <div class="col-md-6">
+            <?=
+            $form->field($model, 'release_by')->dropDownList(app\helpers\AppHelper::getAllUsers(), [
+                'prompt' => 'Please Select'
+            ])
+            ?>
+        </div>
+        <span class="clearfix"></span>
+        <div class="col-md-6">
+        <?= $form->field($model, 'note')->textarea(['rows' => 6]) ?>
+        </div>
     </div>
 
-    <?php ActiveForm::end(); ?>
+    <div class="form-group">
+<?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+    </div>
+
+<?php ActiveForm::end(); ?>
 
 </div>

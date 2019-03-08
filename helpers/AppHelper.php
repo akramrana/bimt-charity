@@ -78,6 +78,20 @@ class AppHelper {
             return "FR-100001";
         }
     }
+    
+    static function getReleaseInvoiceNumber()
+    {
+        $order = \app\models\PaymentRelease::find()
+                ->select(['MAX(SUBSTRING(`release_invoice_number`,4)) AS release_invoice_number'])
+                ->asArray()
+                ->one();
+
+        if (!empty($order['release_invoice_number'])) {
+            return 'DI-'.($order['release_invoice_number'] + 1);
+        } else {
+            return "DI-100001";
+        }
+    }
 
     static function monthList() {
         return [
@@ -123,6 +137,23 @@ class AppHelper {
                 ->orderBy(['status_id' => SORT_ASC])
                 ->all();
         $list = \yii\helpers\ArrayHelper::map($model, 'status_id', 'name');
+        return $list;
+    }
+    
+    static function getApprovedFundRequest()
+    {
+        $query = \app\models\FundRequests::find();
+        $query->join('LEFT JOIN', '(
+                                        SELECT t1.*
+                                        FROM fund_request_status AS t1
+                                        LEFT OUTER JOIN fund_request_status AS t2 ON t1.fund_request_id = t2.fund_request_id 
+                                                AND (t1.created_at < t2.created_at 
+                                                 OR (t1.created_at = t2.created_at AND t1.fund_request_status_id < t2.fund_request_status_id))
+                                        WHERE t2.fund_request_id IS NULL
+                                        ) as temp', 'temp.fund_request_id = fund_requests.fund_request_id');
+        $query->andWhere(['temp.status_id' => 2,'is_active' => 1,'is_deleted' => 0]);
+        $model = $query->all();
+        $list = \yii\helpers\ArrayHelper::map($model, 'fund_request_id', 'fund_request_number');
         return $list;
     }
 }

@@ -47,6 +47,7 @@ class PaymentReleaseSearch extends PaymentRelease
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['payment_release_id' => SORT_DESC]],
         ]);
 
         $this->load($params);
@@ -63,7 +64,7 @@ class PaymentReleaseSearch extends PaymentRelease
             'fund_request_id' => $this->fund_request_id,
             'release_by' => $this->release_by,
             'amount' => $this->amount,
-            'is_deleted' => $this->is_deleted,
+            'is_deleted' => 0,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
