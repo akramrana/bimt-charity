@@ -36,8 +36,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'request_description:ntext',
                 'request_amount',
                 //'file',
-               [
-                    'label' => 'Status',
+                [
+                    'label' => 'Active Status',
                     'attribute' => 'is_active',
                     'format' => 'raw',
                     'value' => function ($model, $url) {
@@ -50,6 +50,19 @@ $this->params['breadcrumbs'][] = $this->title;
                                 . '<label class="onoffswitch-label" for="myonoffswitch' . $model->fund_request_id . '"></label></div>';
                     },
                     'filter' => Html::activeDropDownList($searchModel, 'is_active', [1 => 'Active', 0 => 'Inactive'], ['class' => 'form-control', 'prompt' => 'Filter']),
+                ],
+                [
+                    'label' => 'Approval Status',
+                    'attribute' => 'status_id',
+                    'format' => 'raw',
+                    'value' => function ($model, $url) {
+                        $fundStatus = \app\models\FundRequestStatus::find()
+                                ->where(['fund_request_id' => $model->fund_request_id])
+                                ->orderBy(['fund_request_status_id' => SORT_DESC])
+                                ->one();
+                        return $fundStatus->status->name;
+                    },
+                    'filter' => Html::activeDropDownList($searchModel, 'status_id', \app\helpers\AppHelper ::getStatusList(), ['class' => 'form-control', 'prompt' => 'Filter']),
                 ],
                 //'is_deleted',
                 //'created_at',

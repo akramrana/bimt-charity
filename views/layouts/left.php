@@ -15,7 +15,7 @@
                     ['label' => 'NAVIGATION', 'options' => ['class' => 'header']],
                     ['label' => 'Dashboard', 'icon' => 'dashboard', 'url' => ['site/index']],
                     ['label' => 'Invoices', 'icon' => 'fa fa-book', 'url' => ['monthly-invoice/index']],
-                    ['label' => 'Receive', 'icon' => 'fa fa-circle-o', 'url' => ['payment-received/index'],],
+                    ['label' => 'Receive', 'icon' => 'fa fa-plus', 'url' => ['payment-received/index'],],
                     ['label' => 'Fund Request', 'icon' => 'fa fa-pie-chart', 'url' => ['fund-request/index']],
                     ['label' => 'Donation', 'icon' => 'share', 'url' => ['payment-release/index']],
                     ['label' => 'Expenses', 'icon' => 'fa fa-money', 'url' => ['expense/index']],

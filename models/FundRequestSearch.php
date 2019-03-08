@@ -9,16 +9,17 @@ use app\models\FundRequests;
 /**
  * FundRequestSearch represents the model behind the search form of `app\models\FundRequests`.
  */
-class FundRequestSearch extends FundRequests
-{
+class FundRequestSearch extends FundRequests {
+
+    public $status_id;
+
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             [['fund_request_id', 'request_user_id', 'is_active', 'is_deleted'], 'integer'],
-            [['fund_request_number', 'request_description', 'file', 'created_at', 'updated_at', 'request_amount'], 'safe'],
+            [['fund_request_number', 'request_description', 'file', 'created_at', 'updated_at', 'request_amount', 'status_id'], 'safe'],
             [['request_amount'], 'number'],
         ];
     }
@@ -26,8 +27,7 @@ class FundRequestSearch extends FundRequests
     /**
      * {@inheritdoc}
      */
-    public function scenarios()
-    {
+    public function scenarios() {
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
@@ -39,9 +39,16 @@ class FundRequestSearch extends FundRequests
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
-    {
+    public function search($params) {
         $query = FundRequests::find();
+        $query->join('LEFT JOIN', '(
+                                        SELECT t1.*
+                                        FROM fund_request_status AS t1
+                                        LEFT OUTER JOIN fund_request_status AS t2 ON t1.fund_request_id = t2.fund_request_id 
+                                                AND (t1.created_at < t2.created_at 
+                                                 OR (t1.created_at = t2.created_at AND t1.fund_request_status_id < t2.fund_request_status_id))
+                                        WHERE t2.fund_request_id IS NULL
+                                        ) as temp', 'temp.fund_request_id = fund_requests.fund_request_id');
 
         // add conditions that should always apply here
 
@@ -67,12 +74,14 @@ class FundRequestSearch extends FundRequests
             'is_deleted' => 0,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'temp.status_id' => $this->status_id,
         ]);
 
         $query->andFilterWhere(['like', 'fund_request_number', $this->fund_request_number])
-            ->andFilterWhere(['like', 'request_description', $this->request_description])
-            ->andFilterWhere(['like', 'file', $this->file]);
+                ->andFilterWhere(['like', 'request_description', $this->request_description])
+                ->andFilterWhere(['like', 'file', $this->file]);
 
         return $dataProvider;
     }
+
 }
