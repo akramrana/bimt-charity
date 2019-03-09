@@ -98,6 +98,9 @@ class FundRequestController extends Controller {
         $model->created_at = date('Y-m-d H:i:s');
         $model->updated_at = date('Y-m-d H:i:s');
         $model->fund_request_number = \app\helpers\AppHelper::getFundRequestInvoiceNumber();
+        if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
+            $model->request_user_id = Yii::$app->user->identity->user_id;
+        }
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $frs = new \app\models\FundRequestStatus();
             $frs->fund_request_id = $model->fund_request_id;
