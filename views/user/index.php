@@ -9,6 +9,15 @@ use yii\grid\GridView;
 
 $this->title = 'Users';
 $this->params['breadcrumbs'][] = $this->title;
+$actionBtn = '{view}{update}{delete}';
+$allowActivate = true;
+if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
+    $actionBtn = '{view}{update}';
+}
+else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
+    $actionBtn = '{view}';
+    $allowActivate = false;
+}
 ?>
 <div class="box box-primary">
 
@@ -49,12 +58,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     'label' => 'Status',
                     'attribute' => 'is_active',
                     'format' => 'raw',
-                    'value' => function ($model, $url) {
+                    'value' => function ($model, $url) use ($allowActivate) {
                         return '<div class="onoffswitch">'
                                 . Html::checkbox('onoffswitch', $model->is_active, [
                                     'class' => "onoffswitch-checkbox",
                                     'id' => "myonoffswitch" . $model->user_id,
                                     'onclick' => 'app.changeStatus("user/activate",this,' . $model->user_id . ')',
+                                    'disabled' => ($allowActivate)?false:true,
                                 ])
                                 . '<label class="onoffswitch-label" for="myonoffswitch' . $model->user_id . '"></label></div>';
                     },
@@ -63,7 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 //'is_deleted',
                 //'created_at',
                 //'updated_at',
-                ['class' => 'yii\grid\ActionColumn'],
+                ['class' => 'yii\grid\ActionColumn','template' => $actionBtn],
             ],
         ]);
         ?>

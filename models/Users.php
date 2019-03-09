@@ -52,7 +52,7 @@ class Users extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fullname', 'email', 'phone', 'password', 'user_type', 'created_at', 'updated_at'], 'required'],
+            [['fullname', 'email', 'phone', 'password', 'user_type', 'created_at', 'updated_at', 'recurring_amount'], 'required'],
             [['address', 'user_type'], 'string'],
             [['enable_login', 'is_active', 'is_deleted'], 'integer'],
             [['recurring_amount'], 'number'],

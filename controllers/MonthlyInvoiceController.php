@@ -39,6 +39,21 @@ class MonthlyInvoiceController extends Controller {
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_SUPER_ADMIN,
+                            UserIdentity::ROLE_ADMIN,
+                        ]
+                    ],
+                    [
+                        'actions' => ['index', 'view', 'create', 'update'],
+                        'allow' => true,
+                        'roles' => [
+                            UserIdentity::ROLE_MODERATOR,
+                        ]
+                    ],
+                    [
+                        'actions' => ['index', 'view'],
+                        'allow' => true,
+                        'roles' => [
+                            UserIdentity::ROLE_GENERAL_USER,
                         ]
                     ],
                 ],

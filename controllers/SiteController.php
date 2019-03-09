@@ -37,6 +37,9 @@ class SiteController extends Controller
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_SUPER_ADMIN,
+                            UserIdentity::ROLE_ADMIN,
+                            UserIdentity::ROLE_MODERATOR,
+                            UserIdentity::ROLE_GENERAL_USER,
                         ]
                     ],
                 ],

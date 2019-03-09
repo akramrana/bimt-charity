@@ -9,6 +9,13 @@ use yii\grid\GridView;
 
 $this->title = 'Monthly Invoices';
 $this->params['breadcrumbs'][] = $this->title;
+$actionBtn = '{view}{update}{delete}';
+if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
+    $actionBtn = '{view}{update}';
+}
+else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
+    $actionBtn = '{view}';
+}
 ?>
 <div class="box box-primary">
 
@@ -48,7 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'filter' => Html::activeDropDownList($searchModel, 'is_paid', [1 => 'Yes', 0 => 'No'], ['class' => 'form-control', 'prompt' => 'Filter']),
                 ],
-                ['class' => 'yii\grid\ActionColumn'],
+                ['class' => 'yii\grid\ActionColumn','template' => $actionBtn],
             ],
         ]);
         ?>

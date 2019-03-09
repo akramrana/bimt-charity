@@ -36,7 +36,7 @@ use dosamigos\fileupload\FileUpload;
             <?= $form->field($model, 'password_hash')->passwordInput() ?>
             
             <?=
-            $form->field($model, 'user_type')->dropDownList(['S' => 'Super Admin', 'A' => 'Admin', 'M' => 'Moderator', 'G' => 'General',], [
+            $form->field($model, 'user_type')->dropDownList(app\helpers\AppHelper::getUserTypeList(), [
                 'prompt' => 'Please Select'
             ])
             ?>

@@ -33,13 +33,28 @@ class FundRequestController extends Controller {
                 'ruleConfig' => [
                     'class' => AccessRule::className(),
                 ],
-                'only' => ['index', 'view', 'create', 'update', 'delete', 'activate'],
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'activate', 'add-status'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'view', 'create', 'update', 'delete', 'activate'],
+                        'actions' => ['index', 'view', 'create', 'update', 'delete', 'activate', 'add-status'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_SUPER_ADMIN,
+                            UserIdentity::ROLE_ADMIN,
+                        ]
+                    ],
+                    [
+                        'actions' => ['index', 'view', 'create', 'update', 'activate'],
+                        'allow' => true,
+                        'roles' => [
+                            UserIdentity::ROLE_MODERATOR,
+                        ]
+                    ],
+                    [
+                        'actions' => ['index', 'view', 'create'],
+                        'allow' => true,
+                        'roles' => [
+                            UserIdentity::ROLE_GENERAL_USER,
                         ]
                     ],
                 ],

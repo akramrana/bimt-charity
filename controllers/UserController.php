@@ -40,6 +40,21 @@ class UserController extends Controller {
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_SUPER_ADMIN,
+                            UserIdentity::ROLE_ADMIN,
+                        ]
+                    ],
+                    [
+                        'actions' => ['index', 'view', 'create', 'activate'],
+                        'allow' => true,
+                        'roles' => [
+                            UserIdentity::ROLE_MODERATOR,
+                        ]
+                    ],
+                    [
+                        'actions' => ['index', 'view'],
+                        'allow' => true,
+                        'roles' => [
+                            UserIdentity::ROLE_GENERAL_USER,
                         ]
                     ],
                 ],
@@ -84,6 +99,7 @@ class UserController extends Controller {
         $model->created_at = date('Y-m-d H:i:s');
         $model->updated_at = date('Y-m-d H:i:s');
         $model->enable_login = 1;
+        $model->recurring_amount = 500;
         if ($model->load(Yii::$app->request->post())) {
             $request = Yii::$app->request->bodyParams;
             $password = $request['Users']['password_hash'];

@@ -13,21 +13,38 @@ $this->title = $model->fund_request_number;
 $this->params['breadcrumbs'][] = ['label' => 'Fund Requests', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
+
+$allowUpdate = false;
+$allowDelete = false;
+$allowStatusChange = false;
+if (\Yii::$app->session['__bimtCharityUserRole'] == 1) {
+    $allowUpdate = true;
+    $allowDelete = true;
+    $allowStatusChange = true;
+}
+else if (\Yii::$app->session['__bimtCharityUserRole'] == 2) {
+    $allowUpdate = true;
+    $allowDelete = true;
+    $allowStatusChange = true;
+}
+else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
+    $allowUpdate = true;
+}
 ?>
 <div class="box box-primary">
 
     <div class="box-body">
 
         <p>
-            <?= Html::a('Update', ['update', 'id' => $model->fund_request_id], ['class' => 'btn btn-primary']) ?>
+            <?= ($allowUpdate)?Html::a('Update', ['update', 'id' => $model->fund_request_id], ['class' => 'btn btn-primary']):"" ?>
             <?=
-            Html::a('Delete', ['delete', 'id' => $model->fund_request_id], [
+            ($allowDelete)?Html::a('Delete', ['delete', 'id' => $model->fund_request_id], [
                 'class' => 'btn btn-danger',
                 'data' => [
                     'confirm' => 'Are you sure you want to delete this item?',
                     'method' => 'post',
                 ],
-            ])
+            ]):""
             ?>
         </p>
 
@@ -101,7 +118,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ->where(['fund_request_id' => $model->fund_request_id])
                         ->orderBy(['fund_request_status_id' => SORT_DESC])
                         ->one();
-                if ($fundStatus->status_id != 2 && $fundStatus->status_id != 3) {
+                if ($allowStatusChange && ($fundStatus->status_id != 2 && $fundStatus->status_id != 3)) {
                     ?>
                     <div id="response"></div>
                     <b>Add Status</b>
