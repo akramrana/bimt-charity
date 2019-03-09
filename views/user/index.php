@@ -11,12 +11,14 @@ $this->title = 'Users';
 $this->params['breadcrumbs'][] = $this->title;
 $actionBtn = '{view}{update}{delete}';
 $allowActivate = true;
+$allowCreate = true;
 if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     $actionBtn = '{view}{update}';
 }
 else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     $actionBtn = '{view}';
     $allowActivate = false;
+    $allowCreate = false;
 }
 ?>
 <div class="box box-primary">
@@ -25,7 +27,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
         <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
         <p>
-            <?= Html::a('Create Users', ['create'], ['class' => 'btn btn-success']) ?>
+            <?= ($allowCreate)?Html::a('Create Users', ['create'], ['class' => 'btn btn-success']):"" ?>
         </p>
 
         <?=

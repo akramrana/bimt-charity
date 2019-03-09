@@ -9,12 +9,14 @@ use yii\grid\GridView;
 
 $this->title = 'Payment Received';
 $this->params['breadcrumbs'][] = $this->title;
+$allowCreate = true;
 $actionBtn = '{view}{update}{delete}';
 if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     $actionBtn = '{view}{update}';
 }
 else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     $actionBtn = '{view}';
+    $allowCreate = false;
 }
 ?>
 <div class="box box-primary">
@@ -22,7 +24,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     <div class="box-body">
 
         <p>
-            <?= Html::a('Create Payment Received', ['create'], ['class' => 'btn btn-success']) ?>
+            <?= ($allowCreate)?Html::a('Create Payment Received', ['create'], ['class' => 'btn btn-success']):"" ?>
         </p>
 
         <?=

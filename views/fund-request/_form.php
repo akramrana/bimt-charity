@@ -17,10 +17,12 @@ use dosamigos\fileupload\FileUpload;
         <div class="col-md-6">
             <?= $form->field($model, 'fund_request_number')->textInput(['maxlength' => true, 'readonly' => 'readonly']) ?>
 
-            <?=
-            $form->field($model, 'request_user_id')->dropDownList(app\helpers\AppHelper::getAllUsers(), [
-                'prompt' => 'Please Select'
-            ])
+            <?php
+            if (\Yii::$app->session['__bimtCharityUserRole'] != 4) {
+                echo $form->field($model, 'request_user_id')->dropDownList(app\helpers\AppHelper::getAllUsers(), [
+                    'prompt' => 'Please Select'
+                ]);
+            }
             ?>
         </div>
         <span class="clearfix"></span>
