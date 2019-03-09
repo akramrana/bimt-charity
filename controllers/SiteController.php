@@ -12,20 +12,19 @@ use app\models\ContactForm;
 use app\components\UserIdentity;
 use app\components\AccessRule;
 
-class SiteController extends Controller
-{
+class SiteController extends Controller {
+
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'access' => [
                 'class' => AccessControl::className(),
                 'ruleConfig' => [
                     'class' => AccessRule::className(),
                 ],
-                'only' => ['logout','index'],
+                'only' => ['logout', 'index'],
                 'rules' => [
                     [
                         'actions' => ['logout'],
@@ -33,7 +32,7 @@ class SiteController extends Controller
                         'roles' => ['@'],
                     ],
                     [
-                        'actions' => ['index'],
+                        'actions' => ['index', 'edit-profile'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_SUPER_ADMIN,
@@ -56,8 +55,7 @@ class SiteController extends Controller
     /**
      * {@inheritdoc}
      */
-    public function actions()
-    {
+    public function actions() {
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
@@ -74,9 +72,34 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionIndex()
-    {
+    public function actionIndex() {
         return $this->render('index');
+    }
+
+    public function actionEditProfile() {
+        $model = \app\models\Users::find()
+                ->where(['is_deleted' => 0, 'is_active' => 1, 'user_id' => Yii::$app->user->identity->user_id])
+                ->one();
+        if ($model->load(Yii::$app->request->post())) {
+            $request = Yii::$app->request->bodyParams;
+            if (!empty($request['Users']['confirm_password'])) {
+                $password = $request['Users']['confirm_password'];
+                $model->password = Yii::$app->security->generatePasswordHash($password);
+            }
+            if ($model->save()) {
+                $msg = 'Profile of ' . $model->fullname . ' has been updated by ' . Yii::$app->user->identity->fullname;
+                \app\helpers\AppHelper::addActivity("US", $model->user_id, $msg);
+                Yii::$app->session->setFlash('success', 'Profile successfully updated');
+                return $this->redirect(['edit-profile']);
+            } else {
+                return $this->render('edit-profile', [
+                            'model' => $model
+                ]);
+            }
+        }
+        return $this->render('edit-profile', [
+                    'model' => $model
+        ]);
     }
 
     /**
@@ -84,8 +107,7 @@ class SiteController extends Controller
      *
      * @return Response|string
      */
-    public function actionLogin()
-    {
+    public function actionLogin() {
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
@@ -97,7 +119,7 @@ class SiteController extends Controller
 
         $model->password = '';
         return $this->render('login', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -106,8 +128,7 @@ class SiteController extends Controller
      *
      * @return Response
      */
-    public function actionLogout()
-    {
+    public function actionLogout() {
         Yii::$app->user->logout();
 
         return $this->goHome();
@@ -118,8 +139,7 @@ class SiteController extends Controller
      *
      * @return Response|string
      */
-    public function actionContact()
-    {
+    public function actionContact() {
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
             Yii::$app->session->setFlash('contactFormSubmitted');
@@ -127,7 +147,7 @@ class SiteController extends Controller
             return $this->refresh();
         }
         return $this->render('contact', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
@@ -136,8 +156,8 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionAbout()
-    {
+    public function actionAbout() {
         return $this->render('about');
     }
+
 }

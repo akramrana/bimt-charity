@@ -132,11 +132,22 @@ class UserController extends Controller {
      */
     public function actionUpdate($id) {
         $model = $this->findModel($id);
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $msg = 'Profile of ' . $model->fullname . ' has been updated by ' . Yii::$app->user->identity->fullname;
-            \app\helpers\AppHelper::addActivity("US", $model->user_id, $msg);
-            Yii::$app->session->setFlash('success', 'User successfully updated');
-            return $this->redirect(['view', 'id' => $model->user_id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $request = Yii::$app->request->bodyParams;
+            if (!empty($request['Users']['confirm_password'])) {
+                $password = $request['Users']['confirm_password'];
+                $model->password = Yii::$app->security->generatePasswordHash($password);
+            }
+            if ($model->save()) {
+                $msg = 'Profile of ' . $model->fullname . ' has been updated by ' . Yii::$app->user->identity->fullname;
+                \app\helpers\AppHelper::addActivity("US", $model->user_id, $msg);
+                Yii::$app->session->setFlash('success', 'User successfully updated');
+                return $this->redirect(['view', 'id' => $model->user_id]);
+            } else {
+                return $this->render('update', [
+                            'model' => $model,
+                ]);
+            }
         }
 
         return $this->render('update', [
@@ -164,17 +175,16 @@ class UserController extends Controller {
     public function actionActivate($id) {
         $model = $this->findModel($id);
 
-        if ($model->is_active == 0){
+        if ($model->is_active == 0) {
             $model->is_active = 1;
             $approvalText = 'activated';
-        }
-        else{
+        } else {
             $model->is_active = 0;
             $approvalText = 'deactivated';
         }
 
         if ($model->validate() && $model->save()) {
-            $msg = 'Profile of ' .$model->fullname . ' '.$approvalText.' by ' . Yii::$app->user->identity->fullname;
+            $msg = 'Profile of ' . $model->fullname . ' ' . $approvalText . ' by ' . Yii::$app->user->identity->fullname;
             \app\helpers\AppHelper::addActivity("US", $model->user_id, $msg);
             return '1';
         } else {
