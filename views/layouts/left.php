@@ -4,7 +4,7 @@
         <div class="user-panel" style="height: 60px;">
             <div class="pull-left info" style="left: 0px;">
                 <p><?=Yii::$app->user->identity->fullname;?></p>
-                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+                <a href="<?php echo \yii\helpers\Url::to(['site/edit-profile']) ?>"><i class="fa fa-circle text-success"></i> Online</a>
             </div>
         </div>
 
