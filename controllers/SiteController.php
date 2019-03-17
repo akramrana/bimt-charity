@@ -73,7 +73,98 @@ class SiteController extends Controller {
      * @return string
      */
     public function actionIndex() {
-        return $this->render('index');
+        $monthStart = date("Y-m-d", strtotime('first day of this month'));
+        $monthEnd = date("Y-m-d", strtotime("last day of this month"));
+
+        $users = \app\models\Users::find()
+                ->where(['is_deleted' => 0])
+                ->count();
+        $monthlyInvoice = \app\models\MonthlyInvoice::find()
+                ->select(['SUM(amount) as amount', 'COUNT(monthly_invoice_id) as invoice_count'])
+                ->where(['is_deleted' => 0])
+                ->andWhere(['BETWEEN', 'DATE(created_at)', $monthStart, $monthEnd])
+                ->asArray()
+                ->one();
+        $payment_received = \app\models\PaymentReceived::find()
+                ->select(['SUM(amount) as amount', 'COUNT(payment_received_id) as receive_count'])
+                ->where(['is_deleted' => 0])
+                ->andWhere(['BETWEEN', 'DATE(created_at)', $monthStart, $monthEnd])
+                ->asArray()
+                ->one();
+        $payment_release = \app\models\PaymentRelease::find()
+                ->select(['SUM(amount) as amount', 'COUNT(payment_release_id) as release_count'])
+                ->where(['is_deleted' => 0])
+                ->andWhere(['BETWEEN', 'DATE(created_at)', $monthStart, $monthEnd])
+                ->asArray()
+                ->one();
+        $expenses = \app\models\Expenses::find()
+                ->select(['SUM(amount) as amount', 'COUNT(expense_id) as expense_count'])
+                ->where(['is_deleted' => 0])
+                ->andWhere(['BETWEEN', 'DATE(created_at)', $monthStart, $monthEnd])
+                ->asArray()
+                ->one();
+        $fund_request = \app\models\FundRequests::find()
+                ->select(['SUM(request_amount) as amount', 'COUNT(fund_request_id) as fund_request_count'])
+                ->where(['is_deleted' => 0])
+                ->andWhere(['BETWEEN', 'DATE(created_at)', $monthStart, $monthEnd])
+                ->asArray()
+                ->one();
+
+        $status = \app\models\Status::find()
+                ->where(['is_deleted' => 0])
+                ->all();
+        $stats = [];
+        foreach ($status as $sts) {
+            $fund_stat_query = \app\models\FundRequests::find()
+                    ->select([
+                        'SUM(request_amount) as amount',
+                        'COUNT(fund_requests.fund_request_id) as fund_request_count',
+                        'temp.status_id',
+                        'status.name',
+                    ])
+                    ->join('LEFT JOIN', '(
+                                        SELECT t1.*
+                                        FROM fund_request_status AS t1
+                                        LEFT OUTER JOIN fund_request_status AS t2 ON t1.fund_request_id = t2.fund_request_id 
+                                                AND (t1.created_at < t2.created_at 
+                                                 OR (t1.created_at = t2.created_at AND t1.fund_request_status_id < t2.fund_request_status_id))
+                                        WHERE t2.fund_request_id IS NULL
+                                        ) as temp', 'temp.fund_request_id = fund_requests.fund_request_id')
+                    ->join('LEFT JOIN', 'status', 'temp.status_id = status.status_id')
+                    ->where(['fund_requests.is_deleted' => 0,'temp.status_id' => $sts->status_id])
+                    ->groupBy('status_id');
+            $fund_stats = $fund_stat_query->asArray()->one();
+            
+            $d = [
+                'name' => $sts->name,
+                'amount' => !empty($fund_stats['amount'])?$fund_stats['amount']:"0",
+                'fund_request_count' => !empty($fund_stats['fund_request_count'])?$fund_stats['fund_request_count']:"0",
+            ];
+            
+            array_push($stats, $d);
+        }
+        
+        $login_history = \app\models\LoginHistory::find()
+                ->limit(10)
+                ->orderBy(['login_history_id' => SORT_DESC])
+                ->all();
+        
+        $activity_log = \app\models\Notifications::find()
+                ->limit(10)
+                ->where(['is_deleted' => 0])
+                ->orderBy(['notification_id' => SORT_DESC])
+                ->all();
+        return $this->render('index', [
+                    'users' => $users,
+                    'monthlyInvoice' => $monthlyInvoice,
+                    'payment_received' => $payment_received,
+                    'payment_release' => $payment_release,
+                    'expenses' => $expenses,
+                    'fund_request' => $fund_request,
+                    'stats' => $stats,
+                    'login_history' => $login_history,
+                    'activity_log' => $activity_log,
+        ]);
     }
 
     public function actionEditProfile() {
