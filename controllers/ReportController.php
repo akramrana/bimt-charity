@@ -62,16 +62,19 @@ class ReportController extends Controller {
         $incoming = 0;
         $outgoing = 0;
         $users = [];
+        $expenses = 0;
         if ($instalment_month != "" && $instalment_year != "") {
             $paymentReceived = \app\models\PaymentReceived::find()
                     ->where(['instalment_month' => $instalment_month, 'instalment_year' => $instalment_year])
                     ->andWhere(['is_deleted' => 0])
                     ->groupBy('donated_by')
                     ->count();
+            
             $incoming = \app\models\PaymentReceived::find()
                     ->select('SUM(amount) as amount')
                     ->where(['instalment_month' => $instalment_month, 'instalment_year' => $instalment_year])
                     ->andWhere(['is_deleted' => 0])
+                    ->asArray()
                     ->one();
 
             $monthStart = date("Y-m-d", strtotime('first day of ' . $instalment_month. ' '.$instalment_year));
@@ -81,6 +84,7 @@ class ReportController extends Controller {
                     ->select('SUM(amount) as amount')
                     ->where(['BETWEEN','DATE(created_at)',$monthStart,$monthEnd])
                     ->andWhere(['is_deleted' => 0])
+                    ->asArray()
                     ->one();
             
             $users = \app\models\Users::find()
@@ -88,6 +92,13 @@ class ReportController extends Controller {
                     ->andWhere(['BETWEEN','DATE(created_at)',$monthStart,$monthEnd])
                     ->asArray()
                     ->all();
+            
+            $expenses = \app\models\Expenses::find()
+                    ->select('SUM(amount) as amount')
+                    ->where(['is_deleted' => 0])
+                    ->andWhere(['BETWEEN','DATE(created_at)',$monthStart,$monthEnd])
+                    ->asArray()
+                    ->one();
         }
 
         return $this->render('index', [
@@ -96,6 +107,7 @@ class ReportController extends Controller {
                     'incoming' => $incoming,
                     'outgoing' => $outgoing,
                     'users' => $users,
+                    'expenses' => $expenses,
         ]);
     }
 

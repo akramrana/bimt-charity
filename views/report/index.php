@@ -63,7 +63,7 @@ if (!empty($get)) {
             <table class="table table-bordered table-striped">
                 <tr>
                     <th>
-                        Type
+                        Description
                     </th>
                     <th>
                         Amount
@@ -75,6 +75,26 @@ if (!empty($get)) {
                     </td>
                     <td>
                         <b><?= $incoming['amount']; ?> BDT</b>
+                    </td>
+                </tr>
+            </table>
+            <hr/>
+            <h4>Expense Overview</h4>
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <th>
+                        Description
+                    </th>
+                    <th>
+                        Amount
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        Expense Amount <sup>Outside of donation</sup>
+                    </td>
+                    <td>
+                        <b><?= $expenses['amount']; ?> BDT</b>
                     </td>
                 </tr>
             </table>
@@ -119,10 +139,18 @@ if (!empty($get)) {
                 </tr>
                 <tr>
                     <td>
+                        Total Expenses <sup>Outside of donation</sup>
+                    </td>
+                    <td>
+                        <b>-<?= $expenses['amount']; ?> BDT</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         Total Outgoing
                     </td>
                     <td>
-                        <b><?= $outgoing['amount']; ?> BDT</b>
+                        <b>-<?= $outgoing['amount']; ?> BDT</b>
                     </td>
                 </tr>
                 <tr>
@@ -130,7 +158,7 @@ if (!empty($get)) {
                         Total Balance
                     </th>
                     <td>
-                        <b><?= ($incoming['amount'] - $outgoing['amount']); ?> BDT</b>
+                        <b><?= ($incoming['amount'] - $expenses['amount'] - $outgoing['amount']); ?> BDT</b>
                     </td>
                 </tr>
             </table>
@@ -154,13 +182,13 @@ if (!empty($get)) {
                         ?>
                         <tr>
                             <td>
-                                <?=$user['fullname']?>
+                                <?= $user['fullname'] ?>
                             </td>
                             <td>
-                                <?=$user['phone']?>
+                                <?= $user['phone'] ?>
                             </td>
                             <td>
-                                <?=date('d.m.Y',strtotime($user['created_at']));?>
+                                <?= date('d.m.Y', strtotime($user['created_at'])); ?>
                             </td>
                         </tr>
                         <?php
