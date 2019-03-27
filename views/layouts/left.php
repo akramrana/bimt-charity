@@ -21,6 +21,7 @@
                     ['label' => 'Expenses', 'icon' => 'fa fa-money', 'url' => ['expense/index']],
                     ['label' => 'Members', 'icon' => 'fa fa-users', 'url' => ['user/index']],
                     ['label' => 'Activity Log', 'icon' => 'fa fa-bell', 'url' => ['notification/index']],
+                    ['label' => 'Report', 'icon' => 'fa fa-bar-chart', 'url' => ['report/index']],
                 ],
             ]
         ) ?>
