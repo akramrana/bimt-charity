@@ -171,6 +171,20 @@ class PaymentReceivedController extends Controller {
         Yii::$app->session->setFlash('success', 'Payment Received invoice successfully deleted');
         return $this->redirect(['index']);
     }
+    
+    public function actionSendMail($id)
+    {
+        $model = $this->findModel($id);
+        Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
+                    'model' => $model,
+                ])
+                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                ->setTo($model->donatedBy->email)
+                ->setSubject("Confirmation of your BCF contribution (Invoice#".$model->received_invoice_number.")")
+                ->send();
+        Yii::$app->session->setFlash('success', 'Invoice successfully sent');
+        return $this->redirect(['index']);
+    }
 
     /**
      * Finds the PaymentReceived model based on its primary key value.

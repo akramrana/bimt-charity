@@ -11,6 +11,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use app\components\UserIdentity;
 use app\components\AccessRule;
+
 /**
  * MonthlyInvoiceController implements the CRUD actions for MonthlyInvoice model.
  */
@@ -32,10 +33,10 @@ class MonthlyInvoiceController extends Controller {
                 'ruleConfig' => [
                     'class' => AccessRule::className(),
                 ],
-                'only' => ['index', 'view', 'create', 'update', 'delete'],
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'send-mail'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'view', 'create', 'update', 'delete'],
+                        'actions' => ['index', 'view', 'create', 'update', 'delete', 'send-mail'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_SUPER_ADMIN,
@@ -43,7 +44,7 @@ class MonthlyInvoiceController extends Controller {
                         ]
                     ],
                     [
-                        'actions' => ['index', 'view', 'create', 'update'],
+                        'actions' => ['index', 'view', 'create', 'update', 'send-mail'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_MODERATOR,
@@ -144,6 +145,19 @@ class MonthlyInvoiceController extends Controller {
         $msg = 'Invoice#' . $model->monthly_invoice_number . ' has been deleted by ' . Yii::$app->user->identity->fullname;
         \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
         Yii::$app->session->setFlash('success', 'Invoice successfully deleted');
+        return $this->redirect(['index']);
+    }
+
+    public function actionSendMail($id) {
+        $model = $this->findModel($id);
+        Yii::$app->mailer->compose('@app/mail/invoice-mail', [
+                    'model' => $model,
+                ])
+                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                ->setTo($model->receiver->email)
+                ->setSubject("Your Sadakah for ".$model->instalment_month." ".$model->instalment_year.'(Invoice#'.$model->monthly_invoice_number.')')
+                ->send();
+        Yii::$app->session->setFlash('success', 'Invoice successfully sent');
         return $this->redirect(['index']);
     }
 

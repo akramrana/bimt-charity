@@ -13,16 +13,20 @@ $this->params['breadcrumbs'][] = $this->title;
 
 $allowUpdate = false;
 $allowDelete = false;
+$allowSendMail = false;
 if (\Yii::$app->session['__bimtCharityUserRole'] == 1) {
     $allowUpdate = true;
     $allowDelete = true;
+    $allowSendMail = true;
 }
 else if (\Yii::$app->session['__bimtCharityUserRole'] == 2) {
     $allowUpdate = true;
     $allowDelete = true;
+    $allowSendMail = true;
 }
 else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     $allowUpdate = true;
+    $allowSendMail = true;
 }
 ?>
 <div class="box box-primary">
@@ -40,6 +44,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                 ],
             ]):""
             ?>
+            <?= ($allowSendMail)?Html::a('Send Mail', ['send-mail', 'id' => $model->monthly_invoice_id], ['class' => 'btn btn-info pull-right']):"" ?>
         </p>
 
         <?=
