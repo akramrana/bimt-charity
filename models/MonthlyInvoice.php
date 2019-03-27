@@ -41,7 +41,7 @@ class MonthlyInvoice extends \yii\db\ActiveRecord
             [['receiver_id', 'is_paid', 'is_deleted'], 'integer'],
             [['amount'], 'number'],
             [['created_at', 'updated_at'], 'safe'],
-            [['monthly_invoice_number', 'instalment_month', 'instalment_year'], 'string', 'max' => 50],
+            [['instalment_month', 'instalment_year'], 'string', 'max' => 50],
             [['monthly_invoice_number'], 'unique'],
             [['receiver_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['receiver_id' => 'user_id']],
         ];

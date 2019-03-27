@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model app\models\Users */
 
 $this->title = $model->fullname;
-$this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Members', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 $allowUpdate = false;

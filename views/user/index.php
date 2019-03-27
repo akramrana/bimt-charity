@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Users';
+$this->title = 'Members';
 $this->params['breadcrumbs'][] = $this->title;
 $actionBtn = '{view}{update}{delete}';
 $allowActivate = true;
@@ -27,7 +27,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
         <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
         <p>
-            <?= ($allowCreate)?Html::a('Create Users', ['create'], ['class' => 'btn btn-success']):"" ?>
+            <?= ($allowCreate)?Html::a('Create Members', ['create'], ['class' => 'btn btn-success']):"" ?>
         </p>
 
         <?=

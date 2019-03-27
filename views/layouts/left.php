@@ -19,7 +19,7 @@
                     ['label' => 'Fund Request', 'icon' => 'fa fa-pie-chart', 'url' => ['fund-request/index']],
                     ['label' => 'Donation', 'icon' => 'share', 'url' => ['payment-release/index']],
                     ['label' => 'Expenses', 'icon' => 'fa fa-money', 'url' => ['expense/index']],
-                    ['label' => 'Users', 'icon' => 'fa fa-users', 'url' => ['user/index']],
+                    ['label' => 'Members', 'icon' => 'fa fa-users', 'url' => ['user/index']],
                     ['label' => 'Activity Log', 'icon' => 'fa fa-bell', 'url' => ['notification/index']],
                 ],
             ]

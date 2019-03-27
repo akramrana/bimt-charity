@@ -32,10 +32,10 @@ class PaymentReceivedController extends Controller {
                 'ruleConfig' => [
                     'class' => AccessRule::className(),
                 ],
-                'only' => ['index', 'view', 'create', 'update', 'delete'],
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'send-mail'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'view', 'create', 'update', 'delete'],
+                        'actions' => ['index', 'view', 'create', 'update', 'delete', 'send-mail'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_SUPER_ADMIN,
@@ -43,7 +43,7 @@ class PaymentReceivedController extends Controller {
                         ]
                     ],
                     [
-                        'actions' => ['index', 'view', 'create', 'update'],
+                        'actions' => ['index', 'view', 'create', 'update', 'send-mail'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_MODERATOR,

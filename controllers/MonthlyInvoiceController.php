@@ -33,10 +33,10 @@ class MonthlyInvoiceController extends Controller {
                 'ruleConfig' => [
                     'class' => AccessRule::className(),
                 ],
-                'only' => ['index', 'view', 'create', 'update', 'delete', 'send-mail'],
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'send-mail', 'generate'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'view', 'create', 'update', 'delete', 'send-mail'],
+                        'actions' => ['index', 'view', 'create', 'update', 'delete', 'send-mail', 'generate'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_SUPER_ADMIN,
@@ -44,7 +44,7 @@ class MonthlyInvoiceController extends Controller {
                         ]
                     ],
                     [
-                        'actions' => ['index', 'view', 'create', 'update', 'send-mail'],
+                        'actions' => ['index', 'view', 'create', 'update', 'send-mail', 'generate'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_MODERATOR,
@@ -155,9 +155,53 @@ class MonthlyInvoiceController extends Controller {
                 ])
                 ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
                 ->setTo($model->receiver->email)
-                ->setSubject("Your Sadakah for ".$model->instalment_month." ".$model->instalment_year.'(Invoice#'.$model->monthly_invoice_number.')')
+                ->setSubject("Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')')
                 ->send();
         Yii::$app->session->setFlash('success', 'Invoice successfully sent');
+        return $this->redirect(['index']);
+    }
+
+    public function actionGenerate() {
+        $users = \app\models\Users::find()
+                ->where(['is_deleted' => 0, 'is_active' => 1])
+                ->all();
+        $proccessed = 0;
+        if (!empty($users)) {
+            foreach ($users as $user) {
+                $model = MonthlyInvoice::find()
+                        ->where(['receiver_id' => $user->user_id, 'instalment_month' => date('F'), 'instalment_year' => date('Y')])
+                        ->one();
+                if (empty($model)) {
+                    $model = new MonthlyInvoice();
+                    $model->created_at = date('Y-m-d H:i:s');
+                    $model->updated_at = date('Y-m-d H:i:s');
+                    $model->monthly_invoice_number = \app\helpers\AppHelper::getNextMonthlyInvoiceNumber();
+                    $model->receiver_id = $user->user_id;
+                    $model->amount = $user->recurring_amount;
+                    $model->instalment_month = date('F');
+                    $model->instalment_year = date('Y');
+                    $model->is_paid = 0;
+                    $model->is_deleted = 0;
+                    if ($model->save()) {
+                        $proccessed = 1;
+                        Yii::$app->mailer->compose('@app/mail/invoice-mail', [
+                                    'model' => $model,
+                                ])
+                                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                                ->setTo($model->receiver->email)
+                                ->setSubject("Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')')
+                                ->send();
+                    } else {
+                        die(json_encode($model->errors));
+                    }
+                }
+            }
+        }
+        if ($proccessed == 1) {
+            Yii::$app->session->setFlash('success', 'Invoice successfully generated');
+        }else{
+            Yii::$app->session->setFlash('warning', 'No invoice generated');
+        }
         return $this->redirect(['index']);
     }
 

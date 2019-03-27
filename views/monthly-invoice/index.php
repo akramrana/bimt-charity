@@ -11,12 +11,14 @@ $this->title = 'Monthly Invoices';
 $this->params['breadcrumbs'][] = $this->title;
 $actionBtn = '{view}{update}{delete}';
 $allowCreate = true;
+$allowGenerate = true;
 if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     $actionBtn = '{view}{update}';
 }
 else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     $actionBtn = '{view}';
     $allowCreate = false;
+    $allowGenerate = false;
 }
 ?>
 <div class="box box-primary">
@@ -25,6 +27,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
 
         <p>
             <?= ($allowCreate)?Html::a('Create Monthly Invoice', ['create'], ['class' => 'btn btn-success']):"" ?>
+            <?= ($allowGenerate)?Html::a('Generate Monthly Invoice', ['generate'], ['class' => 'btn btn-info pull-right']):"" ?>
         </p>
 
         <?=
