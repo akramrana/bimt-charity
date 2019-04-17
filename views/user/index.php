@@ -14,8 +14,7 @@ $allowActivate = true;
 $allowCreate = true;
 if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     $actionBtn = '{view}{update}';
-}
-else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
+} else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     $actionBtn = '{view}';
     $allowActivate = false;
     $allowCreate = false;
@@ -24,10 +23,10 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
 <div class="box box-primary">
 
     <div class="box-body">
-        <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+        <?php // echo $this->render('_search', ['model' => $searchModel]);  ?>
 
         <p>
-            <?= ($allowCreate)?Html::a('Create Members', ['create'], ['class' => 'btn btn-success']):"" ?>
+            <?= ($allowCreate) ? Html::a('Create Members', ['create'], ['class' => 'btn btn-success']) : "" ?>
         </p>
 
         <?=
@@ -56,6 +55,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
                 //'password',
                 //'user_type',
                 'recurring_amount',
+                'currency.code',
                 [
                     'label' => 'Status',
                     'attribute' => 'is_active',
@@ -66,7 +66,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
                                     'class' => "onoffswitch-checkbox",
                                     'id' => "myonoffswitch" . $model->user_id,
                                     'onclick' => 'app.changeStatus("user/activate",this,' . $model->user_id . ')',
-                                    'disabled' => ($allowActivate)?false:true,
+                                    'disabled' => ($allowActivate) ? false : true,
                                 ])
                                 . '<label class="onoffswitch-label" for="myonoffswitch' . $model->user_id . '"></label></div>';
                     },
@@ -75,7 +75,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
                 //'is_deleted',
                 //'created_at',
                 //'updated_at',
-                ['class' => 'yii\grid\ActionColumn','template' => $actionBtn],
+                ['class' => 'yii\grid\ActionColumn', 'template' => $actionBtn],
             ],
         ]);
         ?>
