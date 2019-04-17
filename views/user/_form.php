@@ -42,6 +42,12 @@ use dosamigos\fileupload\FileUpload;
             ?>
             
             
+            <?=
+            $form->field($model, 'currency_id')->dropDownList(app\helpers\AppHelper::getAllCurrency(), [
+                'prompt' => 'Please Select'
+            ])
+            ?>
+            
             <label>
                 Image
             </label>

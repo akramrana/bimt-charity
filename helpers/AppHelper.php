@@ -167,5 +167,12 @@ class AppHelper {
         }
         return $type;
     }
+    
+    static function getAllCurrency()
+    {
+        $model = \app\models\Currencies::find()->all();
+        $list = \yii\helpers\ArrayHelper::map($model, 'currency_id', 'code');
+        return $list;
+    }
 
 }

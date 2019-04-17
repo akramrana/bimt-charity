@@ -56,7 +56,7 @@ class Users extends \yii\db\ActiveRecord
             [['address', 'user_type'], 'string'],
             [['enable_login', 'is_active', 'is_deleted'], 'integer'],
             [['recurring_amount'], 'number'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at', 'currency_id'], 'safe'],
             [['fullname', 'email', 'phone', 'alt_phone', 'batch', 'department'], 'string', 'max' => 50],
             [['image'], 'string', 'max' => 250],
             ['email', 'email'],
@@ -92,6 +92,7 @@ class Users extends \yii\db\ActiveRecord
             'is_deleted' => 'Is Deleted',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'currency_id' => 'Currency',
         ];
     }
 
@@ -157,6 +158,14 @@ class Users extends \yii\db\ActiveRecord
     public function getPaymentReleases()
     {
         return $this->hasMany(PaymentRelease::className(), ['release_by' => 'user_id']);
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currencies::className(), ['currency_id' => 'currency_id']);
     }
     
     public function checkUniqueEmail($attribute, $params) {

@@ -100,6 +100,8 @@ class UserController extends Controller {
         $model->updated_at = date('Y-m-d H:i:s');
         $model->enable_login = 1;
         $model->recurring_amount = 500;
+        $model->currency_id = 13;
+        
         if ($model->load(Yii::$app->request->post())) {
             $request = Yii::$app->request->bodyParams;
             $password = $request['Users']['password_hash'];
