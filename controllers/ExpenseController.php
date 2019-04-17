@@ -100,7 +100,7 @@ class ExpenseController extends Controller {
         $model->user_id = Yii::$app->user->identity->user_id;
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', 'Expense successfully added');
-            $msg = 'Expense amount '.$model->amount . ' Tk added by ' . Yii::$app->user->identity->fullname;
+            $msg = 'Expense amount '.$model->amount . ' '.$model->currency->code . ' added by ' . Yii::$app->user->identity->fullname;
             \app\helpers\AppHelper::addActivity("EX", $model->expense_id, $msg);
             return $this->redirect(['view', 'id' => $model->expense_id]);
         }
