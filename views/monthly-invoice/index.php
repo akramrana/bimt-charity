@@ -45,6 +45,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
                     'filter' => Html::activeDropDownList($searchModel, 'receiver_id', app\helpers\AppHelper ::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter']),
                 ],
                 'amount',
+                'currency.code',
                 [
                     'attribute' => 'instalment_month',
                     'filter' => Html::activeDropDownList($searchModel, 'instalment_month', app\helpers\AppHelper ::monthList(), ['class' => 'form-control', 'prompt' => 'Filter']),

@@ -40,7 +40,7 @@ class MonthlyInvoice extends \yii\db\ActiveRecord
             [['monthly_invoice_number', 'receiver_id', 'amount', 'instalment_month', 'instalment_year', 'created_at', 'updated_at'], 'required'],
             [['receiver_id', 'is_paid', 'is_deleted'], 'integer'],
             [['amount'], 'number'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at','currency_id'], 'safe'],
             [['instalment_month', 'instalment_year'], 'string', 'max' => 50],
             [['monthly_invoice_number'], 'unique'],
             [['receiver_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['receiver_id' => 'user_id']],
@@ -63,6 +63,7 @@ class MonthlyInvoice extends \yii\db\ActiveRecord
             'is_deleted' => 'Is Deleted',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'currency_id' => 'Currency',
         ];
     }
 
@@ -80,5 +81,13 @@ class MonthlyInvoice extends \yii\db\ActiveRecord
     public function getPaymentReceiveds()
     {
         return $this->hasMany(PaymentReceived::className(), ['monthly_invoice_id' => 'monthly_invoice_id']);
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currencies::className(), ['currency_id' => 'currency_id']);
     }
 }

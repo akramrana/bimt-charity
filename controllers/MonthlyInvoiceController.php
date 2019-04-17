@@ -95,6 +95,7 @@ class MonthlyInvoiceController extends Controller {
      */
     public function actionCreate() {
         $model = new MonthlyInvoice();
+        $model->currency_id = 13;
         $model->created_at = date('Y-m-d H:i:s');
         $model->updated_at = date('Y-m-d H:i:s');
         $model->monthly_invoice_number = \app\helpers\AppHelper::getNextMonthlyInvoiceNumber();
@@ -178,6 +179,7 @@ class MonthlyInvoiceController extends Controller {
                     $model->monthly_invoice_number = \app\helpers\AppHelper::getNextMonthlyInvoiceNumber();
                     $model->receiver_id = $user->user_id;
                     $model->amount = $user->recurring_amount;
+                    $model->currency_id = $user->currency_id;
                     $model->instalment_month = date('F');
                     $model->instalment_year = date('Y');
                     $model->is_paid = 0;

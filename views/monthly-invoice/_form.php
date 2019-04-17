@@ -24,6 +24,13 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'instalment_month')->dropDownList(app\helpers\AppHelper::monthList(),[
                 'prompt' => 'Please Select'
             ]) ?>
+            
+            <?=
+            $form->field($model, 'currency_id')->dropDownList(app\helpers\AppHelper::getAllCurrency(), [
+                'prompt' => 'Please Select'
+            ])
+            ?>
+            
             <?= $form->field($model, 'is_paid')->checkbox() ?>
         </div>
         <div class="col-md-6">

@@ -63,6 +63,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                     'attribute' => 'is_paid',
                     'value' => ($model->is_paid == 1) ? "Yes" : "No"
                 ],
+                'currency.code',
                 'created_at',
                 'updated_at',
             ],
