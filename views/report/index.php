@@ -69,14 +69,20 @@ if (!empty($get)) {
                         Amount
                     </th>
                 </tr>
-                <tr>
-                    <td>
-                        Member Contribution
-                    </td>
-                    <td>
-                        <b><?= $incoming['amount']; ?> BDT</b>
-                    </td>
-                </tr>
+                <?php
+                foreach ($incoming as $ic) {
+                    ?>
+                    <tr>
+                        <td>
+                            Incoming <?= $ic['code']; ?>
+                        </td>
+                        <td>
+                            <b><?= $ic['amount']; ?> <?= $ic['code']; ?></b>
+                        </td>
+                    </tr>
+                    <?php
+                }
+                ?>
             </table>
             <hr/>
             <h4>Expense Overview</h4>
@@ -89,14 +95,20 @@ if (!empty($get)) {
                         Amount
                     </th>
                 </tr>
-                <tr>
-                    <td>
-                        Expense Amount <sup>Outside of donation</sup>
-                    </td>
-                    <td>
-                        <b><?= $expenses['amount']; ?> BDT</b>
-                    </td>
-                </tr>
+                <?php
+                foreach ($expenses as $ex) {
+                    ?>
+                    <tr>
+                        <td>
+                            Expense Amount <?= $ex['code']; ?> <sup>Outside of donation</sup>
+                        </td>
+                        <td>
+                            <b><?= $ex['amount']; ?> <?= $ex['code']; ?></b>
+                        </td>
+                    </tr>
+                    <?php
+                }
+                ?>
             </table>
             <hr/>
             <h4>Outgoing Payment Overview</h4>
@@ -109,17 +121,24 @@ if (!empty($get)) {
                         Amount
                     </th>
                 </tr>
-                <tr>
-                    <td>
-                        Donation
-                    </td>
-                    <td>
-                        <b><?= $outgoing['amount']; ?> BDT</b>
-                    </td>
-                </tr>
+                <?php
+                foreach ($outgoing as $og) {
+                    ?>
+                    <tr>
+                        <td>
+                            Outgoing <?= $og['code']; ?>
+                        </td>
+                        <td>
+                            <b><?= $og['amount']; ?> <?= $og['code']; ?></b>
+                        </td>
+                    </tr>
+                    <?php
+                }
+                ?>
             </table>
+            
             <hr/>
-            <h4>Total Balance</h4>
+            <h4>Total Balance Current Month</h4>
             <table class="table table-bordered table-striped">
                 <tr>
                     <th>
@@ -129,38 +148,20 @@ if (!empty($get)) {
                         Amount
                     </th>
                 </tr>
-                <tr>
-                    <td>
-                        Total Incoming
-                    </td>
-                    <td>
-                        <b><?= $incoming['amount']; ?> BDT</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Total Expenses <sup>Outside of donation</sup>
-                    </td>
-                    <td>
-                        <b>-<?= $expenses['amount']; ?> BDT</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Total Outgoing
-                    </td>
-                    <td>
-                        <b>-<?= $outgoing['amount']; ?> BDT</b>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        Total Balance
-                    </th>
-                    <td>
-                        <b><?= ($incoming['amount'] - $expenses['amount'] - $outgoing['amount']); ?> BDT</b>
-                    </td>
-                </tr>
+                <?php
+                foreach ($totalBalances as $tb) {
+                    ?>
+                    <tr>
+                        <td>
+                            Total Balance <?=$tb['code'];?>
+                        </td>
+                        <td>
+                            <b><?php echo ($tb['received_amount'] - $tb['expense_amount'] - $tb['donate_amount']);?> <?=$tb['code'];?></b>
+                        </td>
+                    </tr>
+                    <?php
+                }
+                ?>
             </table>
             <hr/>
             <h4>Member Increment Overview</h4>
