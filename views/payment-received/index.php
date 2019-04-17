@@ -13,8 +13,7 @@ $allowCreate = true;
 $actionBtn = '{view}{update}{delete}';
 if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     $actionBtn = '{view}{update}';
-}
-else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
+} else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     $actionBtn = '{view}';
     $allowCreate = false;
 }
@@ -24,7 +23,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     <div class="box-body">
 
         <p>
-            <?= ($allowCreate)?Html::a('Create Payment Received', ['create'], ['class' => 'btn btn-success']):"" ?>
+            <?= ($allowCreate) ? Html::a('Create Payment Received', ['create'], ['class' => 'btn btn-success']) : "" ?>
         </p>
 
         <?=
@@ -65,11 +64,12 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
                     },
                     'filter' => Html::activeDropDownList($searchModel, 'has_invoice', [1 => 'Yes', 0 => 'No'], ['class' => 'form-control', 'prompt' => 'Filter']),
                 ],
+                'currency.code',
                 //'monthly_invoice_id',
                 //'created_at',
                 //'updated_at',
                 //'is_deleted',
-                ['class' => 'yii\grid\ActionColumn','template' => $actionBtn],
+                ['class' => 'yii\grid\ActionColumn', 'template' => $actionBtn],
             ],
         ]);
         ?>

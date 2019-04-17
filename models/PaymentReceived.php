@@ -45,6 +45,7 @@ class PaymentReceived extends \yii\db\ActiveRecord
             [['donated_by', 'received_by', 'has_invoice', 'monthly_invoice_id', 'is_deleted'], 'integer'],
             [['comments'], 'string'],
             [['amount'], 'number'],
+            [['currency_id'],'safe'],
             [['received_invoice_number', 'instalment_month', 'instalment_year'], 'string', 'max' => 50],
             [['received_invoice_number'], 'unique'],
             [['monthly_invoice_id'], 'exist', 'skipOnError' => true, 'targetClass' => MonthlyInvoice::className(), 'targetAttribute' => ['monthly_invoice_id' => 'monthly_invoice_id']],
@@ -72,6 +73,7 @@ class PaymentReceived extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'is_deleted' => 'Is Deleted',
+            'currency_id' => 'Currency',
         ];
     }
 
@@ -97,5 +99,13 @@ class PaymentReceived extends \yii\db\ActiveRecord
     public function getReceivedBy()
     {
         return $this->hasOne(Users::className(), ['user_id' => 'received_by']);
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currencies::className(), ['currency_id' => 'currency_id']);
     }
 }

@@ -94,6 +94,7 @@ class PaymentReceivedController extends Controller {
      */
     public function actionCreate() {
         $model = new PaymentReceived();
+        $model->currency_id = 13;
         $model->created_at = date('Y-m-d H:i:s');
         $model->updated_at = date('Y-m-d H:i:s');
         $model->received_invoice_number = \app\helpers\AppHelper::getReceivePayInvoiceNumber();
@@ -103,6 +104,7 @@ class PaymentReceivedController extends Controller {
                 $model->instalment_month = $invoice->instalment_month;
                 $model->instalment_year = $invoice->instalment_year;
                 $model->amount = $invoice->amount;
+                $model->currency_id = $invoice->currency_id;
             }
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Payment Received invoice successfully added');
