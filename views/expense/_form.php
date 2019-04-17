@@ -6,6 +6,9 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model app\models\Expenses */
 /* @var $form yii\widgets\ActiveForm */
+if($model->isNewRecord){
+    $model->currency_id = 13;
+}
 ?>
 
 <div class="expenses-form">
@@ -17,6 +20,12 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'purpose')->textarea(['rows' => 6]) ?>
 
             <?= $form->field($model, 'amount')->textInput() ?>
+            
+            <?=
+            $form->field($model, 'currency_id')->dropDownList(app\helpers\AppHelper::getAllCurrency(), [
+                'prompt' => 'Please Select'
+            ])
+            ?>
         </div>
     </div>
 

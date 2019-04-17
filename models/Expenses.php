@@ -35,7 +35,7 @@ class Expenses extends \yii\db\ActiveRecord
             [['user_id', 'created_at', 'updated_at', 'amount', 'purpose'], 'required'],
             [['user_id', 'is_deleted'], 'integer'],
             [['purpose'], 'string'],
-            [['created_at', 'updated_at', 'amount'], 'safe'],
+            [['created_at', 'updated_at', 'amount', 'currency_id'], 'safe'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'user_id']],
         ];
     }
@@ -53,6 +53,7 @@ class Expenses extends \yii\db\ActiveRecord
             'is_deleted' => 'Is Deleted',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'currency_id' => 'Currency',
         ];
     }
 
@@ -62,5 +63,13 @@ class Expenses extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(Users::className(), ['user_id' => 'user_id']);
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currencies::className(), ['currency_id' => 'currency_id']);
     }
 }

@@ -51,6 +51,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                 ],
                 'purpose:ntext',
                 'amount',
+                'currency.code',
                 'created_at',
                 'updated_at',
             ],
