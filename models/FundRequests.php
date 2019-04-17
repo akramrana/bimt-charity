@@ -42,7 +42,7 @@ class FundRequests extends \yii\db\ActiveRecord
             [['request_user_id', 'is_active', 'is_deleted'], 'integer'],
             [['request_description'], 'string'],
             [['request_amount'], 'number'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at', 'currency_id'], 'safe'],
             [['fund_request_number'], 'string', 'max' => 50],
             [['file'], 'string', 'max' => 250],
             [['fund_request_number'], 'unique'],
@@ -66,6 +66,7 @@ class FundRequests extends \yii\db\ActiveRecord
             'is_deleted' => 'Is Deleted',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'currency_id' => 'Currency',
         ];
     }
 
@@ -91,5 +92,13 @@ class FundRequests extends \yii\db\ActiveRecord
     public function getPaymentReleases()
     {
         return $this->hasMany(PaymentRelease::className(), ['fund_request_id' => 'fund_request_id']);
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currencies::className(), ['currency_id' => 'currency_id']);
     }
 }

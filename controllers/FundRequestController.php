@@ -95,6 +95,7 @@ class FundRequestController extends Controller {
      */
     public function actionCreate() {
         $model = new FundRequests();
+        $model->currency_id = 13;
         $model->created_at = date('Y-m-d H:i:s');
         $model->updated_at = date('Y-m-d H:i:s');
         $model->fund_request_number = \app\helpers\AppHelper::getFundRequestInvoiceNumber();

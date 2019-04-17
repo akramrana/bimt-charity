@@ -70,6 +70,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                     'attribute' => 'is_active',
                     'value' => ($model->is_active == 1) ? "Active" : "Inactive"
                 ],
+                'currency.code',
                 'created_at',
                 'updated_at',
             ],

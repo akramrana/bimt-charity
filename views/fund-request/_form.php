@@ -32,6 +32,12 @@ use dosamigos\fileupload\FileUpload;
         <span class="clearfix"></span>
         <div class="col-md-6">
             <?= $form->field($model, 'request_amount')->textInput() ?>
+            
+            <?=
+            $form->field($model, 'currency_id')->dropDownList(app\helpers\AppHelper::getAllCurrency(), [
+                'prompt' => 'Please Select'
+            ])
+            ?>
 
             <label>
                 Document(if any)

@@ -13,8 +13,7 @@ $actionBtn = '{view}{update}{delete}';
 $allowActivate = true;
 if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     $actionBtn = '{view}{update}';
-}
-else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
+} else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     $actionBtn = '{view}';
     $allowActivate = false;
 }
@@ -44,6 +43,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
                 ],
                 'request_description:ntext',
                 'request_amount',
+                'currency.code',
                 //'file',
                 [
                     'label' => 'Active Status',
@@ -55,7 +55,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
                                     'class' => "onoffswitch-checkbox",
                                     'id' => "myonoffswitch" . $model->fund_request_id,
                                     'onclick' => 'app.changeStatus("fund-request/activate",this,' . $model->fund_request_id . ')',
-                                    'disabled' => ($allowActivate)?false:true,
+                                    'disabled' => ($allowActivate) ? false : true,
                                 ])
                                 . '<label class="onoffswitch-label" for="myonoffswitch' . $model->fund_request_id . '"></label></div>';
                     },
@@ -77,7 +77,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
                 //'is_deleted',
                 //'created_at',
                 //'updated_at',
-                ['class' => 'yii\grid\ActionColumn','template' => $actionBtn],
+                ['class' => 'yii\grid\ActionColumn', 'template' => $actionBtn],
             ],
         ]);
         ?>
