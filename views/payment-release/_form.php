@@ -32,6 +32,12 @@ use yii\widgets\ActiveForm;
                 'prompt' => 'Please Select'
             ])
             ?>
+            
+            <?=
+            $form->field($model, 'currency_id')->dropDownList(app\helpers\AppHelper::getAllCurrency(), [
+                'prompt' => 'Please Select'
+            ])
+            ?>
         </div>
         <span class="clearfix"></span>
         <div class="col-md-6">

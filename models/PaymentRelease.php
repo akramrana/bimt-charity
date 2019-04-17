@@ -40,7 +40,7 @@ class PaymentRelease extends \yii\db\ActiveRecord
             [['fund_request_id', 'release_by', 'is_deleted'], 'integer'],
             [['amount'], 'number'],
             [['note'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at', 'currency_id'], 'safe'],
             [['release_invoice_number'], 'string', 'max' => 50],
             [['release_invoice_number'], 'unique'],
             [['fund_request_id'], 'exist', 'skipOnError' => true, 'targetClass' => FundRequests::className(), 'targetAttribute' => ['fund_request_id' => 'fund_request_id']],
@@ -63,6 +63,7 @@ class PaymentRelease extends \yii\db\ActiveRecord
             'is_deleted' => 'Is Deleted',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'currency_id' => 'Currency',
         ];
     }
 
@@ -80,5 +81,13 @@ class PaymentRelease extends \yii\db\ActiveRecord
     public function getReleaseBy()
     {
         return $this->hasOne(Users::className(), ['user_id' => 'release_by']);
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(Currencies::className(), ['currency_id' => 'currency_id']);
     }
 }

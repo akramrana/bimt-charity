@@ -55,6 +55,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                     'value' => $model->releaseBy->fullname
                 ],
                 'amount',
+                'currency.code',
                 'note:ntext',
                 'created_at',
                 'updated_at',

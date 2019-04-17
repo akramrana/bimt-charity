@@ -13,8 +13,7 @@ $actionBtn = '{view}{update}{delete}';
 $allowCreate = true;
 if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     $actionBtn = '{view}{update}';
-}
-else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
+} else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     $actionBtn = '{view}';
     $allowCreate = false;
 }
@@ -24,7 +23,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     <div class="box-body">
 
         <p>
-            <?= ($allowCreate)?Html::a('Create Payment Release', ['create'], ['class' => 'btn btn-success']):"" ?>
+            <?= ($allowCreate) ? Html::a('Create Payment Release', ['create'], ['class' => 'btn btn-success']) : "" ?>
         </p>
 
         <?=
@@ -50,10 +49,11 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
                 ],
                 'amount',
                 'note:ntext',
+                'currency.code',
                 //'is_deleted',
                 //'created_at',
                 //'updated_at',
-                ['class' => 'yii\grid\ActionColumn','template' => $actionBtn],
+                ['class' => 'yii\grid\ActionColumn', 'template' => $actionBtn],
             ],
         ]);
         ?>

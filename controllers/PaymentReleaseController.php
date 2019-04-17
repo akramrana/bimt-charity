@@ -94,6 +94,7 @@ class PaymentReleaseController extends Controller {
      */
     public function actionCreate() {
         $model = new PaymentRelease();
+        $model->currency_id = 13;
         $model->created_at = date('Y-m-d H:i:s');
         $model->updated_at = date('Y-m-d H:i:s');
         $model->release_invoice_number = \app\helpers\AppHelper::getReleaseInvoiceNumber();
