@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
+$this->registerJsFile('https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js', ['depends' => [\yii\web\JqueryAsset::className()]]);
+app\assets\DateRangePickerAsset::register($this);
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\NotificationSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -10,11 +12,18 @@ use yii\widgets\ActiveForm;
 $this->title = 'Report';
 $this->params['breadcrumbs'][] = $this->title;
 $get = Yii::$app->request->queryParams;
-$month = null;
-$year = null;
+
+$startDate = date('Y-m-d');
+$endDate = date('Y-m-d', strtotime($startDate . '+1 month'));
+$date_range = '';
+
 if (!empty($get)) {
-    $month = $get['instalment_month'];
-    $year = $get['instalment_year'];
+    $dateRange = explode(' to ', str_replace("/", "-", $get['date_range']));
+    $monthStart = $dateRange[0];
+    $monthEnd = $dateRange[1];
+    $startDate = $monthStart;
+    $endDate = $monthEnd;
+    $date_range = $get['date_range'];
 }
 ?>
 <div class="box box-primary">
@@ -28,17 +37,11 @@ if (!empty($get)) {
         ]);
         ?>
 
-        <label>Month</label>
+        <label>Date Range</label>
         <?=
-        Html::dropDownList('instalment_month', $month, app\helpers\AppHelper::monthList(), [
-            'class' => 'form-control'
-        ])
-        ?>
-
-        <label>Year</label>
-        <?=
-        Html::dropDownList('instalment_year', $year, app\helpers\AppHelper::YearsList(), [
-            'class' => 'form-control'
+        Html::textInput('date_range', $date_range, [
+            'class' => 'form-control',
+            'id' => 'date_range'
         ])
         ?>
 
@@ -54,7 +57,7 @@ if (!empty($get)) {
         if (!empty($get)) {
             ?>
             <hr/>
-            <p><b>Reporting Month:</b> <?= $get['instalment_month']; ?> <?= $get['instalment_year']; ?></p>
+            <p><b>Reporting Date:</b> <?= date('j F,Y',strtotime($monthStart)); ?> to <?= date('j F,Y',strtotime($monthEnd)); ?></p>
             <p><b>Total Members:</b> <?= $totalMembers; ?> member(s)</p>
             <p><b>Contributed:</b> <?= $paymentReceived; ?> member(s)</p>
             <p><b>Did not Contributed:</b> <?= ($totalMembers - $paymentReceived); ?> member(s)</p>
@@ -136,7 +139,7 @@ if (!empty($get)) {
                 }
                 ?>
             </table>
-            
+
             <hr/>
             <h4>Total Balance Current Month</h4>
             <table class="table table-bordered table-striped">
@@ -153,10 +156,10 @@ if (!empty($get)) {
                     ?>
                     <tr>
                         <td>
-                            Total Balance <?=$tb['code'];?>
+                            Total Balance <?= $tb['code']; ?>
                         </td>
                         <td>
-                            <b><?php echo ($tb['received_amount'] - $tb['expense_amount'] - $tb['donate_amount']);?> <?=$tb['code'];?></b>
+                            <b><?php echo ($tb['received_amount'] - $tb['expense_amount'] - $tb['donate_amount']); ?> <?= $tb['code']; ?></b>
                         </td>
                     </tr>
                     <?php
@@ -203,3 +206,17 @@ if (!empty($get)) {
     </div>
 
 </div>
+<?php
+$this->registerJs("$('#date_range').daterangepicker({
+    autoUpdateInput: false,
+    locale: {
+      format: 'YYYY-MM-DD'
+    },   
+    timePicker: false,
+    startDate:'" . $startDate . "',
+    endDate:'" . $endDate . "',
+});
+$('input[id=\"date_range\"]').on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('YYYY-MM-DD') + ' to ' + picker.endDate.format('YYYY-MM-DD'));
+});
+", \yii\web\View::POS_END, 'date-range-picker');
