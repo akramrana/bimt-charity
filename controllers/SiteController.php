@@ -251,4 +251,43 @@ class SiteController extends Controller {
         return $this->render('about');
     }
 
+    public function actionRegister()
+    {
+        $model = new \app\models\Users();
+        $model->scenario = 'create';
+        $model->created_at = date('Y-m-d H:i:s');
+        $model->updated_at = date('Y-m-d H:i:s');
+        $model->enable_login = 1;
+        $model->recurring_amount = 500;
+        $model->currency_id = 13;
+        $model->user_type = 'G';
+        //
+        if ($model->load(Yii::$app->request->post())) {
+            $request = Yii::$app->request->bodyParams;
+            $password = $request['Users']['password_hash'];
+            $model->password = Yii::$app->security->generatePasswordHash($password);
+            if ($model->save()) {
+                Yii::$app->mailer->compose('@app/mail/register', [
+                    'model' => $model,
+                    'password' => $password,
+                ])
+                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                ->setTo($model->email)
+                ->setSubject("Welcome to BIMT Charity")
+                ->send();
+                
+                Yii::$app->session->setFlash('success', 'Registration successfully completed');
+                //
+                return $this->redirect(['register']);
+            } else {
+                echo json_encode($model->errors);
+                return $this->render('register', [
+                            'model' => $model,
+                ]);
+            }
+        }
+        return $this->render('register', [
+                    'model' => $model,
+        ]);
+    }
 }
