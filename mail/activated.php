@@ -14,6 +14,9 @@
     Your member account has been activated. You can now login to BIMT Charity Web Portal. 
 </p>
 <p>
+    BIMT Charity Web Portal Url: http://bimtcharity.org
+</p>
+<p>
     Ma'assalam<br/>
     BIMT Charity Foundation<br/>
 </p>
