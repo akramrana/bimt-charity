@@ -2,6 +2,6 @@
 
 return [
     'adminEmail' => 'admin@example.com',
-    'siteEmail' => 'mywebapp61@gmail.com',
+    'siteEmail' => 'communication@bimtcharity.org',
     'appName' => 'BIMT Charity',
 ];
