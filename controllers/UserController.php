@@ -192,7 +192,7 @@ class UserController extends Controller {
                 ])
                 ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
                 ->setTo($model->email)
-                ->setSubject("BIMT Charity member account activated")
+                ->setSubject("BIMT Charity Foundation member account activated")
                 ->send();
             }
             $msg = 'Profile of ' . $model->fullname . ' ' . $approvalText . ' by ' . Yii::$app->user->identity->fullname;

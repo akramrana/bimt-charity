@@ -21,7 +21,16 @@ $this->title = 'Dashboard';
             <div class="info-box-content">
                 <span class="info-box-text">Invoice Sent This Month</span>
                 <span class="info-box-number"><?= $monthlyInvoice['invoice_count']; ?></span>
-                <span class="info-box-more"><?= number_format($monthlyInvoice['amount'], 2); ?> BDT</span>
+
+                <span class="info-box-more"><?php
+                    foreach ($monthlyInvoiceCurrencyWise as $miw) {
+                        ?>
+                        <?= number_format($miw['amount'], 2) . ' ' . $miw['code']; ?> || 
+                        <?php
+                    }
+                    ?>
+                </span>
+
             </div>
         </div>
     </div>
@@ -32,7 +41,15 @@ $this->title = 'Dashboard';
             <div class="info-box-content">
                 <span class="info-box-text">Payment Receive This Month</span>
                 <span class="info-box-number"><?= $payment_received['receive_count']; ?></span>
-                <span class="info-box-more"><?= number_format($payment_received['amount'], 2); ?> BDT</span>
+                <span class="info-box-more">
+                    <?php
+                    foreach ($paymentReceivedCurrencyWise as $prw) {
+                        ?>
+                        <?= number_format($prw['amount'], 2) . ' ' . $prw['code']; ?> || 
+                        <?php
+                    }
+                    ?>
+                </span>
             </div>
         </div>
     </div>
@@ -43,7 +60,15 @@ $this->title = 'Dashboard';
             <div class="info-box-content">
                 <span class="info-box-text">Fund Request This Month</span>
                 <span class="info-box-number"><?= $fund_request['fund_request_count']; ?></span>
-                <span class="info-box-more"><?= number_format($fund_request['amount'], 2); ?> BDT</span>
+                <span class="info-box-more">
+                    <?php
+                    foreach ($fundRequestCurrencyWise as $fcw) {
+                        ?>
+                        <?= number_format($fcw['amount'], 2) . ' ' . $fcw['code']; ?>
+                        <?php
+                    }
+                    ?>
+                </span>
             </div>
         </div>
     </div>
@@ -55,7 +80,15 @@ $this->title = 'Dashboard';
             <div class="info-box-content">
                 <span class="info-box-text">Payment Release This Month</span>
                 <span class="info-box-number"><?= $payment_release['release_count']; ?></span>
-                <span class="info-box-more"><?= number_format($payment_release['amount'], 2); ?> BDT</span>
+                <span class="info-box-more">
+                    <?php
+                    foreach ($paymentReleaseCurrencyWise as $prc) {
+                        ?>
+                        <?= number_format($prc['amount'], 2) . ' ' . $prc['code']; ?> || 
+                        <?php
+                    }
+                    ?>
+                </span>
             </div>
         </div>
     </div>
@@ -66,7 +99,15 @@ $this->title = 'Dashboard';
             <div class="info-box-content">
                 <span class="info-box-text">Expense This Month</span>
                 <span class="info-box-number"><?= $expenses['expense_count']; ?></span>
-                <span class="info-box-more"><?= number_format($expenses['amount'], 2); ?> BDT</span>
+                <span class="info-box-more">
+                    <?php
+                    foreach ($expensesCurrencyWise as $ecw) {
+                        ?>
+                        <?= number_format($ecw['amount'], 2) . ' ' . $ecw['code']; ?> || 
+                        <?php
+                    }
+                    ?>
+                </span>
             </div>
         </div>
     </div>
@@ -95,7 +136,15 @@ $this->title = 'Dashboard';
                                 <div class="info-box-content">
                                     <span class="info-box-text"><?= $stat['name']; ?></span>
                                     <span class="info-box-number"><?= $stat['fund_request_count']; ?></span>
-                                    <span class="info-box-more"><?= number_format($stat['amount'], 2); ?> BDT</span>
+                                    <span class="info-box-more">
+                                        <?php
+                                        foreach ($stat['fund_stat_curr_wise'] as $fscw) {
+                                            ?>
+                                            <?= number_format($fscw['amount'], 2).' '.$fscw['code']; ?> || 
+                                            <?php
+                                        }
+                                        ?>
+                                    </span>
                                 </div>
                             </div>
                         </div>
