@@ -16,7 +16,7 @@
     We do confirm your following contribution for BIMT Charity Foundation:
 </p>
 <p>
-    Amount: <?= $model->amount; ?> BDT<br/>
+    Amount: <?= $model->amount; ?> <?= $model->currency->code; ?><br/>
     Received Date: <?= date('d.m.Y', strtotime($model->created_at)); ?><br/>
     For Month(s): <?= $model->instalment_month; ?> <?= $model->instalment_year; ?><br/>
     Comments: <?= $model->comments; ?>

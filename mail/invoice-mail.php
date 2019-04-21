@@ -14,7 +14,7 @@
     This is the beginning of <?= $model->instalment_month ?>. This is why we would like to cordially request you to contribute for 'BIMT Charity Foundation' with your SADAKAH.
 </p>
 <p>
-    Proposed amount: <?= $model->amount; ?> BDT (more or less amount is unquestionably accepted)<br/>
+    Proposed amount: <?= $model->amount; ?> <?= $model->currency->code; ?> (more or less amount is unquestionably accepted)<br/>
     Proposed deadline: 15 <?= $model->instalment_month ?>,<?= $model->instalment_year; ?>
 </p>
 <p>
