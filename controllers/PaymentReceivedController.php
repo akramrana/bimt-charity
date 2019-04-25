@@ -188,6 +188,23 @@ class PaymentReceivedController extends Controller {
         return $this->redirect(['index']);
     }
 
+    public function actionGetPaidInvoice($id)
+    {
+        $model = \app\models\MonthlyInvoice::find()
+                ->where(['is_deleted' => 0, 'is_paid' => 1])
+                ->andWhere(['receiver_id' => $id])
+                ->orderBy(['monthly_invoice_id' => SORT_DESC])
+                ->all();
+        $html = '<option value=""></option>';
+        if(!empty($model)){
+            foreach ($model as $row)
+            {
+                $html.='<option value="'.$row->monthly_invoice_id.'">'.$row->monthly_invoice_number.'</option>';
+            }
+        }
+        return $html;
+    }
+
     /**
      * Finds the PaymentReceived model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

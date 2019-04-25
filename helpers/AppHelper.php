@@ -174,5 +174,15 @@ class AppHelper {
         $list = \yii\helpers\ArrayHelper::map($model, 'currency_id', 'code');
         return $list;
     }
+    
+    static function getUserPaidInvoiceList($user_id) {
+        $model = \app\models\MonthlyInvoice::find()
+                ->where(['is_deleted' => 0, 'is_paid' => 1])
+                ->andWhere(['receiver_id' => $user_id])
+                ->orderBy(['monthly_invoice_id' => SORT_DESC])
+                ->all();
+        $list = \yii\helpers\ArrayHelper::map($model, 'monthly_invoice_id', 'monthly_invoice_number');
+        return $list;
+    }
 
 }
