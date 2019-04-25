@@ -167,3 +167,6 @@ a.desc:after {
     position: absolute;
     top: 40%;
 }
+.logo-lg{
+    font-size: 16px;
+}

@@ -14,7 +14,7 @@ $this->title = 'Member Registration';
 
 <div class="login-box" style="width: 50%;">
     <div class="login-logo">
-        <a href="#"><b>BIMT</b>Charity <br/>Member Registration</a>
+        <a href="#"><b>BIMT</b>Charity Foundation<br/>Member Registration</a>
     </div>
     <!-- /.login-logo -->
     <div class="login-box-body">
