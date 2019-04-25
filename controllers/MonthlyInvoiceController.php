@@ -186,6 +186,8 @@ class MonthlyInvoiceController extends Controller {
                     $model->is_deleted = 0;
                     if ($model->save()) {
                         $proccessed = 1;
+                        $msg = 'Invoice#' . $model->monthly_invoice_number . ' generated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' against receiver ' . $model->receiver->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
+                        \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
                         Yii::$app->mailer->compose('@app/mail/invoice-mail', [
                                     'model' => $model,
                                 ])
@@ -201,7 +203,7 @@ class MonthlyInvoiceController extends Controller {
         }
         if ($proccessed == 1) {
             Yii::$app->session->setFlash('success', 'Invoice successfully generated');
-        }else{
+        } else {
             Yii::$app->session->setFlash('warning', 'No invoice generated');
         }
         return $this->redirect(['index']);
