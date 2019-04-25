@@ -326,6 +326,7 @@ class SiteController extends Controller {
 
     public function actionRegister()
     {
+        return $this->redirect(['login']);
         $model = new \app\models\Users();
         $model->scenario = 'create';
         $model->created_at = date('Y-m-d H:i:s');
