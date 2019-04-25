@@ -73,6 +73,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                     'value' => !empty($model->monthlyInvoice)?$model->monthlyInvoice->monthly_invoice_number:""
                 ],
                 'currency.code',
+                'received_date',
                 'created_at',
                 'updated_at',
             ],

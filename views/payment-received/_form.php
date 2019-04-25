@@ -2,10 +2,17 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use app\assets\DatePickerAsset;
+
+DatePickerAsset::register($this);
 
 /* @var $this yii\web\View */
 /* @var $model app\models\PaymentReceived */
 /* @var $form yii\widgets\ActiveForm */
+$userPaidInvoiceList = [];
+if(!$model->isNewRecord){
+    $userPaidInvoiceList = app\helpers\AppHelper::getUserPaidInvoiceList($model->donated_by);
+}
 ?>
 
 <div class="payment-received-form">
@@ -20,7 +27,8 @@ use yii\widgets\ActiveForm;
         <div class="col-md-6">
             <?=
             $form->field($model, 'donated_by')->dropDownList(app\helpers\AppHelper::getAllUsers(), [
-                'prompt' => 'Please Select'
+                'prompt' => 'Please Select',
+                'onchange' => 'app.getUserPaidInvoiceList(this.value)'
             ])
             ?>
         </div>
@@ -33,6 +41,10 @@ use yii\widgets\ActiveForm;
         </div>
         <span class="clearfix"></span>
         <div class="col-md-6">
+            <?= $form->field($model, 'received_date')->textInput([
+                'class' => 'form-control datepicker'
+            ]);?>
+            
             <?= $form->field($model, 'comments')->textarea(['rows' => 6]) ?>
         </div>
         <span class="clearfix"></span>
@@ -56,7 +68,7 @@ use yii\widgets\ActiveForm;
             ?>
             <div id="monthly-invoice" class="<?= $class; ?>">
                 <?=
-                $form->field($model, 'monthly_invoice_id')->dropDownList(app\helpers\AppHelper::getPaidInvoiceList(), [
+                $form->field($model, 'monthly_invoice_id')->dropDownList($userPaidInvoiceList, [
                     'prompt' => 'Please Select'
                 ])->label('Select Invoice');
                 ?>
@@ -98,3 +110,8 @@ use yii\widgets\ActiveForm;
 <?php ActiveForm::end(); ?>
 
 </div>
+<?php
+$this->registerJs("$('.datepicker').datepicker({
+       format: 'yyyy-mm-dd',
+        autoclose: true,
+});", \yii\web\View::POS_END);
