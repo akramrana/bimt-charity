@@ -31,19 +31,19 @@ var app = {
             }
         });
     },
-    showHideMonthlyInvoice:function()
+    showHideMonthlyInvoice: function ()
     {
-        if($("#paymentreceived-has_invoice").is(":checked")){
+        if ($("#paymentreceived-has_invoice").is(":checked")) {
             $("#monthly-invoice").removeClass("hidden");
             $("#instalment-month-year").addClass("hidden");
             $("#paymentreceived-amount").val("0");
-        }else{
+        } else {
             $("#monthly-invoice").addClass("hidden");
             $("#instalment-month-year").removeClass("hidden");
             $("#paymentreceived-amount").val("");
         }
     },
-    addFundStatus:function(){
+    addFundStatus: function () {
         $(".global-loader").show();
         $.ajax({
             type: "POST",
@@ -67,6 +67,29 @@ var app = {
                 alert(jqXHR.responseText);
             }
         })
+    },
+    getUserPaidInvoiceList: function (val)
+    {
+        if ($.trim(val) != "") {
+            $(".global-loader").show();
+            $.ajax({
+                type: "GET",
+                url: baseUrl + 'payment-received/get-paid-invoice',
+                data: {
+                    'id':val
+                },
+                success: function (response)
+                {
+                    $(".global-loader").hide();
+                    $("#paymentreceived-monthly_invoice_id").html(response);
+                },
+                error: function (jqXHR, textStatus, errorThrown)
+                {
+                    $(".global-loader").hide();
+                    alert(jqXHR.responseText);
+                }
+            })
+        }
     }
 };
 
