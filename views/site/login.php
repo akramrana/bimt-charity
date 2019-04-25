@@ -68,7 +68,7 @@ $fieldOptions2 = [
                  /.social-auth-links 
         
                 <a href="#">I forgot my password</a><br>-->
-        <a href="<?php echo yii\helpers\BaseUrl::home() ?>site/register" class="text-center">Register a new membership</a>
+<!--        <a href="<?php echo yii\helpers\BaseUrl::home() ?>site/register" class="text-center">Register a new membership</a>-->
 
     </div>
     <!-- /.login-box-body -->
