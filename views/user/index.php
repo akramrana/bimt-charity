@@ -9,7 +9,7 @@ use yii\grid\GridView;
 
 $this->title = 'Members';
 $this->params['breadcrumbs'][] = $this->title;
-$actionBtn = '{view}{update}{delete}';
+$actionBtn = '{view}{update}{reset}{delete}';
 $allowActivate = true;
 $allowCreate = true;
 if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
@@ -75,7 +75,17 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                 //'is_deleted',
                 //'created_at',
                 //'updated_at',
-                ['class' => 'yii\grid\ActionColumn', 'template' => $actionBtn],
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'template' => $actionBtn,
+                    'buttons' => [
+                        'reset' => function($url, $model) {
+                            return Html::a('<i class="glyphicon glyphicon-refresh"></i>',['user/resend','id' => $model->user_id],[
+                                'onclick' => 'return confirm("Are you sure you want to reset this user?")'
+                            ]);
+                        }
+                    ],
+                ],
             ],
         ]);
         ?>

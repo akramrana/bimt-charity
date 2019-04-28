@@ -33,10 +33,10 @@ class UserController extends Controller {
                 'ruleConfig' => [
                     'class' => AccessRule::className(),
                 ],
-                'only' => ['index', 'view', 'create', 'update', 'delete', 'activate'],
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'activate', 'resend'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'view', 'create', 'update', 'delete', 'activate'],
+                        'actions' => ['index', 'view', 'create', 'update', 'delete', 'activate', 'resend'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_SUPER_ADMIN,
@@ -101,12 +101,22 @@ class UserController extends Controller {
         $model->enable_login = 1;
         $model->recurring_amount = 500;
         $model->currency_id = 13;
-        
+
         if ($model->load(Yii::$app->request->post())) {
             $request = Yii::$app->request->bodyParams;
             $password = $request['Users']['password_hash'];
             $model->password = Yii::$app->security->generatePasswordHash($password);
             if ($model->save()) {
+                //
+                Yii::$app->mailer->compose('@app/mail/register', [
+                            'model' => $model,
+                            'password' => $password,
+                        ])
+                        ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                        ->setTo($model->email)
+                        ->setSubject("Welcome to BIMT Charity Foundation")
+                        ->send();
+
                 Yii::$app->session->setFlash('success', 'User successfully added');
                 //
                 $msg = $model->fullname . ' has been added by ' . Yii::$app->user->identity->fullname;
@@ -186,14 +196,14 @@ class UserController extends Controller {
         }
 
         if ($model->validate() && $model->save()) {
-            if($model->is_active==1){
+            if ($model->is_active == 1) {
                 Yii::$app->mailer->compose('@app/mail/activated', [
-                    'model' => $model,
-                ])
-                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                ->setTo($model->email)
-                ->setSubject("BIMT Charity Foundation member account activated")
-                ->send();
+                            'model' => $model,
+                        ])
+                        ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                        ->setTo($model->email)
+                        ->setSubject("BIMT Charity Foundation member account activated")
+                        ->send();
             }
             $msg = 'Profile of ' . $model->fullname . ' ' . $approvalText . ' by ' . Yii::$app->user->identity->fullname;
             \app\helpers\AppHelper::addActivity("US", $model->user_id, $msg);
@@ -201,6 +211,24 @@ class UserController extends Controller {
         } else {
 
             return json_encode($model->errors);
+        }
+    }
+
+    public function actionResend($id) {
+        $model = $this->findModel($id);
+        $password = Yii::$app->security->generateRandomString();
+        if ($model->save()) {
+            Yii::$app->mailer->compose('@app/mail/register', [
+                        'model' => $model,
+                        'password' => $password,
+                    ])
+                    ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                    ->setTo($model->email)
+                    ->setSubject("Welcome to BIMT Charity Foundation")
+                    ->send();
+
+            Yii::$app->session->setFlash('success', 'User info successfully sent');
+            return $this->redirect(['index']);
         }
     }
 
