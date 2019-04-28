@@ -3,5 +3,5 @@
 return [
     'adminEmail' => 'admin@example.com',
     'siteEmail' => 'communication@bimtcharity.org',
-    'appName' => 'BIMT Charity',
+    'appName' => 'BIMT Charity Foundation',
 ];

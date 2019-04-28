@@ -216,7 +216,8 @@ class UserController extends Controller {
 
     public function actionResend($id) {
         $model = $this->findModel($id);
-        $password = Yii::$app->security->generateRandomString();
+        $password = Yii::$app->security->generateRandomString(6);
+        $model->password = Yii::$app->security->generatePasswordHash($password);
         if ($model->save()) {
             Yii::$app->mailer->compose('@app/mail/register', [
                         'model' => $model,
