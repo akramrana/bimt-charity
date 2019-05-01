@@ -49,7 +49,7 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 1) {
                 [
                     'attribute' => 'file',
                     'value' => Html::a('Download File', \yii\helpers\BaseUrl::home() . 'uploads/' . $model->file, [
-                        'download' => 'download',
+                        'download' => $model->file,
                         'title' => $model->title,
                     ]),
                     'format' => 'raw',
