@@ -57,10 +57,24 @@ class UploadController extends \yii\web\Controller {
         $imageFile = UploadedFile::getInstanceByName($attribute);
         //$directory = \Yii::getAlias('@app/web/uploads') . DIRECTORY_SEPARATOR . Yii::$app->session->id . DIRECTORY_SEPARATOR;
         $directory = \Yii::getAlias('@app/web/uploads') . DIRECTORY_SEPARATOR;
+        
         if ($imageFile) {
             $filetype = mime_content_type($imageFile->tempName);
+            //debugPrint($filetype);exit;
             $filesize = $imageFile->size / 1024;
-            $allowed = array('image/png', 'image/jpeg', 'image/gif', 'application/pdf', 'application/msword', 'application/rtf', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint');
+            $allowed = array(
+                'image/png', 
+                'image/jpeg', 
+                'image/gif', 
+                'application/pdf', 
+                'application/msword', 
+                'application/rtf', 
+                'application/vnd.ms-excel', 
+                'application/vnd.ms-powerpoint', 
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
+                'application/zip');
             if (!in_array(strtolower($filetype), $allowed)) {
                 return json_encode(['files' => [
                         'error' => "File type not supported",
@@ -72,7 +86,7 @@ class UploadController extends \yii\web\Controller {
                     ]
                 ]);
             } else {
-                $uid = uniqid(time(), true);
+                $uid = Yii::$app->security->generateRandomString(6);
                 $fileName = $uid . '.' . $imageFile->extension;
                 $filePath = $directory . $fileName;
                 if ($imageFile->saveAs($filePath)) {
