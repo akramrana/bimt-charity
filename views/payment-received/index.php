@@ -65,6 +65,12 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                     'filter' => Html::activeDropDownList($searchModel, 'has_invoice', [1 => 'Yes', 0 => 'No'], ['class' => 'form-control', 'prompt' => 'Filter']),
                 ],
                 'currency.code',
+                [
+                    'attribute' => 'monthly_invoice_number',
+                    'value' => function($model){
+                        return !empty($model->monthlyInvoice) ? $model->monthlyInvoice->monthly_invoice_number : "";
+                    }
+                ],
                 //'monthly_invoice_id',
                 //'created_at',
                 //'updated_at',

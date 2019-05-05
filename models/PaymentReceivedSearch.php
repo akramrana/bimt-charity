@@ -11,6 +11,7 @@ use app\models\PaymentReceived;
  */
 class PaymentReceivedSearch extends PaymentReceived
 {
+    public $monthly_invoice_number;
     /**
      * {@inheritdoc}
      */
@@ -18,7 +19,7 @@ class PaymentReceivedSearch extends PaymentReceived
     {
         return [
             [['payment_received_id', 'donated_by', 'received_by', 'has_invoice', 'monthly_invoice_id', 'is_deleted'], 'integer'],
-            [['received_invoice_number', 'comments', 'instalment_month', 'instalment_year'], 'safe'],
+            [['received_invoice_number', 'comments', 'instalment_month', 'instalment_year','monthly_invoice_number'], 'safe'],
             [['amount', 'created_at', 'updated_at'], 'number'],
         ];
     }
@@ -41,7 +42,8 @@ class PaymentReceivedSearch extends PaymentReceived
      */
     public function search($params)
     {
-        $query = PaymentReceived::find();
+        $query = PaymentReceived::find()
+                ->join('left join','monthly_invoice','payment_received.monthly_invoice_id = monthly_invoice.monthly_invoice_id');
 
         // add conditions that should always apply here
 
@@ -61,20 +63,20 @@ class PaymentReceivedSearch extends PaymentReceived
         // grid filtering conditions
         $query->andFilterWhere([
             'payment_received_id' => $this->payment_received_id,
-            'donated_by' => $this->donated_by,
-            'received_by' => $this->received_by,
-            'amount' => $this->amount,
-            'has_invoice' => $this->has_invoice,
-            'monthly_invoice_id' => $this->monthly_invoice_id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'is_deleted' => 0,
+            'payment_received.donated_by' => $this->donated_by,
+            'payment_received.received_by' => $this->received_by,
+            'payment_received.amount' => $this->amount,
+            'payment_received.has_invoice' => $this->has_invoice,
+            'monthly_invoice.monthly_invoice_number' => $this->monthly_invoice_number,
+            'payment_received.created_at' => $this->created_at,
+            'payment_received.updated_at' => $this->updated_at,
+            'payment_received.is_deleted' => 0,
         ]);
 
-        $query->andFilterWhere(['like', 'received_invoice_number', $this->received_invoice_number])
-            ->andFilterWhere(['like', 'comments', $this->comments])
-            ->andFilterWhere(['like', 'instalment_month', $this->instalment_month])
-            ->andFilterWhere(['like', 'instalment_year', $this->instalment_year]);
+        $query->andFilterWhere(['like', 'payment_received.received_invoice_number', $this->received_invoice_number])
+            ->andFilterWhere(['like', 'payment_received.comments', $this->comments])
+            ->andFilterWhere(['like', 'payment_received.instalment_month', $this->instalment_month])
+            ->andFilterWhere(['like', 'payment_received.instalment_year', $this->instalment_year]);
 
         return $dataProvider;
     }
