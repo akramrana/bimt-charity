@@ -99,11 +99,29 @@ class MonthlyInvoiceController extends Controller {
         $model->created_at = date('Y-m-d H:i:s');
         $model->updated_at = date('Y-m-d H:i:s');
         $model->monthly_invoice_number = \app\helpers\AppHelper::getNextMonthlyInvoiceNumber();
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Invoice successfully added');
-            $msg = 'Invoice#' . $model->monthly_invoice_number . ' generated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' against receiver ' . $model->receiver->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
-            \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
-            return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $request = Yii::$app->request->bodyParams;
+            $check = MonthlyInvoice::find()
+                    ->where([
+                        'receiver_id' => $request['MonthlyInvoice']['receiver_id'],
+                        'instalment_month' => $request['MonthlyInvoice']['instalment_month'],
+                        'instalment_year' => $request['MonthlyInvoice']['instalment_year'],
+                    ])
+                    ->one();
+            if(!empty($check)){
+                Yii::$app->session->setFlash('warning', $request['MonthlyInvoice']['instalment_month'].' month invoice already exist for this user');
+                return $this->redirect(['create']);
+            }
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', 'Invoice successfully added');
+                $msg = 'Invoice#' . $model->monthly_invoice_number . ' generated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' against receiver ' . $model->receiver->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
+                \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
+                return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
+            } else {
+                return $this->render('create', [
+                            'model' => $model,
+                ]);
+            }
         }
         return $this->render('create', [
                     'model' => $model,
