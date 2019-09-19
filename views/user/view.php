@@ -45,6 +45,7 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
         DetailView::widget([
             'model' => $model,
             'attributes' => [
+                'member_code',
                 'fullname',
                 [
                     'label' => 'Image',

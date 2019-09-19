@@ -18,7 +18,7 @@ class UserSearch extends Users
     {
         return [
             [['user_id', 'enable_login', 'password', 'is_active', 'is_deleted'], 'integer'],
-            [['fullname', 'image', 'email', 'phone', 'alt_phone', 'address', 'batch', 'department', 'user_type', 'created_at', 'updated_at'], 'safe'],
+            [['fullname', 'image', 'email', 'phone', 'alt_phone', 'address', 'batch', 'department', 'user_type', 'created_at', 'updated_at', 'member_code'], 'safe'],
             [['recurring_amount'], 'number'],
         ];
     }
@@ -61,6 +61,7 @@ class UserSearch extends Users
         // grid filtering conditions
         $query->andFilterWhere([
             'user_id' => $this->user_id,
+            'member_code' => $this->member_code,
             'enable_login' => $this->enable_login,
             'password' => $this->password,
             'recurring_amount' => $this->recurring_amount,

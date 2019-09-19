@@ -35,14 +35,15 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
             'filterModel' => $searchModel,
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
-                [
+                /*[
                     'label' => 'Image',
                     'value' => function($model) {
                         return \yii\helpers\BaseUrl::home() . 'uploads/' . $model->image;
                     },
                     'format' => ['image', ['width' => '96']],
                     'filter' => false,
-                ],
+                ],*/
+                'member_code',
                 'fullname',
                 //'image',
                 'email:email',

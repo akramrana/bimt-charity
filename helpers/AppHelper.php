@@ -185,4 +185,16 @@ class AppHelper {
         return $list;
     }
 
+    static function getNextMemberCode() {
+        $order = \app\models\Users::find()
+                ->select(['MAX(SUBSTRING(`member_code`,2)) AS member_code'])
+                ->asArray()
+                ->one();
+
+        if (!empty($order['member_code'])) {
+            return 'M' . ($order['member_code'] + 1);
+        } else {
+            return "M100001";
+        }
+    }
 }

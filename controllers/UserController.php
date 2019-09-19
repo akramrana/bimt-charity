@@ -101,6 +101,7 @@ class UserController extends Controller {
         $model->enable_login = 1;
         $model->recurring_amount = 500;
         $model->currency_id = 13;
+        $model->member_code = \app\helpers\AppHelper::getNextMemberCode();
 
         if ($model->load(Yii::$app->request->post())) {
             $request = Yii::$app->request->bodyParams;

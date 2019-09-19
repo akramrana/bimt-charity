@@ -56,7 +56,7 @@ class Users extends \yii\db\ActiveRecord
             [['address', 'user_type'], 'string'],
             [['enable_login', 'is_active', 'is_deleted'], 'integer'],
             [['recurring_amount'], 'number'],
-            [['created_at', 'updated_at', 'currency_id'], 'safe'],
+            [['created_at', 'updated_at', 'currency_id', 'member_code'], 'safe'],
             [['fullname', 'email', 'phone', 'alt_phone', 'batch', 'department'], 'string', 'max' => 50],
             [['image'], 'string', 'max' => 250],
             ['email', 'email'],
@@ -74,6 +74,7 @@ class Users extends \yii\db\ActiveRecord
     {
         return [
             'user_id' => 'User ID',
+            'member_code' => 'Member ID',
             'fullname' => 'Name',
             'image' => 'Image',
             'email' => 'Email',
