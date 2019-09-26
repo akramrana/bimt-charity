@@ -18,7 +18,7 @@ class UserSearch extends Users
     {
         return [
             [['user_id', 'enable_login', 'password', 'is_active', 'is_deleted'], 'integer'],
-            [['fullname', 'image', 'email', 'phone', 'alt_phone', 'address', 'batch', 'department', 'user_type', 'created_at', 'updated_at', 'member_code'], 'safe'],
+            [['fullname', 'image', 'email', 'phone', 'alt_phone', 'address', 'batch', 'department', 'user_type', 'created_at', 'updated_at', 'member_code', 'invited_user_id'], 'safe'],
             [['recurring_amount'], 'number'],
         ];
     }
@@ -65,6 +65,7 @@ class UserSearch extends Users
             'enable_login' => $this->enable_login,
             'password' => $this->password,
             'recurring_amount' => $this->recurring_amount,
+            'invited_user_id' => $this->invited_user_id,
             'is_active' => $this->is_active,
             'is_deleted' => $this->is_deleted,
             'created_at' => $this->created_at,

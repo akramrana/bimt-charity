@@ -122,6 +122,12 @@ use dosamigos\fileupload\FileUpload;
             <?= $form->field($model, 'confirm_password')->passwordInput() ?>
             
             <?= $form->field($model, 'recurring_amount')->textInput() ?>
+            
+            <?=
+            $form->field($model, 'invited_user_id')->dropDownList(app\helpers\AppHelper::getAllUsers(), [
+                'prompt' => 'Please Select'
+            ])
+            ?>
         </div>
     </div>
 

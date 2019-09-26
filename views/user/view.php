@@ -69,6 +69,10 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                     'value' => ($model->is_active == 1) ? "Yes" : "No"
                 ],
                 'currency.code',
+                [
+                    'attribute' => 'invited_user_id',
+                    'value' => !empty($model->invitedBy)?$model->invitedBy->fullname:''
+                ],
                 'created_at',
                 'updated_at',
             ],

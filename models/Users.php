@@ -56,7 +56,7 @@ class Users extends \yii\db\ActiveRecord
             [['address', 'user_type'], 'string'],
             [['enable_login', 'is_active', 'is_deleted'], 'integer'],
             [['recurring_amount'], 'number'],
-            [['created_at', 'updated_at', 'currency_id', 'member_code'], 'safe'],
+            [['created_at', 'updated_at', 'currency_id', 'member_code', 'invited_user_id'], 'safe'],
             [['fullname', 'email', 'phone', 'alt_phone', 'batch', 'department'], 'string', 'max' => 50],
             [['image'], 'string', 'max' => 250],
             ['email', 'email'],
@@ -89,6 +89,7 @@ class Users extends \yii\db\ActiveRecord
             'confirm_password' => 'Confirm Password',
             'user_type' => 'User Type',
             'recurring_amount' => 'Donation Amount Per Month',
+            'invited_user_id' => 'Invited By',
             'is_active' => 'Active Status',
             'is_deleted' => 'Is Deleted',
             'created_at' => 'Created At',
@@ -179,5 +180,13 @@ class Users extends \yii\db\ActiveRecord
         if (!empty($model)) {
             $this->addError($attribute, Yii::t('app', 'This email has already been taken.'));
         }
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInvitedBy()
+    {
+        return $this->hasOne(Users::className(), ['user_id' => 'invited_user_id']);
     }
 }

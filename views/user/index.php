@@ -35,20 +35,20 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
             'filterModel' => $searchModel,
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
-                /*[
-                    'label' => 'Image',
-                    'value' => function($model) {
-                        return \yii\helpers\BaseUrl::home() . 'uploads/' . $model->image;
-                    },
-                    'format' => ['image', ['width' => '96']],
-                    'filter' => false,
-                ],*/
+                /* [
+                  'label' => 'Image',
+                  'value' => function($model) {
+                  return \yii\helpers\BaseUrl::home() . 'uploads/' . $model->image;
+                  },
+                  'format' => ['image', ['width' => '96']],
+                  'filter' => false,
+                  ], */
                 'member_code',
                 'fullname',
                 //'image',
                 'email:email',
                 'phone',
-                'alt_phone',
+                //'alt_phone',
                 'address:ntext',
                 //'batch',
                 //'department',
@@ -57,6 +57,13 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                 //'user_type',
                 'recurring_amount',
                 'currency.code',
+                [
+                    'attribute' => 'invited_user_id',
+                    'value' => function($model) {
+                        return !empty($model->invitedBy) ? $model->invitedBy->fullname : '';
+                    },
+                    'filter' => Html::activeDropDownList($searchModel, 'invited_user_id', app\helpers\AppHelper ::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter'])
+                ],
                 [
                     'label' => 'Status',
                     'attribute' => 'is_active',
@@ -81,8 +88,8 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                     'template' => $actionBtn,
                     'buttons' => [
                         'reset' => function($url, $model) {
-                            return Html::a('<i class="glyphicon glyphicon-refresh"></i>',['user/resend','id' => $model->user_id],[
-                                'onclick' => 'return confirm("Are you sure you want to reset this user?")'
+                            return Html::a('<i class="glyphicon glyphicon-refresh"></i>', ['user/resend', 'id' => $model->user_id], [
+                                        'onclick' => 'return confirm("Are you sure you want to reset this user?")'
                             ]);
                         }
                     ],
