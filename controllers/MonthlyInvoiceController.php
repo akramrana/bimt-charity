@@ -15,7 +15,8 @@ use app\components\AccessRule;
 /**
  * MonthlyInvoiceController implements the CRUD actions for MonthlyInvoice model.
  */
-class MonthlyInvoiceController extends Controller {
+class MonthlyInvoiceController extends Controller
+{
 
     /**
      * {@inheritdoc}
@@ -108,8 +109,8 @@ class MonthlyInvoiceController extends Controller {
                         'instalment_year' => $request['MonthlyInvoice']['instalment_year'],
                     ])
                     ->one();
-            if(!empty($check)){
-                Yii::$app->session->setFlash('warning', $request['MonthlyInvoice']['instalment_month'].' month invoice already exist for this user');
+            if (!empty($check)) {
+                Yii::$app->session->setFlash('warning', $request['MonthlyInvoice']['instalment_month'] . ' month invoice already exist for this user');
                 return $this->redirect(['create']);
             }
             if ($model->save()) {
@@ -138,11 +139,44 @@ class MonthlyInvoiceController extends Controller {
     public function actionUpdate($id) {
         $model = $this->findModel($id);
         $model->updated_at = date('Y-m-d H:i:s');
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Invoice successfully updated');
-            $msg = 'Invoice#' . $model->monthly_invoice_number . ' has been modified by ' . Yii::$app->user->identity->fullname;
-            \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
-            return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $request = Yii::$app->request->bodyParams;
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', 'Invoice successfully updated');
+                $msg = 'Invoice#' . $model->monthly_invoice_number . ' has been modified by ' . Yii::$app->user->identity->fullname;
+                \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
+                //
+                $paymentReceived = new \app\models\PaymentReceived();
+                $paymentReceived->received_invoice_number = \app\helpers\AppHelper::getReceivePayInvoiceNumber();
+                $paymentReceived->donated_by = $model->receiver_id;
+                $paymentReceived->received_by = $model->invoice_received_by;
+                $paymentReceived->amount = $model->amount;
+                $paymentReceived->currency_id = $model->currency_id;
+                $paymentReceived->instalment_month = $model->instalment_month;
+                $paymentReceived->instalment_year = $model->instalment_year;
+                $paymentReceived->has_invoice = 1;
+                $paymentReceived->monthly_invoice_id = $model->monthly_invoice_id;
+                $paymentReceived->received_date = $model->invoice_received_date;
+                $paymentReceived->created_at = date('Y-m-d H:i:s');
+                $paymentReceived->updated_at = date('Y-m-d H:i:s');
+                if ($paymentReceived->save()) {
+                    $msg1 = 'Invoice#' . $paymentReceived->received_invoice_number . ' generated for ' . $paymentReceived->instalment_month . ' ' . $paymentReceived->instalment_year . ' Donated By ' . $paymentReceived->donatedBy->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
+                    \app\helpers\AppHelper::addActivity("PREC", $paymentReceived->payment_received_id, $msg1);
+                    //
+                    Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
+                                'model' => $paymentReceived,
+                            ])
+                            ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                            ->setTo($paymentReceived->donatedBy->email)
+                            ->setSubject("Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")")
+                            ->send();
+                }
+                return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
+            } else {
+                return $this->render('update', [
+                            'model' => $model,
+                ]);
+            }
         }
 
         return $this->render('update', [

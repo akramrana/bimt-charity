@@ -23,6 +23,7 @@ use Yii;
  */
 class MonthlyInvoice extends \yii\db\ActiveRecord
 {
+    public $invoice_received_by,$invoice_received_date;
     /**
      * {@inheritdoc}
      */
@@ -40,7 +41,7 @@ class MonthlyInvoice extends \yii\db\ActiveRecord
             [['monthly_invoice_number', 'receiver_id', 'amount', 'instalment_month', 'instalment_year', 'created_at', 'updated_at'], 'required'],
             [['receiver_id', 'is_paid', 'is_deleted'], 'integer'],
             [['amount'], 'number'],
-            [['created_at', 'updated_at','currency_id'], 'safe'],
+            [['created_at', 'updated_at','currency_id', 'invoice_received_date', 'invoice_received_by'], 'safe'],
             [['instalment_month', 'instalment_year'], 'string', 'max' => 50],
             [['monthly_invoice_number'], 'unique'],
             [['receiver_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['receiver_id' => 'user_id']],
@@ -64,6 +65,8 @@ class MonthlyInvoice extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'currency_id' => 'Currency',
+            'invoice_received_by' => 'Payment Received By',
+            'invoice_received_date' => 'Payment Received Date',
         ];
     }
 

@@ -90,6 +90,15 @@ var app = {
                 }
             })
         }
+    },
+    showPaidSection:function()
+    {
+        var is_paid = $("#monthlyinvoice-is_paid").is(":checked");
+        if(is_paid){
+            $("#paid-section").show();
+        }else{
+            $("#paid-section").hide();
+        }
     }
 };
 
