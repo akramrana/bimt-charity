@@ -118,30 +118,32 @@ class MonthlyInvoiceController extends Controller
                 $msg = 'Invoice#' . $model->monthly_invoice_number . ' generated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' against receiver ' . $model->receiver->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
                 \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
                 //
-                $paymentReceived = new \app\models\PaymentReceived();
-                $paymentReceived->received_invoice_number = \app\helpers\AppHelper::getReceivePayInvoiceNumber();
-                $paymentReceived->donated_by = $model->receiver_id;
-                $paymentReceived->received_by = $model->invoice_received_by;
-                $paymentReceived->amount = $model->amount;
-                $paymentReceived->currency_id = $model->currency_id;
-                $paymentReceived->instalment_month = $model->instalment_month;
-                $paymentReceived->instalment_year = $model->instalment_year;
-                $paymentReceived->has_invoice = 1;
-                $paymentReceived->monthly_invoice_id = $model->monthly_invoice_id;
-                $paymentReceived->received_date = $model->invoice_received_date;
-                $paymentReceived->created_at = date('Y-m-d H:i:s');
-                $paymentReceived->updated_at = date('Y-m-d H:i:s');
-                if ($paymentReceived->save()) {
-                    $msg1 = 'Invoice#' . $paymentReceived->received_invoice_number . ' generated for ' . $paymentReceived->instalment_month . ' ' . $paymentReceived->instalment_year . ' Donated By ' . $paymentReceived->donatedBy->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
-                    \app\helpers\AppHelper::addActivity("PREC", $paymentReceived->payment_received_id, $msg1);
-                    //
-                    Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
-                                'model' => $paymentReceived,
-                            ])
-                            ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                            ->setTo($paymentReceived->donatedBy->email)
-                            ->setSubject("Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")")
-                            ->send();
+                if ($model->is_paid == 1 && $model->invoice_received_by != null && $model->invoice_received_date != null) {
+                    $paymentReceived = new \app\models\PaymentReceived();
+                    $paymentReceived->received_invoice_number = \app\helpers\AppHelper::getReceivePayInvoiceNumber();
+                    $paymentReceived->donated_by = $model->receiver_id;
+                    $paymentReceived->received_by = $model->invoice_received_by;
+                    $paymentReceived->amount = $model->amount;
+                    $paymentReceived->currency_id = $model->currency_id;
+                    $paymentReceived->instalment_month = $model->instalment_month;
+                    $paymentReceived->instalment_year = $model->instalment_year;
+                    $paymentReceived->has_invoice = 1;
+                    $paymentReceived->monthly_invoice_id = $model->monthly_invoice_id;
+                    $paymentReceived->received_date = $model->invoice_received_date;
+                    $paymentReceived->created_at = date('Y-m-d H:i:s');
+                    $paymentReceived->updated_at = date('Y-m-d H:i:s');
+                    if ($paymentReceived->save()) {
+                        $msg1 = 'Invoice#' . $paymentReceived->received_invoice_number . ' generated for ' . $paymentReceived->instalment_month . ' ' . $paymentReceived->instalment_year . ' Donated By ' . $paymentReceived->donatedBy->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
+                        \app\helpers\AppHelper::addActivity("PREC", $paymentReceived->payment_received_id, $msg1);
+                        //
+                        Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
+                                    'model' => $paymentReceived,
+                                ])
+                                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                                ->setTo($paymentReceived->donatedBy->email)
+                                ->setSubject("Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")")
+                                ->send();
+                    }
                 }
                 return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
             } else {
@@ -172,30 +174,32 @@ class MonthlyInvoiceController extends Controller
                 $msg = 'Invoice#' . $model->monthly_invoice_number . ' has been modified by ' . Yii::$app->user->identity->fullname;
                 \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
                 //
-                $paymentReceived = new \app\models\PaymentReceived();
-                $paymentReceived->received_invoice_number = \app\helpers\AppHelper::getReceivePayInvoiceNumber();
-                $paymentReceived->donated_by = $model->receiver_id;
-                $paymentReceived->received_by = $model->invoice_received_by;
-                $paymentReceived->amount = $model->amount;
-                $paymentReceived->currency_id = $model->currency_id;
-                $paymentReceived->instalment_month = $model->instalment_month;
-                $paymentReceived->instalment_year = $model->instalment_year;
-                $paymentReceived->has_invoice = 1;
-                $paymentReceived->monthly_invoice_id = $model->monthly_invoice_id;
-                $paymentReceived->received_date = $model->invoice_received_date;
-                $paymentReceived->created_at = date('Y-m-d H:i:s');
-                $paymentReceived->updated_at = date('Y-m-d H:i:s');
-                if ($paymentReceived->save()) {
-                    $msg1 = 'Invoice#' . $paymentReceived->received_invoice_number . ' generated for ' . $paymentReceived->instalment_month . ' ' . $paymentReceived->instalment_year . ' Donated By ' . $paymentReceived->donatedBy->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
-                    \app\helpers\AppHelper::addActivity("PREC", $paymentReceived->payment_received_id, $msg1);
-                    //
-                    Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
-                                'model' => $paymentReceived,
-                            ])
-                            ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                            ->setTo($paymentReceived->donatedBy->email)
-                            ->setSubject("Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")")
-                            ->send();
+                if ($model->is_paid == 1 && $model->invoice_received_by != null && $model->invoice_received_date != null) {
+                    $paymentReceived = new \app\models\PaymentReceived();
+                    $paymentReceived->received_invoice_number = \app\helpers\AppHelper::getReceivePayInvoiceNumber();
+                    $paymentReceived->donated_by = $model->receiver_id;
+                    $paymentReceived->received_by = $model->invoice_received_by;
+                    $paymentReceived->amount = $model->amount;
+                    $paymentReceived->currency_id = $model->currency_id;
+                    $paymentReceived->instalment_month = $model->instalment_month;
+                    $paymentReceived->instalment_year = $model->instalment_year;
+                    $paymentReceived->has_invoice = 1;
+                    $paymentReceived->monthly_invoice_id = $model->monthly_invoice_id;
+                    $paymentReceived->received_date = $model->invoice_received_date;
+                    $paymentReceived->created_at = date('Y-m-d H:i:s');
+                    $paymentReceived->updated_at = date('Y-m-d H:i:s');
+                    if ($paymentReceived->save()) {
+                        $msg1 = 'Invoice#' . $paymentReceived->received_invoice_number . ' generated for ' . $paymentReceived->instalment_month . ' ' . $paymentReceived->instalment_year . ' Donated By ' . $paymentReceived->donatedBy->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
+                        \app\helpers\AppHelper::addActivity("PREC", $paymentReceived->payment_received_id, $msg1);
+                        //
+                        Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
+                                    'model' => $paymentReceived,
+                                ])
+                                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                                ->setTo($paymentReceived->donatedBy->email)
+                                ->setSubject("Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")")
+                                ->send();
+                    }
                 }
                 return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
             } else {
