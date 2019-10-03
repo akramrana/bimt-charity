@@ -50,7 +50,7 @@ DatePickerAsset::register($this);
             ?>
         </div>
         <?php
-        if (!$model->isNewRecord && $model->is_paid!=1) {
+        if ($model->is_paid!=1) {
             ?>
             <span class="clearfix"></span>
             <div id="paid-section" style="display: none;">
