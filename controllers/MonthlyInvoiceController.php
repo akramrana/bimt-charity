@@ -233,13 +233,15 @@ class MonthlyInvoiceController extends Controller
 
     public function actionSendMail($id) {
         $model = $this->findModel($id);
-        Yii::$app->mailer->compose('@app/mail/invoice-mail', [
-                    'model' => $model,
-                ])
-                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                ->setTo($model->receiver->email)
-                ->setSubject("Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')')
-                ->send();
+        if ($model->is_paid != 1) {
+            Yii::$app->mailer->compose('@app/mail/invoice-mail', [
+                        'model' => $model,
+                    ])
+                    ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                    ->setTo($model->receiver->email)
+                    ->setSubject("Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')')
+                    ->send();
+        }
         Yii::$app->session->setFlash('success', 'Invoice successfully sent');
         return $this->redirect(['index']);
     }
