@@ -14,11 +14,13 @@
     This is the beginning of <?= $model->instalment_month ?>. This is why we would like to cordially request you to contribute for 'BIMT Charity Foundation' with your SADAKAH.
 </p>
 <p>
-    Proposed amount: <?= $model->amount; ?> <?= $model->currency->code; ?> (more or less amount is unquestionably accepted)<br/>
+    Proposed amount: <?= $model->amount; ?> <?= $model->currency->code; ?> (more or less amount is unquestionably acceptable)<br/>
     Proposed deadline: 15 <?= $model->instalment_month ?>,<?= $model->instalment_year; ?>
 </p>
 <p>
-    In case you need to mention a SUBJECT during Transfer, just write FOR BCF as subject. It is strongly recommended to inform corresponding account holder after transfering the money so that we can track your transaction. We will try to send you an acknowledgement as soon as possible once we receive it.
+    In case you need to mention a SUBJECT during Transfer, just write FOR BCF as subject. 
+    It is strongly recommended to inform corresponding account holder (mentioning your member ID, 
+    if possible) after transferring the money so that we can track your transaction.
 </p>
 <p>
     Insha Allah we will try our level best to use your SADAKAH in right way. Verily, Allah is all knowing and all seeing.
@@ -52,7 +54,9 @@
     May Allah accept our SADAKAH, our all efforts and make these a good reason go acquire Allah's satisfaction in Dunya and in Akhira.
 </p>
 <p>
-    Ma'assalam<br/>
+    M’assalam<br/>
     Finance Control Board<br/>
     BIMT Charity Foundation<br/>
+    For detail please contact with Rafiq Bin Arafat, Rakibul Ahsun Mohin, Alif Khondokar.<br/>
+    Web portal Link: http://bimtcharity.org/site/login
 </p>

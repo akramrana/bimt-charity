@@ -23,7 +23,8 @@
 </p>
 
 <p>
-    Your SADAKAH has been received with thanks. 
+    Your SADAKAH has been received with thanks. For details you can visit our web portal,<br/>
+    your SADAKAH has been documented under ‘+ Receive’ Menu
 </p>
 <p>
 
@@ -32,9 +33,10 @@
 </p>
 
 <p>
-    Ma'ssalam<br/>
-
+    M’assalam<br/>
     Finance Control Board<br/>
-
     BIMT Charity Foundation<br/>
+    For detail please contact with Rafiq Bin Arafat, Rakibul Ahsun Mohin, Alif Khondokar.<br/>
+    Webportal Link: http://bimtcharity.org/site/login
+
 </p>
