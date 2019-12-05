@@ -11,11 +11,13 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use app\components\UserIdentity;
 use app\components\AccessRule;
+use yii\web\ForbiddenHttpException;
 
 /**
  * FundRequestController implements the CRUD actions for FundRequests model.
  */
-class FundRequestController extends Controller {
+class FundRequestController extends Controller
+{
 
     /**
      * {@inheritdoc}
@@ -51,7 +53,7 @@ class FundRequestController extends Controller {
                         ]
                     ],
                     [
-                        'actions' => ['index', 'view', 'create'],
+                        'actions' => ['index', 'view', 'create', 'update', 'withdraw'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_GENERAL_USER,
@@ -95,6 +97,7 @@ class FundRequestController extends Controller {
      */
     public function actionCreate() {
         $model = new FundRequests();
+        $model->scenario = 'create';
         $model->currency_id = 13;
         $model->created_at = date('Y-m-d H:i:s');
         $model->updated_at = date('Y-m-d H:i:s');
@@ -132,6 +135,14 @@ class FundRequestController extends Controller {
      */
     public function actionUpdate($id) {
         $model = $this->findModel($id);
+        $fundStatus = \app\models\FundRequestStatus::find()
+                ->where(['fund_request_id' => $model->fund_request_id])
+                ->orderBy(['fund_request_status_id' => SORT_DESC])
+                ->one();
+        if (\Yii::$app->session['__bimtCharityUserRole'] == 4 && (Yii::$app->user->identity->user_id != $model->request_user_id) && $fundStatus->status_id < 2) {
+            throw new ForbiddenHttpException('You are not authorized to view this page.');
+        }
+        $model->scenario = 'update';
         $model->updated_at = date('Y-m-d H:i:s');
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $msg = 'Invoice#' . $model->fund_request_number . ' Updated by ' . Yii::$app->user->identity->fullname;
@@ -199,6 +210,15 @@ class FundRequestController extends Controller {
                 if (!empty($check)) {
                     return json_encode(['status' => 201, 'msg' => 'The fund request is already in "' . strtoupper($check->status->name) . '" status']);
                 }
+                $underInvestigationStatus = \app\models\FundRequestStatus::find()
+                        ->where(['fund_request_id' => $model->fund_request_id,'status_id' => 5])
+                        ->one();
+                if(($request['status']==2 || $request['status']==3 || $request['status']==6) && empty($underInvestigationStatus)){
+                    return json_encode(['status' => 201, 'msg' => 'Can\'t change status without investigation']);
+                }
+                if($request['status']==6){
+                    return json_encode(['status' => 201, 'msg' => 'Request submitter only can withdraw']);
+                }
                 $status = new \app\models\FundRequestStatus();
                 $status->fund_request_id = $request['fund_request_id'];
                 $status->status_id = $request['status'];
@@ -206,7 +226,7 @@ class FundRequestController extends Controller {
                 $status->comments = !empty($request['comment']) ? $request['comment'] : "";
                 $status->created_at = date('Y-m-d H:i:s');
                 if ($status->save()) {
-                    $msg = 'Invoice#' . $model->fund_request_number . ' has been '.$status->status->name.' by ' . Yii::$app->user->identity->fullname;
+                    $msg = 'Invoice#' . $model->fund_request_number . ' has been ' . $status->status->name . ' by ' . Yii::$app->user->identity->fullname;
                     \app\helpers\AppHelper::addActivity("FR", $model->fund_request_id, $msg);
                     return json_encode(['status' => 200, 'msg' => 'Fund status successfully updated.']);
                 } else {
@@ -215,6 +235,30 @@ class FundRequestController extends Controller {
             }
         } else {
             return json_encode(['status' => 201, 'msg' => 'Error processing your request.']);
+        }
+    }
+
+    public function actionWithdraw($id) {
+        $model = $this->findModel($id);
+        $fundStatus = \app\models\FundRequestStatus::find()
+                ->where(['fund_request_id' => $model->fund_request_id])
+                ->orderBy(['fund_request_status_id' => SORT_DESC])
+                ->one();
+        if (\Yii::$app->session['__bimtCharityUserRole'] == 4 && (Yii::$app->user->identity->user_id == $model->request_user_id) && ($fundStatus->status_id == 1 || $fundStatus->status_id == 4)) {
+            $frs = new \app\models\FundRequestStatus();
+            $frs->fund_request_id = $model->fund_request_id;
+            $frs->status_id = 6;
+            $frs->user_id = Yii::$app->user->identity->user_id;
+            $frs->comments = "";
+            $frs->created_at = date('Y-m-d H:i:s');
+            $frs->save();
+            //
+            $msg = 'Invoice#' . $model->fund_request_number . ' Withdraw by ' . Yii::$app->user->identity->fullname;
+            \app\helpers\AppHelper::addActivity("FR", $model->fund_request_id, $msg);
+            Yii::$app->session->setFlash('success', 'Fund request successfully Withdrawn');
+            return $this->redirect(['view', 'id' => $model->fund_request_id]);
+        } else {
+            throw new ForbiddenHttpException('You are not authorized to view this page.');
         }
     }
 
