@@ -44,29 +44,38 @@ var app = {
         }
     },
     addFundStatus: function () {
-        $(".global-loader").show();
-        $.ajax({
-            type: "POST",
-            url: baseUrl + 'fund-request/add-status',
-            data: $("#fund-request-status-form").serialize(),
-            success: function (response)
-            {
-                $(".global-loader").hide();
-                var result = JSON.parse(response);
-                if (result.status == 201) {
-                    $("#response").html('<div class="alert alert-danger">' + result.msg + '</div>');
+        var status = $("#status_id").val();
+        var comments = $("#comments").val();
+        if ($.trim(status) != "" && $.trim(comments) != "") {
+            $(".global-loader").show();
+            $.ajax({
+                type: "POST",
+                url: baseUrl + 'fund-request/add-status',
+                data: $("#fund-request-status-form").serialize(),
+                success: function (response)
+                {
+                    $(".global-loader").hide();
+                    var result = JSON.parse(response);
+                    if (result.status == 201) {
+                        $("#response").html('<div class="alert alert-danger">' + result.msg + '</div>');
+                    }
+                    if (result.status == 200) {
+                        $("#response").html('<div class="alert alert-success">' + result.msg + '</div>');
+                        $.pjax.reload({container: '#fund-status-pjax'});
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown)
+                {
+                    $(".global-loader").hide();
+                    alert(jqXHR.responseText);
                 }
-                if (result.status == 200) {
-                    $("#response").html('<div class="alert alert-success">' + result.msg + '</div>');
-                    $.pjax.reload({container: '#fund-status-pjax'});
-                }
-            },
-            error: function (jqXHR, textStatus, errorThrown)
-            {
-                $(".global-loader").hide();
-                alert(jqXHR.responseText);
-            }
-        })
+            })
+        } else {
+            $("#response").html('<div class="alert alert-danger">Select status and Enter your comments</div>');
+            setTimeout(function () {
+                $("#response").html("");
+            },4000)
+        }
     },
     getUserPaidInvoiceList: function (val)
     {
@@ -76,7 +85,7 @@ var app = {
                 type: "GET",
                 url: baseUrl + 'payment-received/get-paid-invoice',
                 data: {
-                    'id':val
+                    'id': val
                 },
                 success: function (response)
                 {
@@ -91,12 +100,12 @@ var app = {
             })
         }
     },
-    showPaidSection:function()
+    showPaidSection: function ()
     {
         var is_paid = $("#monthlyinvoice-is_paid").is(":checked");
-        if(is_paid){
+        if (is_paid) {
             $("#paid-section").show();
-        }else{
+        } else {
             $("#paid-section").hide();
         }
     }
