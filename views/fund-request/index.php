@@ -86,7 +86,7 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                                     ->where(['fund_request_id' => $model->fund_request_id])
                                     ->orderBy(['fund_request_status_id' => SORT_DESC])
                                     ->one();
-                            if((\Yii::$app->session['__bimtCharityUserRole'] == 4 && Yii::$app->user->identity->user_id==$model->request_user_id && $fundStatus->status_id < 2) || \Yii::$app->session['__bimtCharityUserRole'] < 4){
+                            if((\Yii::$app->session['__bimtCharityUserRole'] == 4 && Yii::$app->user->identity->user_id==$model->request_user_id && ($fundStatus->status_id == 1 || $fundStatus->status_id == 4)) || \Yii::$app->session['__bimtCharityUserRole'] < 4){
                                 return Html::a('<span class="glyphicon glyphicon-pencil"></span>',$url,[
                                     'title' => 'Update',
                                     'aria-label' => 'Update',
