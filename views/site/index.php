@@ -140,7 +140,7 @@ $this->title = 'Dashboard';
                                         <?php
                                         foreach ($stat['fund_stat_curr_wise'] as $fscw) {
                                             ?>
-                                            <?= number_format($fscw['amount'], 2).' '.$fscw['code']; ?> || 
+                                            <?= number_format($fscw['amount'], 2) . ' ' . $fscw['code']; ?> || 
                                             <?php
                                         }
                                         ?>
@@ -183,10 +183,12 @@ $this->title = 'Dashboard';
                             <?php
                             if (!empty($login_history)) {
                                 foreach ($login_history as $lh) {
+                                    $dateTime = new \DateTime($lh->datetime);
+                                    $dateTime->setTimezone(new \DateTimeZone('Asia/Dhaka'));
                                     ?>
                                     <tr>
                                         <td><?= $lh->user->fullname; ?></td>
-                                        <td><?= date('F j Y h:i A', strtotime($lh->datetime)); ?></td>
+                                        <td><?= $dateTime->format('F j Y h:i A'); ?> (BST)</td>
                                     </tr>
                                     <?php
                                 }
@@ -224,10 +226,12 @@ $this->title = 'Dashboard';
                             <?php
                             if (!empty($activity_log)) {
                                 foreach ($activity_log as $al) {
+                                    $dateTime1 = new \DateTime($al->created_at);
+                                    $dateTime1->setTimezone(new \DateTimeZone('Asia/Dhaka'));
                                     ?>
                                     <tr>
                                         <td><?= $al->comments; ?></td>
-                                        <td><?= date('F j Y h:i A', strtotime($al->created_at)); ?></td>
+                                        <td><?= $dateTime1->format('F j Y h:i A'); ?> (BST)</td>
                                     </tr>
                                     <?php
                                 }
