@@ -29,3 +29,15 @@ ENGINE=InnoDB
 
 ALTER TABLE `notifications`
 	CHANGE COLUMN `type` `type` ENUM('FR','MI','PREC','PREL','EX','US','D') NULL DEFAULT NULL AFTER `notification_id`;
+
+ALTER TABLE `fund_requests`
+	ADD COLUMN `title` VARCHAR(255) NULL AFTER `request_user_id`,
+	CHANGE COLUMN `request_description` `request_description` TEXT NOT NULL AFTER `title`,
+	ADD COLUMN `reason` TEXT NULL AFTER `request_description`,
+	ADD COLUMN `receiver_contact_details` TEXT NULL AFTER `reason`,
+	ADD COLUMN `investigation_information` TEXT NULL AFTER `receiver_contact_details`,
+	ADD COLUMN `fund_receiver_account_details` TEXT NULL AFTER `investigation_information`,
+	ADD COLUMN `additional_information` TEXT NULL AFTER `fund_receiver_account_details`;
+
+ALTER TABLE `status`
+	ADD COLUMN `sort_order` INT NULL AFTER `name`;
