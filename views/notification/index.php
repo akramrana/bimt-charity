@@ -21,9 +21,16 @@ $this->params['breadcrumbs'][] = $this->title;
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
                 'comments:ntext',
-                'created_at',
-                //'is_deleted',
-                //['class' => 'yii\grid\ActionColumn'],
+                [
+                    'attribute' => 'created_at',
+                    'value' => function($model) {
+                        $dateTime = new \DateTime($model->created_at);
+                        $dateTime->setTimezone(new \DateTimeZone('Asia/Dhaka'));
+                        return $dateTime->format('Y-m-d h:i A').' (BST)';
+                    }
+                ],
+            //'is_deleted',
+            //['class' => 'yii\grid\ActionColumn'],
             ],
         ]);
         ?>
