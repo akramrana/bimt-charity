@@ -129,7 +129,7 @@ class AppHelper {
     static function getStatusList() {
         $model = \app\models\Status::find()
                 ->where(['is_deleted' => 0])
-                ->orderBy(['status_id' => SORT_ASC])
+                ->orderBy(['sort_order' => SORT_ASC])
                 ->all();
         $list = \yii\helpers\ArrayHelper::map($model, 'status_id', 'name');
         return $list;
