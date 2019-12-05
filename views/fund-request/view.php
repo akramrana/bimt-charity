@@ -17,6 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 $allowUpdate = false;
 $allowDelete = false;
 $allowStatusChange = false;
+$allowWithdrawReq = false;
 if (\Yii::$app->session['__bimtCharityUserRole'] == 1) {
     $allowUpdate = true;
     $allowDelete = true;
@@ -29,6 +30,20 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 2) {
 }
 else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     $allowUpdate = true;
+}
+else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
+    $fundStatus = \app\models\FundRequestStatus::find()
+            ->where(['fund_request_id' => $model->fund_request_id])
+            ->orderBy(['fund_request_status_id' => SORT_DESC])
+            ->one();
+    if (Yii::$app->user->identity->user_id == $model->request_user_id && $fundStatus->status_id < 2) {
+        $allowUpdate = true;
+    }
+    if(Yii::$app->user->identity->user_id == $model->request_user_id){
+        if($fundStatus->status_id == 1 || $fundStatus->status_id==4 || $fundStatus->status_id==5){
+            $allowWithdrawReq = true;
+        }
+    }
 }
 ?>
 <div class="box box-primary">
@@ -46,6 +61,15 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                 ],
             ]):""
             ?>
+            <?=
+            ($allowWithdrawReq)?Html::a('Withdraw', ['withdraw', 'id' => $model->fund_request_id], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Are you sure you want to withdraw this request?',
+                    'method' => 'post',
+                ],
+            ]):""
+            ?>
         </p>
 
         <?=
@@ -57,7 +81,13 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                     'attribute' => 'request_user_id',
                     'value' => $model->requestUser->fullname
                 ],
+                'title',
                 'request_description:ntext',
+                'reason',
+                'receiver_contact_details',
+                'investigation_information',
+                'fund_receiver_account_details',
+                'additional_information',
                 'request_amount',
                 [
                     'attribute' => 'file',
@@ -119,14 +149,17 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                         ->where(['fund_request_id' => $model->fund_request_id])
                         ->orderBy(['fund_request_status_id' => SORT_DESC])
                         ->one();
-                if ($allowStatusChange && ($fundStatus->status_id != 2 && $fundStatus->status_id != 3)) {
+                if ($allowStatusChange && ($fundStatus->status_id != 3 && $fundStatus->status_id != 6 && $fundStatus->status_id != 2)) {
                     ?>
                     <div id="response"></div>
                     <b>Add Status</b>
                     <?php
                     echo Html::beginForm('', 'get', ['id' => 'fund-request-status-form']);
-                    echo Html::dropDownList('status', '', \app\helpers\AppHelper::getStatusList(), ['prompt' => 'Select Status', 'class' => 'form-control select2']) . '<br/>';
-                    echo Html::textarea('comments', '', ['class' => 'form-control', 'style' => 'height: 100px; resize: none;']);
+                    echo Html::dropDownList('status', '', \app\helpers\AppHelper::getStatusList(), ['prompt' => 'Select Status', 'class' => 'form-control select2', 'id' => 'status_id']) . '<br/>';
+                    echo Html::label("Admin comments","",[
+                        'class' => 'control level',
+                    ]). '<br/>';
+                    echo Html::textarea('comments', '', ['class' => 'form-control', 'style' => 'height: 100px; resize: none;', 'id' => 'comments']);
                     echo Html::hiddenInput('fund_request_id', $model->fund_request_id) . "<br/>";
                     echo Html::button('Submit', ['type' => 'button', 'class' => 'btn btn-info pull pull-right', 'onclick' => 'app.addFundStatus()']);
                     echo Html::endForm();

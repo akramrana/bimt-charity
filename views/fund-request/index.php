@@ -14,7 +14,7 @@ $allowActivate = true;
 if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     $actionBtn = '{view}{update}';
 } else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
-    $actionBtn = '{view}';
+    $actionBtn = '{view}{update}';
     $allowActivate = false;
 }
 ?>
@@ -77,7 +77,25 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                 //'is_deleted',
                 //'created_at',
                 //'updated_at',
-                ['class' => 'yii\grid\ActionColumn', 'template' => $actionBtn],
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'template' => $actionBtn,
+                    'buttons' => [
+                        'update' => function($url, $model) {
+                            $fundStatus = \app\models\FundRequestStatus::find()
+                                    ->where(['fund_request_id' => $model->fund_request_id])
+                                    ->orderBy(['fund_request_status_id' => SORT_DESC])
+                                    ->one();
+                            if((\Yii::$app->session['__bimtCharityUserRole'] == 4 && Yii::$app->user->identity->user_id==$model->request_user_id && $fundStatus->status_id < 2) || \Yii::$app->session['__bimtCharityUserRole'] < 4){
+                                return Html::a('<span class="glyphicon glyphicon-pencil"></span>',$url,[
+                                    'title' => 'Update',
+                                    'aria-label' => 'Update',
+                                    'data-pjax' => 0
+                                ]);
+                            }
+                        }
+                    ]
+                ],
             ],
         ]);
         ?>

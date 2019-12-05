@@ -27,7 +27,26 @@ use dosamigos\fileupload\FileUpload;
         </div>
         <span class="clearfix"></span>
         <div class="col-md-6">
+            <?= $form->field($model, 'title')->textInput() ?>
+        </div>
+        <span class="clearfix"></span>
+        <div class="col-md-6">
             <?= $form->field($model, 'request_description')->textarea(['rows' => 6]) ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'reason')->textarea(['rows' => 6]) ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'receiver_contact_details')->textarea(['rows' => 6]) ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'investigation_information')->textarea(['rows' => 6]) ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'fund_receiver_account_details')->textarea(['rows' => 6]) ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'additional_information')->textarea(['rows' => 6]) ?>
         </div>
         <span class="clearfix"></span>
         <div class="col-md-6">
