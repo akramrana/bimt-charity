@@ -210,14 +210,14 @@ class FundRequestController extends Controller
                 if (!empty($check)) {
                     return json_encode(['status' => 201, 'msg' => 'The fund request is already in "' . strtoupper($check->status->name) . '" status']);
                 }
+                if($request['status']==6){
+                    return json_encode(['status' => 201, 'msg' => 'Request submitter only can withdraw']);
+                }
                 $underInvestigationStatus = \app\models\FundRequestStatus::find()
                         ->where(['fund_request_id' => $model->fund_request_id,'status_id' => 5])
                         ->one();
                 if(($request['status']==2 || $request['status']==3 || $request['status']==6) && empty($underInvestigationStatus)){
                     return json_encode(['status' => 201, 'msg' => 'Can\'t change status without investigation']);
-                }
-                if($request['status']==6){
-                    return json_encode(['status' => 201, 'msg' => 'Request submitter only can withdraw']);
                 }
                 $status = new \app\models\FundRequestStatus();
                 $status->fund_request_id = $request['fund_request_id'];
