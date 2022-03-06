@@ -197,4 +197,12 @@ class AppHelper {
             return "M100001";
         }
     }
+    
+    static function getAllUsersWithEmail() {
+        $models = \app\models\User::find()->where(['is_deleted' => 0])->all();
+        $list = \yii\helpers\ArrayHelper::map($models, 'user_id', function($model){
+            return $model->fullname.': '.$model->email.' :'.$model->phone;
+        });
+        return $list;
+    }
 }
