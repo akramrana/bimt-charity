@@ -12,7 +12,8 @@ use app\models\ContactForm;
 use app\components\UserIdentity;
 use app\components\AccessRule;
 
-class SiteController extends Controller {
+class SiteController extends Controller
+{
 
     /**
      * {@inheritdoc}
@@ -24,7 +25,7 @@ class SiteController extends Controller {
                 'ruleConfig' => [
                     'class' => AccessRule::className(),
                 ],
-                'only' => ['logout', 'index'],
+                'only' => ['logout', 'index', 'send-mail'],
                 'rules' => [
                     [
                         'actions' => ['logout'],
@@ -32,10 +33,16 @@ class SiteController extends Controller {
                         'roles' => ['@'],
                     ],
                     [
-                        'actions' => ['index', 'edit-profile'],
+                        'actions' => ['index', 'edit-profile', 'send-mail'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_SUPER_ADMIN,
+                        ]
+                    ],
+                    [
+                        'actions' => ['index', 'edit-profile'],
+                        'allow' => true,
+                        'roles' => [
                             UserIdentity::ROLE_ADMIN,
                             UserIdentity::ROLE_MODERATOR,
                             UserIdentity::ROLE_GENERAL_USER,
@@ -86,7 +93,7 @@ class SiteController extends Controller {
                 ->asArray()
                 ->one();
         $monthlyInvoiceCurrencyWise = \app\models\MonthlyInvoice::find()
-                ->select(['SUM(amount) as amount','currencies.code'])
+                ->select(['SUM(amount) as amount', 'currencies.code'])
                 ->join('LEFT JOIN', 'currencies', 'monthly_invoice.currency_id = currencies.currency_id')
                 ->where(['is_deleted' => 0])
                 ->andWhere(['BETWEEN', 'DATE(created_at)', $monthStart, $monthEnd])
@@ -101,7 +108,7 @@ class SiteController extends Controller {
                 ->asArray()
                 ->one();
         $paymentReceivedCurrencyWise = \app\models\PaymentReceived::find()
-                ->select(['SUM(amount) as amount','currencies.code'])
+                ->select(['SUM(amount) as amount', 'currencies.code'])
                 ->join('LEFT JOIN', 'currencies', 'payment_received.currency_id = currencies.currency_id')
                 ->where(['is_deleted' => 0])
                 ->andWhere(['BETWEEN', 'DATE(created_at)', $monthStart, $monthEnd])
@@ -116,7 +123,7 @@ class SiteController extends Controller {
                 ->asArray()
                 ->one();
         $paymentReleaseCurrencyWise = \app\models\PaymentRelease::find()
-                ->select(['SUM(amount) as amount','currencies.code'])
+                ->select(['SUM(amount) as amount', 'currencies.code'])
                 ->join('LEFT JOIN', 'currencies', 'payment_release.currency_id = currencies.currency_id')
                 ->where(['is_deleted' => 0])
                 ->andWhere(['BETWEEN', 'DATE(created_at)', $monthStart, $monthEnd])
@@ -131,7 +138,7 @@ class SiteController extends Controller {
                 ->asArray()
                 ->one();
         $expensesCurrencyWise = \app\models\Expenses::find()
-                ->select(['SUM(amount) as amount','currencies.code'])
+                ->select(['SUM(amount) as amount', 'currencies.code'])
                 ->join('LEFT JOIN', 'currencies', 'expenses.currency_id = currencies.currency_id')
                 ->where(['is_deleted' => 0])
                 ->andWhere(['BETWEEN', 'DATE(created_at)', $monthStart, $monthEnd])
@@ -145,7 +152,7 @@ class SiteController extends Controller {
                 ->andWhere(['BETWEEN', 'DATE(created_at)', $monthStart, $monthEnd])
                 ->asArray()
                 ->one();
-        
+
         $fundRequestCurrencyWise = \app\models\FundRequests::find()
                 ->select(['SUM(request_amount) as amount', 'currencies.code'])
                 ->join('LEFT JOIN', 'currencies', 'fund_requests.currency_id = currencies.currency_id')
@@ -177,10 +184,10 @@ class SiteController extends Controller {
                                         WHERE t2.fund_request_id IS NULL
                                         ) as temp', 'temp.fund_request_id = fund_requests.fund_request_id')
                     ->join('LEFT JOIN', 'status', 'temp.status_id = status.status_id')
-                    ->where(['fund_requests.is_deleted' => 0,'temp.status_id' => $sts->status_id])
+                    ->where(['fund_requests.is_deleted' => 0, 'temp.status_id' => $sts->status_id])
                     ->groupBy('status_id');
             $fund_stats = $fund_stat_query->asArray()->one();
-            
+
             $fund_stat_curr_wise_query = \app\models\FundRequests::find()
                     ->select([
                         'SUM(request_amount) as amount',
@@ -198,25 +205,25 @@ class SiteController extends Controller {
                                         ) as temp', 'temp.fund_request_id = fund_requests.fund_request_id')
                     ->join('LEFT JOIN', 'status', 'temp.status_id = status.status_id')
                     ->join('LEFT JOIN', 'currencies', 'fund_requests.currency_id = currencies.currency_id')
-                    ->where(['fund_requests.is_deleted' => 0,'temp.status_id' => $sts->status_id])
+                    ->where(['fund_requests.is_deleted' => 0, 'temp.status_id' => $sts->status_id])
                     ->groupBy('fund_requests.currency_id');
             $fund_stat_curr_wise = $fund_stat_curr_wise_query->asArray()->all();
-            
+
             $d = [
                 'name' => $sts->name,
-                'amount' => !empty($fund_stats['amount'])?$fund_stats['amount']:"0",
-                'fund_request_count' => !empty($fund_stats['fund_request_count'])?$fund_stats['fund_request_count']:"0",
+                'amount' => !empty($fund_stats['amount']) ? $fund_stats['amount'] : "0",
+                'fund_request_count' => !empty($fund_stats['fund_request_count']) ? $fund_stats['fund_request_count'] : "0",
                 'fund_stat_curr_wise' => $fund_stat_curr_wise,
             ];
-            
+
             array_push($stats, $d);
         }
-        
+
         $login_history = \app\models\LoginHistory::find()
                 ->limit(10)
                 ->orderBy(['login_history_id' => SORT_DESC])
                 ->all();
-        
+
         $activity_log = \app\models\Notifications::find()
                 ->limit(10)
                 ->where(['is_deleted' => 0])
@@ -324,8 +331,7 @@ class SiteController extends Controller {
         return $this->render('about');
     }
 
-    public function actionRegister()
-    {
+    public function actionRegister() {
         return $this->redirect(['login']);
         $model = new \app\models\Users();
         $model->scenario = 'create';
@@ -342,14 +348,14 @@ class SiteController extends Controller {
             $model->password = Yii::$app->security->generatePasswordHash($password);
             if ($model->save()) {
                 Yii::$app->mailer->compose('@app/mail/register', [
-                    'model' => $model,
-                    'password' => $password,
-                ])
-                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                ->setTo($model->email)
-                ->setSubject("Welcome to BIMT Charity Foundation")
-                ->send();
-                
+                            'model' => $model,
+                            'password' => $password,
+                        ])
+                        ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                        ->setTo($model->email)
+                        ->setSubject("Welcome to BIMT Charity Foundation")
+                        ->send();
+
                 Yii::$app->session->setFlash('success', 'Registration successfully completed');
                 //
                 return $this->redirect(['register']);
@@ -364,4 +370,70 @@ class SiteController extends Controller {
                     'model' => $model,
         ]);
     }
+
+    /**
+     * Displays about page.
+     *
+     * @return string
+     */
+    public function actionSendMail() {
+        $model = new \app\models\SendMailForm();
+        if ($model->load(Yii::$app->request->post())) {
+            $request = Yii::$app->request->bodyParams;
+            //debugPrint($request);
+            //exit;
+            $emails = [];
+            $sendMailForm = $request['SendMailForm'];
+            if (!empty($sendMailForm['userIds'])) {
+                $users = \app\models\Users::find()
+                        ->where(['user_id' => $sendMailForm['userIds']])
+                        ->andWhere(['is_active' => 1, 'is_deleted' => 0])
+                        ->all();
+                if (!empty($users)) {
+                    foreach ($users as $usr) {
+                        $emails[] = $usr->email;
+                    }
+                }
+            } else {
+                $users = \app\models\Users::find()
+                        ->andWhere(['is_active' => 1, 'is_deleted' => 0])
+                        ->all();
+                if (!empty($users)) {
+                    foreach ($users as $usr) {
+                        $emails[] = $usr->email;
+                    }
+                }
+            }
+            if (!empty($emails)) {
+                $fileName = !empty($sendMailForm['attachment']) ? 'uploads/' . $sendMailForm['attachment'] : "";
+                if (!empty($sendMailForm['attachment'])) {
+                    Yii::$app->mailer->compose('@app/mail/sent-email', [
+                                'message' => $sendMailForm['message'],
+                            ])
+                            ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                            //->setTo($model->email)
+                            ->setBcc($emails)
+                            ->setSubject($sendMailForm['subject'])
+                            ->attach($fileName)
+                            ->send();
+                } else {
+                    Yii::$app->mailer->compose('@app/mail/sent-email', [
+                                'message' => $sendMailForm['message'],
+                            ])
+                            ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                            //->setTo($model->email)
+                            ->setBcc($emails)
+                            ->setSubject($sendMailForm['subject'])
+                            ->send();
+                }
+                Yii::$app->session->setFlash('success', 'Mail successfully sent');
+                //
+                return $this->redirect(['send-mail']);
+            }
+        }
+        return $this->render('send-mail', [
+                    'model' => $model
+        ]);
+    }
+
 }
