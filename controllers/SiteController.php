@@ -411,8 +411,8 @@ class SiteController extends Controller
                                 'message' => $sendMailForm['message'],
                             ])
                             ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                            //->setTo($model->email)
-                            ->setBcc($emails)
+                            ->setTo($emails)
+                            //->setBcc($emails)
                             ->setSubject($sendMailForm['subject'])
                             ->attach($fileName)
                             ->send();
@@ -421,8 +421,8 @@ class SiteController extends Controller
                                 'message' => $sendMailForm['message'],
                             ])
                             ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                            //->setTo($model->email)
-                            ->setBcc($emails)
+                            ->setTo($emails)
+                            //->setBcc($emails)
                             ->setSubject($sendMailForm['subject'])
                             ->send();
                 }
