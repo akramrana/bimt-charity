@@ -1,10 +1,12 @@
 <?php
 
 namespace app\models;
+
 use Yii;
 use yii\db\ActiveRecord;
 
-class User extends ActiveRecord implements \yii\web\IdentityInterface {
+class User extends ActiveRecord implements \yii\web\IdentityInterface
+{
 
     public $auth_key;
 
@@ -23,7 +25,7 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
      */
     public static function findIdentity($id) {
         if (\Yii::$app->session['_bimtCharityAuth'] == 1) {
-            return static::findOne(['user_id' => $id, 'is_active' => self::STATUS_ACTIVE,'is_deleted' => self::STATUS_DELETED]);
+            return static::findOne(['user_id' => $id, 'is_active' => self::STATUS_ACTIVE, 'is_deleted' => self::STATUS_DELETED]);
         }
     }
 
@@ -41,7 +43,14 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
      * @return static|null
      */
     public static function findByUsername($username) {
-        return static::findOne(['email' => $username,'is_deleted' => self::STATUS_DELETED,'is_active' => self::STATUS_ACTIVE,]);
+        //return static::findOne(['email' => $username,'is_deleted' => self::STATUS_DELETED,'is_active' => self::STATUS_ACTIVE,]);
+        return static::find()->where([
+                            'email' => $username,
+                            'is_deleted' => self::STATUS_DELETED,
+                            'is_active' => self::STATUS_ACTIVE,
+                        ])
+                        ->andWhere(['>', 'recurring_amount', 0])
+                        ->one();
     }
 
     /**
@@ -54,16 +63,14 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
     /**
      * @inheritdoc
      */
-    public function getAuthKey()
-    {
+    public function getAuthKey() {
         return $this->auth_key;
     }
 
     /**
      * @inheritdoc
      */
-    public function validateAuthKey($authKey)
-    {
+    public function validateAuthKey($authKey) {
         return $this->getAuthKey() === $authKey;
     }
 
@@ -73,8 +80,7 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
      * @param string $password password to validate
      * @return boolean if password provided is valid for current user
      */
-    public function validatePassword($password)
-    {
+    public function validatePassword($password) {
         return Yii::$app->security->validatePassword($password, $this->password);
     }
 
@@ -83,17 +89,14 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface {
      *
      * @param string $password
      */
-    public function setPassword($password)
-    {
+    public function setPassword($password) {
         $this->password = Yii::$app->security->generatePasswordHash($password);
     }
 
     /**
      * Generates "remember me" authentication key
      */
-    public function generateAuthKey()
-    {
+    public function generateAuthKey() {
         $this->auth_key = Yii::$app->security->generateRandomString();
     }
-
 }
