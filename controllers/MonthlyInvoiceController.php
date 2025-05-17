@@ -252,6 +252,7 @@ class MonthlyInvoiceController extends Controller
                 ->all();
         $proccessed = 0;
         if (!empty($users)) {
+            $mailArr = [];
             foreach ($users as $user) {
                 $model = MonthlyInvoice::find()
                         ->where(['receiver_id' => $user->user_id, 'instalment_month' => date('F'), 'instalment_year' => date('Y')])
@@ -272,18 +273,25 @@ class MonthlyInvoiceController extends Controller
                         $proccessed = 1;
                         $msg = 'Invoice#' . $model->monthly_invoice_number . ' generated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' against receiver ' . $model->receiver->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
                         \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
-                        Yii::$app->mailer->compose('@app/mail/invoice-mail', [
-                                    'model' => $model,
-                                ])
-                                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                                ->setTo($model->receiver->email)
-                                ->setSubject("Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')')
-                                ->send();
+
+                        array_push($mailArr, $user->email);
+                        /* Yii::$app->mailer->compose('@app/mail/invoice-mail', [
+                          'model' => $model,
+                          ])
+                          ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                          ->setTo($model->receiver->email)
+                          ->setSubject("Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')')
+                          ->send(); */
                     } else {
                         die(json_encode($model->errors));
                     }
                 }
             }
+            Yii::$app->mailer->compose('@app/mail/invoice-mail-common', [])
+                    ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                    ->setTo($mailArr)
+                    ->setSubject("Your Sadakah for " . date('F') . " " . date('Y'))
+                    ->send();
         }
         if ($proccessed == 1) {
             Yii::$app->session->setFlash('success', 'Invoice successfully generated');
@@ -307,5 +315,4 @@ class MonthlyInvoiceController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-
 }
