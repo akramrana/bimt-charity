@@ -240,7 +240,7 @@ class FundRequestController extends Controller
                         $prModel->created_at = date('Y-m-d H:i:s');
                         $prModel->updated_at = date('Y-m-d H:i:s');
                         $prModel->fund_request_id = $model->fund_request_id;
-                        $prModel->release_by = Yii::$app->user->identity->user_id;
+                        $prModel->release_by = 7;
                         $prModel->amount = $model->request_amount;
                         $prModel->note = "System Added";
                         $prModel->release_invoice_number = \app\helpers\AppHelper::getReleaseInvoiceNumber();
@@ -277,6 +277,38 @@ class FundRequestController extends Controller
             return $this->redirect(['view', 'id' => $model->fund_request_id]);
         } else {
             throw new ForbiddenHttpException('You are not authorized to view this page.');
+        }
+    }
+
+    public function actionDoReleasePayment($id) {
+        $model = $this->findModel($id);
+        $fundStatus = \app\models\FundRequestStatus::find()
+                ->where(['fund_request_id' => $model->fund_request_id])
+                ->orderBy(['fund_request_status_id' => SORT_DESC])
+                ->one();
+        if ($fundStatus->status_id === 2) {
+            $checkPaymentRelease = \app\models\PaymentRelease::find()
+                    ->where(['fund_request_id' => $model->fund_request_id])
+                    ->one();
+            if (empty($checkPaymentRelease)) {
+                $prModel = new \app\models\PaymentRelease();
+                $prModel->currency_id = 13;
+                $prModel->created_at = date('Y-m-d H:i:s');
+                $prModel->updated_at = date('Y-m-d H:i:s');
+                $prModel->fund_request_id = $model->fund_request_id;
+                $prModel->release_by = 7;
+                $prModel->amount = $model->request_amount;
+                $prModel->note = "System Added";
+                $prModel->release_invoice_number = \app\helpers\AppHelper::getReleaseInvoiceNumber();
+                $prModel->save();
+                //
+                $msg = 'Invoice#' . $prModel->release_invoice_number . ' generated against fund request #' . $model->fund_request_number . ' Created by ' . Yii::$app->user->identity->fullname;
+                \app\helpers\AppHelper::addActivity("PREL", $prModel->payment_release_id, $msg);
+                Yii::$app->session->setFlash('success', 'Payment Release invoice successfully added');
+            }else{
+                Yii::$app->session->setFlash('warning', 'Payment Release invoice already exist!');
+            }
+            return $this->redirect(['view', 'id' => $model->fund_request_id]);
         }
     }
 

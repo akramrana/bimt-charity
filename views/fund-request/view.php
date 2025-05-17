@@ -22,16 +22,13 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 1) {
     $allowUpdate = true;
     $allowDelete = true;
     $allowStatusChange = true;
-}
-else if (\Yii::$app->session['__bimtCharityUserRole'] == 2) {
+} else if (\Yii::$app->session['__bimtCharityUserRole'] == 2) {
     $allowUpdate = true;
     $allowDelete = true;
     $allowStatusChange = true;
-}
-else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
+} else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     $allowUpdate = true;
-}
-else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
+} else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     $fundStatus = \app\models\FundRequestStatus::find()
             ->where(['fund_request_id' => $model->fund_request_id])
             ->orderBy(['fund_request_status_id' => SORT_DESC])
@@ -39,36 +36,46 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     if (Yii::$app->user->identity->user_id == $model->request_user_id && ($fundStatus->status_id == 1 || $fundStatus->status_id == 4)) {
         $allowUpdate = true;
     }
-    if(Yii::$app->user->identity->user_id == $model->request_user_id){
-        if($fundStatus->status_id == 1 || $fundStatus->status_id==4 || $fundStatus->status_id==5){
+    if (Yii::$app->user->identity->user_id == $model->request_user_id) {
+        if ($fundStatus->status_id == 1 || $fundStatus->status_id == 4 || $fundStatus->status_id == 5) {
             $allowWithdrawReq = true;
         }
     }
 }
+$fundStatus = \app\models\FundRequestStatus::find()
+        ->where(['fund_request_id' => $model->fund_request_id])
+        ->orderBy(['fund_request_status_id' => SORT_DESC])
+        ->one();
 ?>
 <div class="box box-primary">
 
     <div class="box-body">
 
         <p>
-            <?= ($allowUpdate)?Html::a('Update', ['update', 'id' => $model->fund_request_id], ['class' => 'btn btn-primary']):"" ?>
+            <?= ($allowUpdate) ? Html::a('Update', ['update', 'id' => $model->fund_request_id], ['class' => 'btn btn-primary']) : "" ?>
             <?=
-            ($allowDelete)?Html::a('Delete', ['delete', 'id' => $model->fund_request_id], [
-                'class' => 'btn btn-danger',
-                'data' => [
-                    'confirm' => 'Are you sure you want to delete this item?',
-                    'method' => 'post',
-                ],
-            ]):""
+            ($allowDelete) ? Html::a('Delete', ['delete', 'id' => $model->fund_request_id], [
+                        'class' => 'btn btn-danger',
+                        'data' => [
+                            'confirm' => 'Are you sure you want to delete this item?',
+                            'method' => 'post',
+                        ],
+                    ]) : ""
             ?>
             <?=
-            ($allowWithdrawReq)?Html::a('Withdraw', ['withdraw', 'id' => $model->fund_request_id], [
-                'class' => 'btn btn-danger',
-                'data' => [
-                    'confirm' => 'Are you sure you want to withdraw this request?',
-                    'method' => 'post',
-                ],
-            ]):""
+            ($allowWithdrawReq) ? Html::a('Withdraw', ['withdraw', 'id' => $model->fund_request_id], [
+                        'class' => 'btn btn-danger',
+                        'data' => [
+                            'confirm' => 'Are you sure you want to withdraw this request?',
+                            'method' => 'post',
+                        ],
+                    ]) : ""
+            ?>
+
+            <?php
+            if ($fundStatus->status_id === 2) {
+                echo ($allowUpdate) ? Html::a('Do Release Payment', ['do-release-payment', 'id' => $model->fund_request_id], ['class' => 'btn btn-default', 'style' => 'float:right']) : "";
+            }
             ?>
         </p>
 
@@ -145,10 +152,6 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
             <?php Pjax::end(); ?>
             <div class="col-md-12">
                 <?php
-                $fundStatus = \app\models\FundRequestStatus::find()
-                        ->where(['fund_request_id' => $model->fund_request_id])
-                        ->orderBy(['fund_request_status_id' => SORT_DESC])
-                        ->one();
                 if ($allowStatusChange && ($fundStatus->status_id != 3 && $fundStatus->status_id != 6 && $fundStatus->status_id != 2)) {
                     ?>
                     <div id="response"></div>
@@ -156,9 +159,9 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
                     <?php
                     echo Html::beginForm('', 'get', ['id' => 'fund-request-status-form']);
                     echo Html::dropDownList('status', '', \app\helpers\AppHelper::getStatusList(), ['prompt' => 'Select Status', 'class' => 'form-control select2', 'id' => 'status_id']) . '<br/>';
-                    echo Html::label("Admin comments","",[
+                    echo Html::label("Admin comments", "", [
                         'class' => 'control level',
-                    ]). '<br/>';
+                    ]) . '<br/>';
                     echo Html::textarea('comments', '', ['class' => 'form-control', 'style' => 'height: 100px; resize: none;', 'id' => 'comments']);
                     echo Html::hiddenInput('fund_request_id', $model->fund_request_id) . "<br/>";
                     echo Html::button('Submit', ['type' => 'button', 'class' => 'btn btn-info pull pull-right', 'onclick' => 'app.addFundStatus()']);
