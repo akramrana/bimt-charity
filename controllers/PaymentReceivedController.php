@@ -11,10 +11,12 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use app\components\UserIdentity;
 use app\components\AccessRule;
+
 /**
  * PaymentReceivedController implements the CRUD actions for PaymentReceived model.
  */
-class PaymentReceivedController extends Controller {
+class PaymentReceivedController extends Controller
+{
 
     /**
      * {@inheritdoc}
@@ -50,7 +52,7 @@ class PaymentReceivedController extends Controller {
                         ]
                     ],
                     [
-                        'actions' => ['index', 'view'],
+                        'actions' => ['index', 'view', 'create'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_GENERAL_USER,
@@ -98,6 +100,9 @@ class PaymentReceivedController extends Controller {
         $model->created_at = date('Y-m-d H:i:s');
         $model->updated_at = date('Y-m-d H:i:s');
         $model->received_invoice_number = \app\helpers\AppHelper::getReceivePayInvoiceNumber();
+        $model->donated_by = Yii::$app->user->identity->user_id;
+        $model->received_by = 7; //mahbub Id
+        //
         if ($model->load(Yii::$app->request->post())) {
             if ($model->has_invoice == 1 && !empty($model->monthly_invoice_id)) {
                 $invoice = \app\models\MonthlyInvoice::findOne($model->monthly_invoice_id);
@@ -173,33 +178,30 @@ class PaymentReceivedController extends Controller {
         Yii::$app->session->setFlash('success', 'Payment Received invoice successfully deleted');
         return $this->redirect(['index']);
     }
-    
-    public function actionSendMail($id)
-    {
+
+    public function actionSendMail($id) {
         $model = $this->findModel($id);
         Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
                     'model' => $model,
                 ])
                 ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
                 ->setTo($model->donatedBy->email)
-                ->setSubject("Confirmation of your BCF contribution (Invoice#".$model->received_invoice_number.")")
+                ->setSubject("Confirmation of your BCF contribution (Invoice#" . $model->received_invoice_number . ")")
                 ->send();
         Yii::$app->session->setFlash('success', 'Invoice successfully sent');
         return $this->redirect(['index']);
     }
 
-    public function actionGetPaidInvoice($id)
-    {
+    public function actionGetPaidInvoice($id) {
         $model = \app\models\MonthlyInvoice::find()
                 ->where(['is_deleted' => 0, 'is_paid' => 1])
                 ->andWhere(['receiver_id' => $id])
                 ->orderBy(['monthly_invoice_id' => SORT_DESC])
                 ->all();
         $html = '<option value=""></option>';
-        if(!empty($model)){
-            foreach ($model as $row)
-            {
-                $html.='<option value="'.$row->monthly_invoice_id.'">'.$row->monthly_invoice_number.'</option>';
+        if (!empty($model)) {
+            foreach ($model as $row) {
+                $html .= '<option value="' . $row->monthly_invoice_id . '">' . $row->monthly_invoice_number . '</option>';
             }
         }
         return $html;
@@ -219,5 +221,4 @@ class PaymentReceivedController extends Controller {
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-
 }

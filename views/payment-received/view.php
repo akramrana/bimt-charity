@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model app\models\PaymentReceived */
 
 $this->title = $model->received_invoice_number;
-$this->params['breadcrumbs'][] = ['label' => 'Payment Receiveds', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Sadaqah', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 $allowUpdate = false;

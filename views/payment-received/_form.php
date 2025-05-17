@@ -25,22 +25,6 @@ if(!$model->isNewRecord){
         </div>
         <span class="clearfix"></span>
         <div class="col-md-6">
-            <?=
-            $form->field($model, 'donated_by')->dropDownList(app\helpers\AppHelper::getAllUsers(), [
-                'prompt' => 'Please Select',
-                'onchange' => 'app.getUserPaidInvoiceList(this.value)'
-            ])
-            ?>
-        </div>
-        <div class="col-md-6">
-            <?=
-            $form->field($model, 'received_by')->dropDownList(app\helpers\AppHelper::getAllUsers(), [
-                'prompt' => 'Please Select'
-            ])
-            ?>
-        </div>
-        <span class="clearfix"></span>
-        <div class="col-md-6">
             <?= $form->field($model, 'received_date')->textInput([
                 'class' => 'form-control datepicker'
             ]);?>

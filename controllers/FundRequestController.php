@@ -142,8 +142,8 @@ class FundRequestController extends Controller
         if (\Yii::$app->session['__bimtCharityUserRole'] == 4 && (Yii::$app->user->identity->user_id != $model->request_user_id)) {
             throw new ForbiddenHttpException('You are not authorized to view this page.');
         }
-        if (\Yii::$app->session['__bimtCharityUserRole'] == 4 && (Yii::$app->user->identity->user_id == $model->request_user_id)){
-            if($fundStatus->status_id != 1 && $fundStatus->status_id != 4){
+        if (\Yii::$app->session['__bimtCharityUserRole'] == 4 && (Yii::$app->user->identity->user_id == $model->request_user_id)) {
+            if ($fundStatus->status_id != 1 && $fundStatus->status_id != 4) {
                 throw new ForbiddenHttpException('You are not authorized to view this page.');
             }
         }
@@ -215,13 +215,13 @@ class FundRequestController extends Controller
                 if (!empty($check)) {
                     return json_encode(['status' => 201, 'msg' => 'The fund request is already in "' . strtoupper($check->status->name) . '" status']);
                 }
-                if($request['status']==6){
+                if ($request['status'] == 6) {
                     return json_encode(['status' => 201, 'msg' => 'Request submitter only can withdraw']);
                 }
                 $underInvestigationStatus = \app\models\FundRequestStatus::find()
-                        ->where(['fund_request_id' => $model->fund_request_id,'status_id' => 5])
+                        ->where(['fund_request_id' => $model->fund_request_id, 'status_id' => 5])
                         ->one();
-                if(($request['status']==2 || $request['status']==3 || $request['status']==6) && empty($underInvestigationStatus)){
+                if (($request['status'] == 2 || $request['status'] == 3 || $request['status'] == 6) && empty($underInvestigationStatus)) {
                     return json_encode(['status' => 201, 'msg' => 'Can\'t change status without investigation']);
                 }
                 $status = new \app\models\FundRequestStatus();
@@ -233,6 +233,19 @@ class FundRequestController extends Controller
                 if ($status->save()) {
                     $msg = 'Invoice#' . $model->fund_request_number . ' has been ' . $status->status->name . ' by ' . Yii::$app->user->identity->fullname;
                     \app\helpers\AppHelper::addActivity("FR", $model->fund_request_id, $msg);
+                    //
+                    if ($status->status_id == 2) {
+                        $prModel = new \app\models\PaymentRelease();
+                        $prModel->currency_id = 13;
+                        $prModel->created_at = date('Y-m-d H:i:s');
+                        $prModel->updated_at = date('Y-m-d H:i:s');
+                        $prModel->fund_request_id = $model->fund_request_id;
+                        $prModel->release_by = Yii::$app->user->identity->user_id;
+                        $prModel->amount = $model->request_amount;
+                        $prModel->note = "System Added";
+                        $prModel->release_invoice_number = \app\helpers\AppHelper::getReleaseInvoiceNumber();
+                        $prModel->save();
+                    }
                     return json_encode(['status' => 200, 'msg' => 'Fund status successfully updated.']);
                 } else {
                     return json_encode($status->errors);
@@ -281,5 +294,4 @@ class FundRequestController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-
 }

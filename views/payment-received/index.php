@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\PaymentReceivedSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Payment Received';
+$this->title = 'Sadaqah';
 $this->params['breadcrumbs'][] = $this->title;
 $allowCreate = true;
 $actionBtn = '{view}{update}{delete}';
@@ -15,7 +15,7 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     $actionBtn = '{view}{update}';
 } else if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
     $actionBtn = '{view}';
-    $allowCreate = false;
+    $allowCreate = true;
 }
 ?>
 <div class="box box-primary">
@@ -23,7 +23,7 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
     <div class="box-body">
 
         <p>
-            <?= ($allowCreate) ? Html::a('Create Payment Received', ['create'], ['class' => 'btn btn-success']) : "" ?>
+            <?= ($allowCreate) ? Html::a('Add Sadaqah', ['create'], ['class' => 'btn btn-success']) : "" ?>
         </p>
 
         <?=

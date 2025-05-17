@@ -61,7 +61,7 @@ class PaymentReceived extends \yii\db\ActiveRecord
     {
         return [
             'payment_received_id' => 'Payment Received ID',
-            'received_invoice_number' => 'Received Invoice Number',
+            'received_invoice_number' => 'Sadaqah Invoice Number',
             'donated_by' => 'Donated By',
             'received_by' => 'Received By',
             'comments' => 'Comments',
