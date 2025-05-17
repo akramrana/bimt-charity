@@ -258,32 +258,34 @@ class MonthlyInvoiceController extends Controller
                         ->where(['receiver_id' => $user->user_id, 'instalment_month' => date('F'), 'instalment_year' => date('Y')])
                         ->one();
                 if (empty($model)) {
-                    $model = new MonthlyInvoice();
-                    $model->created_at = date('Y-m-d H:i:s');
-                    $model->updated_at = date('Y-m-d H:i:s');
-                    $model->monthly_invoice_number = \app\helpers\AppHelper::getNextMonthlyInvoiceNumber();
-                    $model->receiver_id = $user->user_id;
-                    $model->amount = $user->recurring_amount;
-                    $model->currency_id = $user->currency_id;
-                    $model->instalment_month = date('F');
-                    $model->instalment_year = date('Y');
-                    $model->is_paid = 0;
-                    $model->is_deleted = 0;
-                    if ($model->save()) {
-                        $proccessed = 1;
-                        $msg = 'Invoice#' . $model->monthly_invoice_number . ' generated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' against receiver ' . $model->receiver->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
-                        \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
+                    if ($user->recurring_amount > 0) {
+                        $model = new MonthlyInvoice();
+                        $model->created_at = date('Y-m-d H:i:s');
+                        $model->updated_at = date('Y-m-d H:i:s');
+                        $model->monthly_invoice_number = \app\helpers\AppHelper::getNextMonthlyInvoiceNumber();
+                        $model->receiver_id = $user->user_id;
+                        $model->amount = $user->recurring_amount;
+                        $model->currency_id = $user->currency_id;
+                        $model->instalment_month = date('F');
+                        $model->instalment_year = date('Y');
+                        $model->is_paid = 0;
+                        $model->is_deleted = 0;
+                        if ($model->save()) {
+                            $proccessed = 1;
+                            $msg = 'Invoice#' . $model->monthly_invoice_number . ' generated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' against receiver ' . $model->receiver->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
+                            \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
 
-                        array_push($mailArr, $user->email);
-                        /* Yii::$app->mailer->compose('@app/mail/invoice-mail', [
-                          'model' => $model,
-                          ])
-                          ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                          ->setTo($model->receiver->email)
-                          ->setSubject("Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')')
-                          ->send(); */
-                    } else {
-                        die(json_encode($model->errors));
+                            array_push($mailArr, $user->email);
+                            /* Yii::$app->mailer->compose('@app/mail/invoice-mail', [
+                              'model' => $model,
+                              ])
+                              ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                              ->setTo($model->receiver->email)
+                              ->setSubject("Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')')
+                              ->send(); */
+                        } else {
+                            die(json_encode($model->errors));
+                        }
                     }
                 }
             }
