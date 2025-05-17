@@ -34,40 +34,48 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                 ['class' => 'yii\grid\SerialColumn'],
                 'received_invoice_number',
                 [
+                    'label' => 'Proof',
+                    'value' => function ($model) {
+                        return \yii\helpers\BaseUrl::home() . 'uploads/' . $model->file;
+                    },
+                    'format' => ['image', ['width' => '128']],
+                    'filter' => false,
+                ],
+                [
                     'attribute' => 'donated_by',
-                    'value' => function($model) {
+                    'value' => function ($model) {
                         return $model->donatedBy->fullname;
                     },
-                    'filter' => Html::activeDropDownList($searchModel, 'donated_by', app\helpers\AppHelper ::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter']),
+                    'filter' => Html::activeDropDownList($searchModel, 'donated_by', app\helpers\AppHelper::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter']),
                 ],
                 [
                     'attribute' => 'received_by',
-                    'value' => function($model) {
+                    'value' => function ($model) {
                         return $model->receivedBy->fullname;
                     },
-                    'filter' => Html::activeDropDownList($searchModel, 'received_by', app\helpers\AppHelper ::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter']),
+                    'filter' => Html::activeDropDownList($searchModel, 'received_by', app\helpers\AppHelper::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter']),
                 ],
                 'comments:ntext',
                 'amount',
                 [
                     'attribute' => 'instalment_month',
-                    'filter' => Html::activeDropDownList($searchModel, 'instalment_month', app\helpers\AppHelper ::monthList(), ['class' => 'form-control', 'prompt' => 'Filter']),
+                    'filter' => Html::activeDropDownList($searchModel, 'instalment_month', app\helpers\AppHelper::monthList(), ['class' => 'form-control', 'prompt' => 'Filter']),
                 ],
                 [
                     'attribute' => 'instalment_year',
-                    'filter' => Html::activeDropDownList($searchModel, 'instalment_year', app\helpers\AppHelper ::YearsList(), ['class' => 'form-control', 'prompt' => 'Filter']),
+                    'filter' => Html::activeDropDownList($searchModel, 'instalment_year', app\helpers\AppHelper::YearsList(), ['class' => 'form-control', 'prompt' => 'Filter']),
                 ],
                 [
                     'attribute' => 'has_invoice',
-                    'value' => function($model) {
-                        return ($model->has_invoice == '1') ? "Yes" : "No";
+                    'value' => function ($model) {
+                        return($model->has_invoice == '1') ? "Yes" : "No";
                     },
                     'filter' => Html::activeDropDownList($searchModel, 'has_invoice', [1 => 'Yes', 0 => 'No'], ['class' => 'form-control', 'prompt' => 'Filter']),
                 ],
                 'currency.code',
                 [
                     'attribute' => 'monthly_invoice_number',
-                    'value' => function($model){
+                    'value' => function ($model) {
                         return !empty($model->monthlyInvoice) ? $model->monthlyInvoice->monthly_invoice_number : "";
                     }
                 ],

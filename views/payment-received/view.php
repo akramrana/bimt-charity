@@ -76,6 +76,11 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                 'received_date',
                 'created_at',
                 'updated_at',
+                [
+                    'label' => 'Proof',
+                    'value' => \yii\helpers\BaseUrl::home() . 'uploads/' . $model->file,
+                    'format' => ['image', ['width' => '256']],
+                ],
             ],
         ])
         ?>

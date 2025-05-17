@@ -27,25 +27,24 @@ use Yii;
  */
 class PaymentReceived extends \yii\db\ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'payment_received';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             [['received_invoice_number', 'donated_by', 'received_by', 'amount', 'created_at', 'updated_at'], 'required'],
             [['donated_by', 'received_by', 'has_invoice', 'monthly_invoice_id', 'is_deleted'], 'integer'],
             [['comments'], 'string'],
             [['amount'], 'number'],
-            [['currency_id','received_date'],'safe'],
+            [['currency_id', 'received_date', 'file'], 'safe'],
             [['received_invoice_number', 'instalment_month', 'instalment_year'], 'string', 'max' => 50],
             [['received_invoice_number'], 'unique'],
             [['monthly_invoice_id'], 'exist', 'skipOnError' => true, 'targetClass' => MonthlyInvoice::className(), 'targetAttribute' => ['monthly_invoice_id' => 'monthly_invoice_id']],
@@ -57,8 +56,7 @@ class PaymentReceived extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'payment_received_id' => 'Payment Received ID',
             'received_invoice_number' => 'Sadaqah Invoice Number',
@@ -75,38 +73,35 @@ class PaymentReceived extends \yii\db\ActiveRecord
             'is_deleted' => 'Is Deleted',
             'currency_id' => 'Currency',
             'received_date' => 'Received Date',
+            'file' => 'Proof',
         ];
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getMonthlyInvoice()
-    {
+    public function getMonthlyInvoice() {
         return $this->hasOne(MonthlyInvoice::className(), ['monthly_invoice_id' => 'monthly_invoice_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getDonatedBy()
-    {
+    public function getDonatedBy() {
         return $this->hasOne(Users::className(), ['user_id' => 'donated_by']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getReceivedBy()
-    {
+    public function getReceivedBy() {
         return $this->hasOne(Users::className(), ['user_id' => 'received_by']);
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
-    {
+    public function getCurrency() {
         return $this->hasOne(Currencies::className(), ['currency_id' => 'currency_id']);
     }
 }
