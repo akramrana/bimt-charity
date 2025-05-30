@@ -13,6 +13,8 @@ DatePickerAsset::register($this);
 $userPaidInvoiceList = [];
 if (!$model->isNewRecord) {
     $userPaidInvoiceList = app\helpers\AppHelper::getUserPaidInvoiceList($model->donated_by);
+}else{
+    $userPaidInvoiceList = app\helpers\AppHelper::getUserUnpaidInvoiceList($model->donated_by);
 }
 ?>
 
