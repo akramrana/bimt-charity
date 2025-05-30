@@ -96,6 +96,7 @@ class PaymentReceivedController extends Controller
      */
     public function actionCreate() {
         $model = new PaymentReceived();
+        $model->scenario = 'add-sadaqa';
         $model->currency_id = 13;
         $model->created_at = date('Y-m-d H:i:s');
         $model->updated_at = date('Y-m-d H:i:s');
@@ -106,10 +107,12 @@ class PaymentReceivedController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             if ($model->has_invoice == 1 && !empty($model->monthly_invoice_id)) {
                 $invoice = \app\models\MonthlyInvoice::findOne($model->monthly_invoice_id);
-                $model->instalment_month = $invoice->instalment_month;
-                $model->instalment_year = $invoice->instalment_year;
-                $model->amount = $invoice->amount;
-                $model->currency_id = $invoice->currency_id;
+                if (!empty($invoice)) {
+                    $model->instalment_month = $invoice->instalment_month;
+                    $model->instalment_year = $invoice->instalment_year;
+                    $model->amount = $invoice->amount;
+                    $model->currency_id = $invoice->currency_id;
+                }
             }
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Payment Received invoice successfully added');
@@ -137,6 +140,7 @@ class PaymentReceivedController extends Controller
      */
     public function actionUpdate($id) {
         $model = $this->findModel($id);
+        $model->scenario = 'add-sadaqa';
         $model->updated_at = date('Y-m-d H:i:s');
         if ($model->load(Yii::$app->request->post())) {
             if ($model->has_invoice == 1 && !empty($model->monthly_invoice_id)) {
