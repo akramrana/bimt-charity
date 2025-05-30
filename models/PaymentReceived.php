@@ -50,6 +50,8 @@ class PaymentReceived extends \yii\db\ActiveRecord
             [['monthly_invoice_id'], 'exist', 'skipOnError' => true, 'targetClass' => MonthlyInvoice::className(), 'targetAttribute' => ['monthly_invoice_id' => 'monthly_invoice_id']],
             [['donated_by'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['donated_by' => 'user_id']],
             [['received_by'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['received_by' => 'user_id']],
+            [['instalment_month', 'instalment_year', 'currency_id', 'received_date'], 'required', 'on' => 'add-sadaqa'],
+            [['instalment_month', 'instalment_year', 'currency_id', 'received_date'], 'required', 'on' => 'update-sadaqa']
         ];
     }
 
