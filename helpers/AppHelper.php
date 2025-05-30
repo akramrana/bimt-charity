@@ -184,6 +184,16 @@ class AppHelper {
         $list = \yii\helpers\ArrayHelper::map($model, 'monthly_invoice_id', 'monthly_invoice_number');
         return $list;
     }
+    
+    static function getUserUnpaidInvoiceList($user_id) {
+        $model = \app\models\MonthlyInvoice::find()
+                ->where(['is_deleted' => 0, 'is_paid' => 0])
+                ->andWhere(['receiver_id' => $user_id])
+                ->orderBy(['monthly_invoice_id' => SORT_DESC])
+                ->all();
+        $list = \yii\helpers\ArrayHelper::map($model, 'monthly_invoice_id', 'monthly_invoice_number');
+        return $list;
+    }
 
     static function getNextMemberCode() {
         $order = \app\models\Users::find()
