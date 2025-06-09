@@ -34,10 +34,10 @@ class MonthlyInvoiceController extends Controller
                 'ruleConfig' => [
                     'class' => AccessRule::className(),
                 ],
-                'only' => ['index', 'view', 'create', 'update', 'delete', 'send-mail', 'generate'],
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'send-mail', 'generate', 'send-mail-to-all'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'view', 'create', 'update', 'delete', 'send-mail', 'generate'],
+                        'actions' => ['index', 'view', 'create', 'update', 'delete', 'send-mail', 'generate', 'send-mail-to-all'],
                         'allow' => true,
                         'roles' => [
                             UserIdentity::ROLE_SUPER_ADMIN,
@@ -300,6 +300,112 @@ class MonthlyInvoiceController extends Controller
         } else {
             Yii::$app->session->setFlash('warning', 'No invoice generated');
         }
+        return $this->redirect(['index']);
+    }
+
+    public function actionSendMailToAll() {
+        $userCount = \app\models\Users::find()
+                ->where(['is_deleted' => 0, 'is_active' => 1])
+                ->count();
+        $batchSize = 40;
+        $totalBatches = ceil($userCount / $batchSize);
+        $subject = "Your Sadakah for " . date('F') . " " . date('Y');
+        $mailDetails = "<p>
+                        Assalamualaikum,<br/>
+                        Dear Brother,
+                    </p>
+                    <p>
+                        We hope by the mercy of almighty Allah (SW) you are doing well as well as your family members.<br/> 
+                        This is the beginning of <?= date('F') ?>. This is why we would like to cordially request you to contribute for 'BIMT Charity Foundation' with your SADAKAH.
+                    </p>
+                    <p>
+                        Proposed amount: 200|500|1000 BDT|USD|EUR (more or less amount is unquestionably acceptable)<br/>
+                        Proposed deadline: 15 ".date('F').",".date('Y')."
+                    </p>
+                    <p>
+                        In case you need to mention a SUBJECT during Transfer, just write FOR BCF as subject. 
+                        It is strongly recommended to inform corresponding account holder (mentioning your member ID, 
+                        if possible) after transferring the money so that we can track your transaction.
+                    </p>
+                    <p>
+                        Insha Allah we will try our level best to use your SADAKAH in right way. Verily, Allah is all knowing and all seeing.
+                    </p>
+
+                    <p>
+                        Bank Details:
+                    </p>
+                    <p>
+                        Bikash: 008801719127039 (Mahbubur Rahman)
+                    </p>
+                    <p>
+                        Germany:<br/>
+                        Account Holder Name: MD Alif Khondokar<br/>
+                        IBAN: DE78 1007 0024 0214 2370 00<br/>
+                        BIC: DEUTDEDBBER
+                    </p>
+                    <p>
+                        Singapore:<br/>
+                        Account Holder Name: Mohin Md Rakibul Ahsun<br/>
+                        Bank Name: POSB<br/>
+                        Account Number: 248-85387-5 (Savings) 
+                    </p>
+                    <p>
+                        May Allah accept our SADAKAH, our all efforts and make these a good reason go acquire Allah's satisfaction in Dunya and in Akhira.
+                    </p>
+                    <p>
+                        M’assalam<br/>
+                        Finance Control Board<br/>
+                        BIMT Charity Foundation<br/>
+                        For detail please contact with Rakibul Ahsun Mohin, Alif Khondokar.<br/>
+                        Web portal Link: http://bimtcharity.org/site/login
+                    </p>";
+        for ($batch = 0; $batch < $totalBatches; $batch++) {
+            $offset = $batch * $batchSize;
+            $users = \app\models\Users::find()
+                    ->where(['is_deleted' => 0, 'is_active' => 1])
+                    ->offset($offset)
+                    ->limit($batchSize)
+                    ->all();
+            $emailList = [];
+            foreach ($users as $user) {
+                array_push($emailList, $user->email);
+            }
+            
+            $mailObject = [
+                'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                'to' => $emailList,
+                'subject' => $subject,
+                'html' => $mailDetails,
+            ];
+            /*$mailObject = '{
+                                "from": "BIMT Charity Foundation<communication@bimtcharity.org>",
+                                "to": '. json_encode($emailList).',
+                                "subject": "'.$subject.'",
+                                "html": "'.$mailDetails.'"
+                            }';*/
+            
+            //debugPrint(json_encode($mailObject));
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.resend.com/emails',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => json_encode($mailObject),
+                CURLOPT_HTTPHEADER => array(
+                    'Authorization: Bearer  re_Qw1yHEhi_C17JhhGFEqARV6EZfKSoFrNa',
+                    'Content-Type: application/json'
+                ),
+            ));
+            $response = curl_exec($curl);
+            //debugPrint($response);
+            curl_close($curl);
+        }
+        Yii::$app->session->setFlash('success', 'Mail successfully sent');
         return $this->redirect(['index']);
     }
 
