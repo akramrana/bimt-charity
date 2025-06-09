@@ -289,11 +289,11 @@ class MonthlyInvoiceController extends Controller
                     }
                 }
             }
-            Yii::$app->mailer->compose('@app/mail/invoice-mail-common', [])
+            /*Yii::$app->mailer->compose('@app/mail/invoice-mail-common', [])
                     ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
                     ->setTo($mailArr)
                     ->setSubject("Your Sadakah for " . date('F') . " " . date('Y'))
-                    ->send();
+                    ->send();*/
         }
         if ($proccessed == 1) {
             Yii::$app->session->setFlash('success', 'Invoice successfully generated');
