@@ -18,7 +18,7 @@ class UserSearch extends Users
     {
         return [
             [['user_id', 'enable_login', 'password', 'is_active', 'is_deleted'], 'integer'],
-            [['fullname', 'image', 'email', 'phone', 'alt_phone', 'address', 'batch', 'department', 'user_type', 'created_at', 'updated_at', 'member_code', 'invited_user_id'], 'safe'],
+            [['fullname', 'image', 'email', 'phone', 'alt_phone', 'address', 'batch', 'department', 'user_type', 'created_at', 'updated_at', 'member_code', 'invited_user_id', 'is_active_donor', 'is_approved', 'is_exception'], 'safe'],
             [['recurring_amount'], 'number'],
         ];
     }
@@ -68,6 +68,9 @@ class UserSearch extends Users
             'invited_user_id' => $this->invited_user_id,
             'is_active' => $this->is_active,
             'is_deleted' => $this->is_deleted,
+            'is_approved' => $this->is_approved,
+            'is_exception' => $this->is_exception,
+            'is_active_donor' => $this->is_active_donor,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);

@@ -12,6 +12,7 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
 
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 1;
+    const STATUS_APPROVED = 1;
 
     /**
      * @inheritdoc
@@ -48,8 +49,13 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
                             'email' => $username,
                             'is_deleted' => self::STATUS_DELETED,
                             'is_active' => self::STATUS_ACTIVE,
+                            'is_approved' => self::STATUS_APPROVED,
                         ])
-                        ->andWhere(['>', 'recurring_amount', 0])
+                        ->andWhere([
+                            'or',
+                            ['>', 'recurring_amount', 0],
+                            ['is_exception' => 1],
+                        ])
                         ->one();
     }
 

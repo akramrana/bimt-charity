@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use dosamigos\fileupload\FileUpload;
+
 /* @var $this yii\web\View */
 /* @var $model app\models\Users */
 /* @var $form yii\widgets\ActiveForm */
@@ -22,7 +23,7 @@ use dosamigos\fileupload\FileUpload;
             <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
             <?= $form->field($model, 'alt_phone')->textInput(['maxlength' => true]) ?>
-            
+
         </div>
     </div>
     <div class="row">
@@ -32,22 +33,22 @@ use dosamigos\fileupload\FileUpload;
         <span class="clearfix"></span>
         <div class="col-md-6">
             <?= $form->field($model, 'batch')->textInput(['maxlength' => true]) ?>
-            
+
             <?= $form->field($model, 'password_hash')->passwordInput() ?>
-            
+
             <?=
             $form->field($model, 'user_type')->dropDownList(app\helpers\AppHelper::getUserTypeList(), [
                 'prompt' => 'Please Select'
             ])
             ?>
-            
-            
+
+
             <?=
             $form->field($model, 'currency_id')->dropDownList(app\helpers\AppHelper::getAllCurrency(), [
                 'prompt' => 'Please Select'
             ])
             ?>
-            
+
             <label>
                 Image
             </label>
@@ -115,14 +116,28 @@ use dosamigos\fileupload\FileUpload;
             </div>
 
             <?php echo $form->field($model, 'image')->hiddenInput()->label(false); ?>
+
+            <?php
+            if (\Yii::$app->session['__bimtCharityUserRole'] == 1 || \Yii::$app->session['__bimtCharityUserRole'] == 2) {
+                ?>
+
+                <?= $form->field($model, 'is_exception')->checkbox() ?>
+
+                <?= $form->field($model, 'is_approved')->checkbox() ?>
+
+                <?= $form->field($model, 'is_active_donor')->checkbox() ?>
+
+                <?php
+            }
+            ?>
         </div>
         <div class="col-md-6">
             <?= $form->field($model, 'department')->textInput(['maxlength' => true]) ?>
-            
+
             <?= $form->field($model, 'confirm_password')->passwordInput() ?>
-            
+
             <?= $form->field($model, 'recurring_amount')->textInput() ?>
-            
+
             <?=
             $form->field($model, 'invited_user_id')->dropDownList(app\helpers\AppHelper::getAllUsers(), [
                 'prompt' => 'Please Select'

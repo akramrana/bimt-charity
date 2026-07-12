@@ -9,6 +9,7 @@
         </div>
 
         <?php
+        $userSearch = Yii::$app->request->get('UserSearch', []);
         //debugPrint(Yii::$app->user->identity);
         echo dmstr\widgets\Menu::widget(
                 [
@@ -21,7 +22,43 @@
                         ['label' => 'Fund Request', 'icon' => 'fa fa-pie-chart', 'url' => ['fund-request/index']],
                         ['label' => 'Donation', 'icon' => 'share', 'url' => ['payment-release/index']],
                         ['label' => 'Expenses', 'icon' => 'fa fa-money', 'url' => ['expense/index']],
-                        ['label' => 'Members', 'icon' => 'fa fa-users', 'url' => ['user/index']],
+                        [
+                            'label' => 'Members',
+                            'icon' => 'fa fa-users',
+                            //'url' => ['user/index'],
+                            'items' => [
+                                [
+                                    'label' => 'Actively Donating',
+                                    'icon' => 'check',
+                                    'url' => ['user/index', 'UserSearch[is_active_donor]' => 1],
+                                    'active' => Yii::$app->controller->route === 'user/index' && isset($userSearch['is_active_donor']) && (int) $userSearch['is_active_donor'] === 1,
+                                ],
+                                [
+                                    'label' => 'Not Actively Donating',
+                                    'icon' => 'close',
+                                    'url' => ['user/index', 'UserSearch[is_active_donor]' => 0],
+                                    'active' => Yii::$app->controller->route === 'user/index' && isset($userSearch['is_active_donor']) && (int) $userSearch['is_active_donor'] === 0,
+                                ],
+                                [
+                                    'label' => 'Waiting for Approval',
+                                    'icon' => 'hourglass',
+                                    'url' => ['user/index', 'UserSearch[is_approved]' => 0],
+                                    'active' => Yii::$app->controller->route === 'user/index' && isset($userSearch['is_approved']) && (int) $userSearch['is_approved'] === 0,
+                                ],
+                                [
+                                    'label' => 'Special Member',
+                                    'icon' => 'star',
+                                    'url' => ['user/index', 'UserSearch[is_exception]' => 1],
+                                    'active' => Yii::$app->controller->route === 'user/index' && isset($userSearch['is_exception']) && (int) $userSearch['is_exception'] === 1,
+                                ],
+                                [
+                                    'label' => 'All Member',
+                                    'icon' => 'list',
+                                    'url' => ['user/index'],
+                                    'active' => Yii::$app->controller->route === 'user/index' && empty($userSearch),
+                                ],
+                            ],
+                        ],
                         ['label' => 'Documents', 'icon' => 'fa fa-file', 'url' => ['document/index']],
                         ['label' => 'Activity Log', 'icon' => 'fa fa-bell', 'url' => ['notification/index']],
                         ['label' => 'Report', 'icon' => 'fa fa-bar-chart', 'url' => ['report/index']],

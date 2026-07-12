@@ -33,36 +33,56 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
         GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
+            'rowOptions' => function ($model) {
+                if ($model->is_active_donor == 0 && $model->is_exception == 0) {
+                    return [
+                        'style' => 'background-color: #fff5f5;',
+                    ];
+                }
+                if ($model->is_active_donor == 1) {
+                    return [
+                        'style' => 'background-color:#f0fff4;'
+                    ];
+                }
+                if ($model->is_exception == 1) {
+                    return ['style' => 'background-color:#f3f8ff;'];
+                }
+                return [];
+            },
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
-                /* [
-                  'label' => 'Image',
-                  'value' => function($model) {
-                  return \yii\helpers\BaseUrl::home() . 'uploads/' . $model->image;
-                  },
-                  'format' => ['image', ['width' => '96']],
-                  'filter' => false,
-                  ], */
                 'member_code',
-                'fullname',
+                [
+                    'attribute' => 'fullname',
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        $html = Html::encode($model->fullname);
+
+                        if ($model->is_active_donor == 1) {
+                            $html .= '<br><span class="label label-success">Active Donor</span>';
+                        }
+                        if ($model->is_active_donor == 0 && $model->is_exception == 0) {
+                            $html .= '<br><span class="label label-danger">Inactive Donor</span>';
+                        }
+                        if ($model->is_exception == 1) {
+                            $html .= '<br><span class="label label-info">Special Member</span>';
+                        }
+
+                        return $html;
+                    },
+                ],
                 //'image',
                 'email:email',
                 'phone',
-                //'alt_phone',
                 'address:ntext',
-                //'batch',
-                //'department',
-                //'enable_login',
-                //'password',
-                //'user_type',
                 'recurring_amount',
                 'currency.code',
                 [
                     'attribute' => 'invited_user_id',
-                    'value' => function($model) {
+                    'value' => function ($model) {
                         return !empty($model->invitedBy) ? $model->invitedBy->fullname : '';
                     },
-                    'filter' => Html::activeDropDownList($searchModel, 'invited_user_id', app\helpers\AppHelper ::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter'])
+                    'filter' => Html::activeDropDownList($searchModel, 'invited_user_id', app\helpers\AppHelper::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter'])
                 ],
                 [
                     'label' => 'Status',
@@ -70,26 +90,23 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                     'format' => 'raw',
                     'value' => function ($model, $url) use ($allowActivate) {
                         return '<div class="onoffswitch">'
-                                . Html::checkbox('onoffswitch', $model->is_active, [
-                                    'class' => "onoffswitch-checkbox",
-                                    'id' => "myonoffswitch" . $model->user_id,
-                                    'onclick' => 'app.changeStatus("user/activate",this,' . $model->user_id . ')',
-                                    'disabled' => ($allowActivate) ? false : true,
-                                ])
-                                . '<label class="onoffswitch-label" for="myonoffswitch' . $model->user_id . '"></label></div>';
+                        . Html::checkbox('onoffswitch', $model->is_active, [
+                            'class' => "onoffswitch-checkbox",
+                            'id' => "myonoffswitch" . $model->user_id,
+                            'onclick' => 'app.changeStatus("user/activate",this,' . $model->user_id . ')',
+                            'disabled' => ($allowActivate) ? false : true,
+                        ])
+                        . '<label class="onoffswitch-label" for="myonoffswitch' . $model->user_id . '"></label></div>';
                     },
                     'filter' => Html::activeDropDownList($searchModel, 'is_active', [1 => 'Active', 0 => 'Inactive'], ['class' => 'form-control', 'prompt' => 'Filter']),
                 ],
-                //'is_deleted',
-                //'created_at',
-                //'updated_at',
                 [
                     'class' => 'yii\grid\ActionColumn',
                     'template' => $actionBtn,
                     'buttons' => [
-                        'reset' => function($url, $model) {
+                        'reset' => function ($url, $model) {
                             return Html::a('<i class="glyphicon glyphicon-refresh"></i>', ['user/resend', 'id' => $model->user_id], [
-                                        'onclick' => 'return confirm("Are you sure you want to reset this user?")'
+                                'onclick' => 'return confirm("Are you sure you want to reset this user?")'
                             ]);
                         }
                     ],
