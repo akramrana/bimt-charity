@@ -160,21 +160,19 @@ class AppHelper {
         ];
         if (\Yii::$app->session['__bimtCharityUserRole'] == 2) {
             unset($type['S']);
-        }
-        else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
+        } else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
             unset($type['S']);
             unset($type['A']);
         }
         return $type;
     }
-    
-    static function getAllCurrency()
-    {
+
+    static function getAllCurrency() {
         $model = \app\models\Currencies::find()->all();
         $list = \yii\helpers\ArrayHelper::map($model, 'currency_id', 'code');
         return $list;
     }
-    
+
     static function getUserPaidInvoiceList($user_id) {
         $model = \app\models\MonthlyInvoice::find()
                 ->where(['is_deleted' => 0, 'is_paid' => 1])
@@ -184,7 +182,7 @@ class AppHelper {
         $list = \yii\helpers\ArrayHelper::map($model, 'monthly_invoice_id', 'monthly_invoice_number');
         return $list;
     }
-    
+
     static function getUserUnpaidInvoiceList($user_id) {
         $model = \app\models\MonthlyInvoice::find()
                 ->where(['is_deleted' => 0, 'is_paid' => 0])
@@ -207,12 +205,30 @@ class AppHelper {
             return "M100001";
         }
     }
-    
+
     static function getAllUsersWithEmail() {
         $models = \app\models\User::find()->where(['is_deleted' => 0])->all();
-        $list = \yii\helpers\ArrayHelper::map($models, 'user_id', function($model){
-            return $model->fullname.': '.$model->email.' :'.$model->phone;
+        $list = \yii\helpers\ArrayHelper::map($models, 'user_id', function ($model) {
+            return $model->fullname . ': ' . $model->email . ' :' . $model->phone;
         });
         return $list;
+    }
+
+    static function hasPaidInvoiceWithinLastTwoMonths($receiver_id) {
+        $query = \app\models\MonthlyInvoice::find()
+                ->where([
+                    'receiver_id' => $receiver_id,
+                    'is_paid' => 1,
+                    'is_deleted' => 0,
+                ])
+                ->andWhere([
+                    '>=',
+                    'updated_at',
+                    date('Y-m-d H:i:s', strtotime('-2 months'))
+        ]);
+        //debugPrint($query->createCommand()->getRawSql());
+        $data = $query->count();
+        //debugPrint($data);
+        return $data;
     }
 }

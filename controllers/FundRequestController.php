@@ -16,8 +16,7 @@ use yii\web\ForbiddenHttpException;
 /**
  * FundRequestController implements the CRUD actions for FundRequests model.
  */
-class FundRequestController extends Controller
-{
+class FundRequestController extends Controller {
 
     /**
      * {@inheritdoc}
@@ -103,7 +102,13 @@ class FundRequestController extends Controller
         $model->updated_at = date('Y-m-d H:i:s');
         $model->fund_request_number = \app\helpers\AppHelper::getFundRequestInvoiceNumber();
         if (\Yii::$app->session['__bimtCharityUserRole'] == 4) {
-            $model->request_user_id = Yii::$app->user->identity->user_id;
+            $user_id = Yii::$app->user->identity->user_id;
+            $model->request_user_id = $user_id;
+
+            if (\app\helpers\AppHelper::hasPaidInvoiceWithinLastTwoMonths($user_id) == 0) {
+                Yii::$app->session->setFlash('danger', 'Dear member, You cannot perform this action because you have no paid invoice within the last two months.');
+                return $this->redirect(['index']);
+            }
         }
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $frs = new \app\models\FundRequestStatus();
@@ -305,7 +310,7 @@ class FundRequestController extends Controller
                 $msg = 'Invoice#' . $prModel->release_invoice_number . ' generated against fund request #' . $model->fund_request_number . ' Created by ' . Yii::$app->user->identity->fullname;
                 \app\helpers\AppHelper::addActivity("PREL", $prModel->payment_release_id, $msg);
                 Yii::$app->session->setFlash('success', 'Payment Release invoice successfully added');
-            }else{
+            } else {
                 Yii::$app->session->setFlash('warning', 'Payment Release invoice already exist!');
             }
             return $this->redirect(['view', 'id' => $model->fund_request_id]);

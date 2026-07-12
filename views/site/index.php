@@ -2,8 +2,25 @@
 /* @var $this yii\web\View */
 
 $this->title = 'Dashboard';
+$user_id = \Yii::$app->user->identity->user_id;
+$hasPaidInvoiceWithinLastTwoMonths = \app\helpers\AppHelper::hasPaidInvoiceWithinLastTwoMonths($user_id);
 ?>
 <div class="row">
+    <?php
+    if ($hasPaidInvoiceWithinLastTwoMonths == 0) {
+        ?>
+        <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+            <div class="alert alert-warning">
+                <i class="fa fa-warning"></i>
+                Dear <?= \Yii::$app->user->identity->fullname ?>,<br/>
+                We couldn't find a paid invoice for the last two months. 
+                Your support helps us serve the community. 
+                May Allah reward your generosity.
+            </div>
+        </div>
+        <?php
+    }
+    ?>
     <div class="col-md-4 col-sm-6 col-xs-12">
         <div class="info-box">
             <span class="info-box-icon bg-yellow"><ion-icon name="people"></ion-icon></span>
