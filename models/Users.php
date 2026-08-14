@@ -100,6 +100,17 @@ class Users extends \yii\db\ActiveRecord
             'is_exception' => 'Special Member',
         ];
     }
+    
+    public function fields() {
+        $fields = parent::fields();
+        $fields['invited_user'] = function ($model) {
+            return $model->invitedBy ? $model->invitedBy->fullname : null;
+        };
+        $fields['currency_code'] = function ($model) {
+            return $model->currency ? $model->currency->code : null;
+        };
+        return $fields;
+    }
 
     /**
      * @return \yii\db\ActiveQuery
