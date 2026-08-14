@@ -426,4 +426,72 @@ class WsController extends Controller {
 
         return $this->response();
     }
+    
+    public function actionDocument($user_id) {
+        $userModel = \app\models\Users::find()
+                ->where(['user_id' => $user_id, 'is_deleted' => 0, 'is_active' => 1, 'is_approved' => 1])
+                ->one();
+
+        if (empty($userModel)) {
+            $this->response_code = 403;
+            $this->message = 'User not found.';
+            return $this->response();
+        }
+        
+        $searchModel = new \app\models\DocumentSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        
+        $dataProvider->prepare();
+
+        $pagination = $dataProvider->getPagination();
+
+        $meta = [
+            'page' => $pagination->getPage() + 1, // Yii page index is 0-based
+            'pageCount' => $pagination->getPageCount(),
+            'totalCount' => $dataProvider->getTotalCount(),
+            'pageSize' => $pagination->getPageSize(),
+        ];
+
+        $this->data = [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'pagination' => $meta,
+        ];
+
+        return $this->response();
+    }
+    
+    public function actionNotification($user_id) {
+        $userModel = \app\models\Users::find()
+                ->where(['user_id' => $user_id, 'is_deleted' => 0, 'is_active' => 1, 'is_approved' => 1])
+                ->one();
+
+        if (empty($userModel)) {
+            $this->response_code = 403;
+            $this->message = 'User not found.';
+            return $this->response();
+        }
+        
+        $searchModel = new \app\models\NotificationSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        
+        $dataProvider->prepare();
+
+        $pagination = $dataProvider->getPagination();
+
+        $meta = [
+            'page' => $pagination->getPage() + 1, // Yii page index is 0-based
+            'pageCount' => $pagination->getPageCount(),
+            'totalCount' => $dataProvider->getTotalCount(),
+            'pageSize' => $pagination->getPageSize(),
+        ];
+
+        $this->data = [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'pagination' => $meta,
+        ];
+
+        return $this->response();
+    }
 }

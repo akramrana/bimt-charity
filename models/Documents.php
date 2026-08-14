@@ -55,6 +55,14 @@ class Documents extends \yii\db\ActiveRecord
         ];
     }
 
+    public function fields() {
+        $fields = parent::fields();
+        $fields['user'] = function ($model) {
+            return $model->user ? $model->user->fullname : null;
+        };
+        return $fields;
+    }
+    
     /**
      * @return \yii\db\ActiveQuery
      */
