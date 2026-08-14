@@ -78,6 +78,20 @@ class PaymentReceived extends \yii\db\ActiveRecord
             'file' => 'Proof',
         ];
     }
+    
+    public function fields() {
+        $fields = parent::fields();
+        $fields['receiver_name'] = function ($model) {
+            return $model->receivedBy ? $model->receivedBy->fullname : null;
+        };
+        $fields['donated_by'] = function ($model) {
+            return $model->donatedBy ? $model->donatedBy->fullname : null;
+        };
+        $fields['currency_code'] = function ($model) {
+            return $model->currency ? $model->currency->code : null;
+        };
+        return $fields;
+    }
 
     /**
      * @return \yii\db\ActiveQuery
