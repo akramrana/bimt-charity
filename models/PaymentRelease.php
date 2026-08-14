@@ -66,6 +66,20 @@ class PaymentRelease extends \yii\db\ActiveRecord
             'currency_id' => 'Currency',
         ];
     }
+    
+    public function fields() {
+        $fields = parent::fields();
+        $fields['fund_request'] = function ($model) {
+            return $model->fundRequest ? $model->fundRequest->fund_request_number : null;
+        };
+        $fields['release_by'] = function ($model) {
+            return $model->releaseBy ? $model->releaseBy->fullname : null;
+        };
+        $fields['currency_code'] = function ($model) {
+            return $model->currency ? $model->currency->code : null;
+        };
+        return $fields;
+    }
 
     /**
      * @return \yii\db\ActiveQuery

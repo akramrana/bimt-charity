@@ -22,8 +22,7 @@ use Yii;
  * @property Users $requestUser
  * @property PaymentRelease[] $paymentReleases
  */
-class FundRequests extends \yii\db\ActiveRecord
-{
+class FundRequests extends \yii\db\ActiveRecord {
 
     /**
      * {@inheritdoc}
@@ -76,6 +75,25 @@ class FundRequests extends \yii\db\ActiveRecord
         ];
     }
 
+    public function fields() {
+        $fields = parent::fields();
+        $fields['request_user'] = function ($model) {
+            return $model->requestUser ? $model->requestUser->fullname : null;
+        };
+        $fields['currency_code'] = function ($model) {
+            return $model->currency ? $model->currency->code : null;
+        };
+        $fields['approval_status'] = function ($model) {
+            $fundStatus = \app\models\FundRequestStatus::find()
+                    ->where(['fund_request_id' => $model->fund_request_id])
+                    ->orderBy(['fund_request_status_id' => SORT_DESC])
+                    ->one();
+
+            return ($fundStatus && $fundStatus->status) ? $fundStatus->status->name : null;
+        };
+        return $fields;
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -103,5 +121,4 @@ class FundRequests extends \yii\db\ActiveRecord
     public function getCurrency() {
         return $this->hasOne(Currencies::className(), ['currency_id' => 'currency_id']);
     }
-
 }
