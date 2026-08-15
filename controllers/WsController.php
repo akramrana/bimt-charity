@@ -358,7 +358,7 @@ class WsController extends Controller {
 
         return $this->response();
     }
-    
+
     public function actionPaymentRelease($user_id) {
         $userModel = \app\models\Users::find()
                 ->where(['user_id' => $user_id, 'is_deleted' => 0, 'is_active' => 1, 'is_approved' => 1])
@@ -369,10 +369,10 @@ class WsController extends Controller {
             $this->message = 'User not found.';
             return $this->response();
         }
-        
+
         $searchModel = new \app\models\PaymentReleaseSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        
+
         $dataProvider->prepare();
 
         $pagination = $dataProvider->getPagination();
@@ -392,7 +392,7 @@ class WsController extends Controller {
 
         return $this->response();
     }
-    
+
     public function actionUser($user_id) {
         $userModel = \app\models\Users::find()
                 ->where(['user_id' => $user_id, 'is_deleted' => 0, 'is_active' => 1, 'is_approved' => 1])
@@ -403,10 +403,10 @@ class WsController extends Controller {
             $this->message = 'User not found.';
             return $this->response();
         }
-        
+
         $searchModel = new \app\models\UserSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        
+
         $dataProvider->prepare();
 
         $pagination = $dataProvider->getPagination();
@@ -426,7 +426,7 @@ class WsController extends Controller {
 
         return $this->response();
     }
-    
+
     public function actionDocument($user_id) {
         $userModel = \app\models\Users::find()
                 ->where(['user_id' => $user_id, 'is_deleted' => 0, 'is_active' => 1, 'is_approved' => 1])
@@ -437,10 +437,10 @@ class WsController extends Controller {
             $this->message = 'User not found.';
             return $this->response();
         }
-        
+
         $searchModel = new \app\models\DocumentSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        
+
         $dataProvider->prepare();
 
         $pagination = $dataProvider->getPagination();
@@ -460,7 +460,7 @@ class WsController extends Controller {
 
         return $this->response();
     }
-    
+
     public function actionNotification($user_id) {
         $userModel = \app\models\Users::find()
                 ->where(['user_id' => $user_id, 'is_deleted' => 0, 'is_active' => 1, 'is_approved' => 1])
@@ -471,10 +471,10 @@ class WsController extends Controller {
             $this->message = 'User not found.';
             return $this->response();
         }
-        
+
         $searchModel = new \app\models\NotificationSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        
+
         $dataProvider->prepare();
 
         $pagination = $dataProvider->getPagination();
@@ -492,6 +492,319 @@ class WsController extends Controller {
             'pagination' => $meta,
         ];
 
+        return $this->response();
+    }
+
+    public function actionEditProfile() {
+        $request = \Yii::$app->request->bodyParams;
+        if (!empty($request)) {
+            if (empty($request['user_id'])) {
+                $this->response_code = 422;
+                $this->message = 'User ID is required.';
+                return $this->response();
+            }
+            $model = \app\models\Users::find()
+                    ->where([
+                        'user_id' => $request['user_id'],
+                        'is_deleted' => 0,
+                        'is_active' => 1,
+                    ])
+                    ->one();
+            if (empty($model)) {
+                $this->response_code = 403;
+                $this->message = 'User not found.';
+                return $this->response();
+            }
+            $model->fullname = $request['fullname'];
+            $model->address = $request['address'];
+            $model->batch = $request['batch'];
+            $model->department = $request['department'];
+            if (isset($request['image']) && $request['image'] !== '') {
+                $image = base64_decode($request['image']);
+                if ($image) {
+                    $img = imagecreatefromstring($image);
+                    if ($img !== false) {
+                        $imageName = time() . '.png';
+                        imagepng($img, Yii::$app->basePath . '/web/uploads/' . $imageName, 9);
+                        imagedestroy($img);
+                        $model->image = $imageName;
+                    }
+                }
+            }
+            $password = isset($request['password_hash']) ? $request['password_hash'] : (isset($request['password']) ? $request['password'] : null);
+            if ($password !== null && $password !== '') {
+                $confirmPassword = isset($request['confirm_password']) ? $request['confirm_password'] : null;
+                if ($password !== $confirmPassword) {
+                    $this->response_code = 422;
+                    $this->message = 'Password and Confirm Password do not match.';
+                    return $this->response();
+                }
+                $model->password_hash = $password;
+                $model->confirm_password = $confirmPassword;
+                $model->password = Yii::$app->security->generatePasswordHash($password);
+            }
+            $model->updated_at = date('Y-m-d H:i:s');
+            if ($model->validate() && $model->save(false)) {
+                $this->message = 'Profile successfully updated.';
+                $this->data = [
+                    'user_id' => (string) $model->user_id,
+                    'fullname' => $model->fullname,
+                    'address' => $model->address,
+                    'batch' => $model->batch,
+                    'department' => $model->department,
+                    'image' => $model->image,
+                ];
+            } else {
+                $this->response_code = 422;
+                $this->message = 'Profile could not be updated.';
+                $this->data = $model->errors;
+            }
+        } else {
+            $this->response_code = 500;
+            $this->message = 'There was an error processing the request. Please try again later.';
+        }
+        return $this->response();
+    }
+
+    public function actionAddSadaqa() {
+        $request = \Yii::$app->request->bodyParams;
+        if (!empty($request)) {
+            if (empty($request['user_id'])) {
+                $this->response_code = 422;
+                $this->message = 'User ID is required.';
+                return $this->response();
+            }
+            $model = \app\models\Users::find()
+                    ->where([
+                        'user_id' => $request['user_id'],
+                        'is_deleted' => 0,
+                        'is_active' => 1,
+                    ])
+                    ->one();
+            if (empty($model)) {
+                $this->response_code = 403;
+                $this->message = 'User not found.';
+                return $this->response();
+            }
+            $paymentReceived = new \app\models\PaymentReceived();
+            $paymentReceived->scenario = 'add-sadaqa';
+            $paymentReceived->received_invoice_number = \app\helpers\AppHelper::getReceivePayInvoiceNumber();
+            $paymentReceived->donated_by = $model->user_id;
+            $paymentReceived->received_by = 7;
+            $paymentReceived->received_date = isset($request['received_date']) ? $request['received_date'] : null;
+            $paymentReceived->comments = isset($request['comments']) ? $request['comments'] : '';
+            $paymentReceived->has_invoice = !empty($request['has_invoice']) ? 1 : 0;
+            $paymentReceived->created_at = date('Y-m-d H:i:s');
+            $paymentReceived->updated_at = date('Y-m-d H:i:s');
+            if ($paymentReceived->has_invoice == 1) {
+                $paymentReceived->monthly_invoice_id = isset($request['monthly_invoice_id']) ? $request['monthly_invoice_id'] : null;
+                $invoice = \app\models\MonthlyInvoice::find()
+                        ->where([
+                            'monthly_invoice_id' => $paymentReceived->monthly_invoice_id,
+                            'receiver_id' => $model->user_id,
+                            'is_deleted' => 0,
+                            'is_paid' => 0,
+                        ])
+                        ->one();
+                if (empty($invoice)) {
+                    $this->response_code = 422;
+                    $this->message = 'Monthly invoice not found.';
+                    return $this->response();
+                }
+                $invoice->is_paid = 1;
+                $invoice->save(false);
+
+                $paymentReceived->instalment_month = $invoice->instalment_month;
+                $paymentReceived->instalment_year = $invoice->instalment_year;
+                $paymentReceived->amount = $invoice->amount;
+                $paymentReceived->currency_id = $invoice->currency_id;
+            } else {
+                $paymentReceived->monthly_invoice_id = null;
+                $paymentReceived->amount = isset($request['amount']) ? $request['amount'] : null;
+                $paymentReceived->currency_id = isset($request['currency_id']) ? $request['currency_id'] : 13;
+                $paymentReceived->instalment_month = isset($request['instalment_month']) ? $request['instalment_month'] : null;
+                $paymentReceived->instalment_year = isset($request['instalment_year']) ? $request['instalment_year'] : null;
+            }
+            if (isset($request['file']) && $request['file'] !== '') {
+                $file = base64_decode($request['file']);
+                if ($file) {
+                    $img = imagecreatefromstring($file);
+                    if ($img !== false) {
+                        $fileName = time() . '.png';
+                        imagepng($img, Yii::$app->basePath . '/web/uploads/' . $fileName, 9);
+                        imagedestroy($img);
+                        $paymentReceived->file = $fileName;
+                    }
+                }
+            }
+            if ($paymentReceived->save()) {
+                $this->message = 'Payment Received invoice successfully added.';
+                $this->data = [
+                    'payment_received_id' => (string) $paymentReceived->payment_received_id,
+                    'received_invoice_number' => $paymentReceived->received_invoice_number,
+                    'donated_by' => (string) $paymentReceived->donated_by,
+                    'received_by' => (string) $paymentReceived->received_by,
+                    'received_date' => $paymentReceived->received_date,
+                    'comments' => $paymentReceived->comments,
+                    'has_invoice' => (int) $paymentReceived->has_invoice,
+                    'monthly_invoice_id' => $paymentReceived->monthly_invoice_id,
+                    'amount' => $paymentReceived->amount,
+                    'currency_id' => $paymentReceived->currency_id,
+                    'instalment_month' => $paymentReceived->instalment_month,
+                    'instalment_year' => $paymentReceived->instalment_year,
+                    'file' => $paymentReceived->file,
+                ];
+            } else {
+                $this->response_code = 422;
+                $this->message = 'Payment Received invoice could not be added.';
+                $this->data = $paymentReceived->errors;
+            }
+        } else {
+            $this->response_code = 500;
+            $this->message = 'There was an error processing the request. Please try again later.';
+        }
+        return $this->response();
+    }
+
+    public function actionUnpaidInvoices($user_id) {
+        $userModel = \app\models\Users::find()
+                ->where(['user_id' => $user_id, 'is_deleted' => 0, 'is_active' => 1, 'is_approved' => 1])
+                ->one();
+
+        if (empty($userModel)) {
+            $this->response_code = 403;
+            $this->message = 'User not found.';
+            return $this->response();
+        }
+
+        $searchModel = new \app\models\MonthlyInvoiceSearch();
+        $searchModel->is_paid = 0;
+        $searchModel->receiver_id = $userModel->user_id;
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $this->data = [
+            'dataProvider' => $dataProvider,
+        ];
+        return $this->response();
+    }
+
+    public function actionCms($page) {
+        $model = \app\models\Cms::find()
+                ->where(['cms_id' => $page])
+                ->one();
+        if (!empty($model)) {
+            $this->data = [
+                'id' => $model->cms_id,
+                'title' => $model->{"title"},
+                'content' => $model->{"content"},
+            ];
+        }
+        return $this->response();
+    }
+
+    public function actionDeleteAccount() {
+        $request = \Yii::$app->request->bodyParams;
+        if (!empty($request)) {
+            if (empty($request['user_id'])) {
+                $this->response_code = 422;
+                $this->message = 'User ID is required.';
+                return $this->response();
+            }
+            $model = \app\models\Users::find()
+                    ->where([
+                        'user_id' => $request['user_id'],
+                        'is_deleted' => 0,
+                        'is_active' => 1,
+                    ])
+                    ->one();
+            if (empty($model)) {
+                $this->response_code = 403;
+                $this->message = 'User not found.';
+                return $this->response();
+            }
+            $model->is_deleted = 1;
+            $model->is_active = 0;
+            $model->is_approved = 0;
+            $model->updated_at = date('Y-m-d H:i:s');
+            if ($model->validate() && $model->save(false)) {
+                $this->message = 'Profile successfully deleted.';
+            } else {
+                $this->response_code = 422;
+                $this->message = 'Profile could not be deleted.';
+                $this->data = $model->errors;
+            }
+        } else {
+            $this->response_code = 500;
+            $this->message = 'There was an error processing the request. Please try again later.';
+        }
+        return $this->response();
+    }
+
+    public function actionSaveDeviceToken() {
+        $request = \Yii::$app->request->bodyParams;
+        if (empty($request)) {
+            $this->response_code = 400;
+            $this->message = 'Invalid request.';
+            return $this->response();
+        }
+        $userId = $request['userId'] ?? null;
+        
+        $deviceId = $request['deviceId'] ?? null;
+        $pushType = $request['pushType'] ?? null;
+        $pushToken = $request['pushToken'] ?? null;
+        // deviceId, pushType and pushToken are required
+        if (empty($deviceId) || empty($pushType) || empty($pushToken)) {
+            $this->response_code = 422;
+            $this->message = 'Device ID, push type and push token are required.';
+            return $this->response();
+        }
+        // Validate push type
+        $allowedPushTypes = ['fcm', 'hms'];
+        if (!in_array($pushType, $allowedPushTypes, true)) {
+            $this->response_code = 422;
+            $this->message = 'Invalid push type.';
+            return $this->response();
+        }
+        $user = \app\models\Users::find()
+                ->where([
+                    'user_id' => $userId,
+                    'is_deleted' => 0,
+                    'is_active' => 1,
+                ])
+                ->one();
+        if (empty($user)) {
+            $this->response_code = 403;
+            $this->message = 'User not found.';
+            return $this->response();
+        }
+        try {
+            $now = date('Y-m-d H:i:s');
+            \Yii::$app->db->createCommand()->upsert(
+                    'device_tokens',
+                    [
+                        'user_id' => $userId,
+                        'device_id' => $deviceId,
+                        'push_type' => $pushType,
+                        'push_token' => $pushToken,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ],
+                    [
+                        'user_id' => $userId,
+                        'push_token' => $pushToken,
+                        'updated_at' => $now,
+                    ]
+            )->execute();
+
+            $this->response_code = 200;
+            $this->message = 'Token saved successfully.';
+        } catch (\Exception $e) {
+            \Yii::error(
+                    'Save device token error: ' . $e->getMessage(),
+                    __METHOD__
+            );
+            $this->response_code = 500;
+            $this->message = 'There was an error saving the device token.';
+        }
         return $this->response();
     }
 }
