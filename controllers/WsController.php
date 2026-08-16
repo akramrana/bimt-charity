@@ -116,6 +116,7 @@ class WsController extends Controller {
                             'created_at' => $model->created_at,
                             'batch' => $model->batch,
                             'department' => $model->department,
+                            'address' => $model->address,
                         ];
                     } else {
                         $this->response_code = 201;
@@ -552,7 +553,7 @@ class WsController extends Controller {
                     'address' => $model->address,
                     'batch' => $model->batch,
                     'department' => $model->department,
-                    'image' => $model->image,
+                    'image' => (string) ($model->image != "") ? Yii::$app->urlManager->createAbsoluteUrl('uploads/' . $model->image) : 'https://myspace.com/common/images/user.png',
                 ];
             } else {
                 $this->response_code = 422;
