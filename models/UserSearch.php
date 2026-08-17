@@ -61,7 +61,7 @@ class UserSearch extends Users
         // grid filtering conditions
         $query->andFilterWhere([
             'user_id' => $this->user_id,
-            'member_code' => $this->member_code,
+            //'member_code' => $this->member_code,
             'enable_login' => $this->enable_login,
             'password' => $this->password,
             'recurring_amount' => $this->recurring_amount,
@@ -76,7 +76,7 @@ class UserSearch extends Users
         ]);
 
         $query->andFilterWhere(['like', 'fullname', $this->fullname])
-            ->andFilterWhere(['like', 'image', $this->image])
+            ->andFilterWhere(['like', 'member_code', $this->member_code])
             ->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'phone', $this->phone])
             ->andFilterWhere(['like', 'alt_phone', $this->alt_phone])

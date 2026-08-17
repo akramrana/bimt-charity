@@ -15,8 +15,7 @@ use app\components\AccessRule;
 /**
  * MonthlyInvoiceController implements the CRUD actions for MonthlyInvoice model.
  */
-class MonthlyInvoiceController extends Controller
-{
+class MonthlyInvoiceController extends Controller {
 
     /**
      * {@inheritdoc}
@@ -192,13 +191,57 @@ class MonthlyInvoiceController extends Controller
                         $msg1 = 'Invoice#' . $paymentReceived->received_invoice_number . ' generated for ' . $paymentReceived->instalment_month . ' ' . $paymentReceived->instalment_year . ' Donated By ' . $paymentReceived->donatedBy->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
                         \app\helpers\AppHelper::addActivity("PREC", $paymentReceived->payment_received_id, $msg1);
                         //
-                        Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
-                                    'model' => $paymentReceived,
-                                ])
-                                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                                ->setTo($paymentReceived->donatedBy->email)
-                                ->setSubject("Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")")
-                                ->send();
+                        /* Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
+                          'model' => $paymentReceived,
+                          ])
+                          ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                          ->setTo($paymentReceived->donatedBy->email)
+                          ->setSubject("Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")")
+                          ->send(); */
+                        $model = $paymentReceived;
+                        $subject = "Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")";
+                        $mailDetails = "<p>
+                                            Assalamu Alaikum,
+                                        </p>
+                                        <p>
+                                            Dear Brother " . $model->donatedBy->fullname . ",
+                                        </p>
+
+                                        <p>
+                                            We do confirm your following contribution for BIMT Charity Foundation:
+                                        </p>
+                                        <p>
+                                            Amount: " . $model->amount . " " . $model->currency->code . "<br/>
+                                            Received Date: " . date('d.m.Y', strtotime($model->created_at)) . "<br/>
+                                            For Month(s): " . $model->instalment_month . " " . $model->instalment_year . "<br/>
+                                            Comments: " . $model->comments . "
+                                        </p>
+
+                                        <p>
+                                            Your SADAKAH has been received with thanks. For details you can visit our web portal,<br/>
+                                            your SADAKAH has been documented under ‘+ Receive’ Menu
+                                        </p>
+                                        <p>
+
+                                            “কে আছে যে আল্লাহকে উত্তম ঋণ দিবে ? তাহলে  তিনি তা বহুগুনে তার জন্য বৃদ্ধি করবেন এবং তার জন্য উত্তম পুরস্কার রয়েছে।“  [সূরা হাদীদ ৫৭:১১]
+
+                                        </p>
+
+                                        <p>
+                                            M’assalam<br/>
+                                            Finance Control Board<br/>
+                                            BIMT Charity Foundation<br/>
+                                            Webportal Link: http://bimtcharity.org/site/login
+
+                                        </p>";
+
+                        $mailObject = [
+                            'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                            'to' => $model->donatedBy->email,
+                            'subject' => $subject,
+                            'html' => $mailDetails,
+                        ];
+                        \app\helpers\AppHelper::resendEmail($mailObject);
                     }
                 }
                 return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
@@ -289,11 +332,11 @@ class MonthlyInvoiceController extends Controller
                     }
                 }
             }
-            /*Yii::$app->mailer->compose('@app/mail/invoice-mail-common', [])
-                    ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                    ->setTo($mailArr)
-                    ->setSubject("Your Sadakah for " . date('F') . " " . date('Y'))
-                    ->send();*/
+            /* Yii::$app->mailer->compose('@app/mail/invoice-mail-common', [])
+              ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+              ->setTo($mailArr)
+              ->setSubject("Your Sadakah for " . date('F') . " " . date('Y'))
+              ->send(); */
         }
         if ($proccessed == 1) {
             Yii::$app->session->setFlash('success', 'Invoice successfully generated');
@@ -316,11 +359,11 @@ class MonthlyInvoiceController extends Controller
                     </p>
                     <p>
                         We hope by the mercy of almighty Allah (SW) you are doing well as well as your family members.<br/> 
-                        This is the beginning of <?= date('F') ?>. This is why we would like to cordially request you to contribute for 'BIMT Charity Foundation' with your SADAKAH.
+                        This is the beginning of " . date('F') . ". This is why we would like to cordially request you to contribute for 'BIMT Charity Foundation' with your SADAKAH.
                     </p>
                     <p>
                         Proposed amount: 200|500|1000 BDT|USD|EUR (more or less amount is unquestionably acceptable)<br/>
-                        Proposed deadline: 15 ".date('F').",".date('Y')."
+                        Proposed deadline: 15 " . date('F') . "," . date('Y') . "
                     </p>
                     <p>
                         In case you need to mention a SUBJECT during Transfer, just write FOR BCF as subject. 
@@ -370,40 +413,22 @@ class MonthlyInvoiceController extends Controller
             foreach ($users as $user) {
                 array_push($emailList, $user->email);
             }
-            
+
             $mailObject = [
                 'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
                 'to' => $emailList,
                 'subject' => $subject,
                 'html' => $mailDetails,
             ];
-            /*$mailObject = '{
-                                "from": "BIMT Charity Foundation<communication@bimtcharity.org>",
-                                "to": '. json_encode($emailList).',
-                                "subject": "'.$subject.'",
-                                "html": "'.$mailDetails.'"
-                            }';*/
-            
+            /* $mailObject = '{
+              "from": "BIMT Charity Foundation<communication@bimtcharity.org>",
+              "to": '. json_encode($emailList).',
+              "subject": "'.$subject.'",
+              "html": "'.$mailDetails.'"
+              }'; */
+
             //debugPrint(json_encode($mailObject));
-            $curl = curl_init();
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.resend.com/emails',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => json_encode($mailObject),
-                CURLOPT_HTTPHEADER => array(
-                    'Authorization: Bearer  re_Qw1yHEhi_C17JhhGFEqARV6EZfKSoFrNa',
-                    'Content-Type: application/json'
-                ),
-            ));
-            $response = curl_exec($curl);
-            //debugPrint($response);
-            curl_close($curl);
+            \app\helpers\AppHelper::resendEmail($mailObject);
         }
         Yii::$app->session->setFlash('success', 'Mail successfully sent');
         return $this->redirect(['index']);

@@ -61,7 +61,6 @@ class DocumentSearch extends Documents
         $query->andFilterWhere([
             'document_id' => $this->document_id,
             'user_id' => $this->user_id,
-            'user_id' => $this->title,
             'created_at' => $this->created_at,
             'is_deleted' => 0,
         ]);

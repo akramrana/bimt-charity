@@ -1,5 +1,6 @@
 <?php
 
+$functions = require __DIR__ . '/functions.php';
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
@@ -23,6 +24,21 @@ $config = [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
                 ],
+            ],
+        ],
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            // send all mails to a file by default. You have to set
+            // 'useFileTransport' to false and configure a transport
+            // for the mailer to send real emails.
+            //'useFileTransport' => true,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.gmail.com',
+                'username' => 'mywebapp61@gmail.com',
+                'password' => 'qegtcmnrwahrookt',
+                'port' => '465',
+                'encryption' => 'ssl',
             ],
         ],
         'db' => $db,

@@ -33,6 +33,16 @@ class AppHelper {
         $model->save();
     }
 
+    static function addActivityCron($type, $type_id, $msg) {
+        $model = new \app\models\Notifications();
+        $model->type = $type;
+        $model->type_id = $type_id;
+        $model->comments = $msg;
+        $model->added_by = 3;
+        $model->created_at = date("Y-m-d H:i:s");
+        $model->save();
+    }
+
     static function getAllUsers() {
         $models = \app\models\User::find()->where(['is_deleted' => 0])->all();
         $list = \yii\helpers\ArrayHelper::map($models, 'user_id', 'fullname');
@@ -230,5 +240,27 @@ class AppHelper {
         $data = $query->count();
         //debugPrint($data);
         return $data;
+    }
+
+    static function resendEmail($mailObject) {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.resend.com/emails',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($mailObject),
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer  ',
+                'Content-Type: application/json'
+            ),
+        ));
+        $response = curl_exec($curl);
+        //debugPrint($response);
+        curl_close($curl);
     }
 }
