@@ -258,6 +258,7 @@ class AppHelper {
                 'Authorization: Bearer ' . $_ENV['RESEND_API_KEY'],
                 'Content-Type: application/json'
             ),
+            
         ));
         $response = curl_exec($curl);
         //debugPrint($response);
