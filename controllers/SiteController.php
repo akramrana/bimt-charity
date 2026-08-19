@@ -12,8 +12,7 @@ use app\models\ContactForm;
 use app\components\UserIdentity;
 use app\components\AccessRule;
 
-class SiteController extends Controller
-{
+class SiteController extends Controller {
 
     /**
      * {@inheritdoc}
@@ -347,14 +346,67 @@ class SiteController extends Controller
             $password = $request['Users']['password_hash'];
             $model->password = Yii::$app->security->generatePasswordHash($password);
             if ($model->save()) {
-                Yii::$app->mailer->compose('@app/mail/register', [
-                            'model' => $model,
-                            'password' => $password,
-                        ])
-                        ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                        ->setTo($model->email)
-                        ->setSubject("Welcome to BIMT Charity Foundation")
-                        ->send();
+                /* Yii::$app->mailer->compose('@app/mail/register', [
+                  'model' => $model,
+                  'password' => $password,
+                  ])
+                  ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                  ->setTo($model->email)
+                  ->setSubject("Welcome to BIMT Charity Foundation")
+                  ->send(); */
+                $subject = "Welcome to BIMT Charity Foundation";
+
+                $mailDetails = "<p>
+                                Assalamualaikum,<br/>
+                                Dear Brother " . $model->fullname . ",
+                            </p>
+                            <p>
+                                Alhamdulillah! We are very much happy to hear that you are going to be a family member of our<br/> 
+                                'BIMT Charity Foundation' family. Our lots of good wishes and DUA for our brother, who has invited<br/> 
+                                you to such an organization which might bring for you and for us a way to acquire the satisfaction of<br/>
+                                almighty Allah in Dunya and in Akhira.
+                            </p>
+                            <p>
+                                Just now your necessary information has been submitted in our Web portal.
+                            </p>
+                            <div>
+                                <p>Next Step:</p>
+                                <ul>
+                                    <li style=\"list-style-type: decimal\">One of our admins will review your profile and then your profile shall be activated or rejected.</li>
+                                    <li style=\"list-style-type: decimal\">You will receive another email, regarding activation status of your profile</li>
+                                    <li style=\"list-style-type: decimal\">If your profile is activated, then you will receive all necessary information within a separate Email.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p>
+                                    Please store this credential in secure place, you can use this information to login our web portal<br/>
+                                    <b>after activation of your profile</b>.
+                                </p>
+                                <p>
+                                    User ID:" . $model->email . "<br/>
+                                    Password:" . $password . "
+                                </p>
+                            </div>
+                            <p>
+                                May Allah accept all our goodness and efforts and make these a good reason to achieve his<br/>
+                                satisfaction in Dunya and in Akhira.
+                            </p>
+                            <p>
+                                ‘মুমিনগণ! তোমাদের ধন-সম্পদ ও সন্তান-সন্ততি যেন তোমাদের আল্লাহর স্মরণ থেকে গাফেল না করে। যারা এ কারণে গাফেল হয়, তারাই তো ক্ষতিগ্রস্ত। আমি তোমাদের যা দিয়েছি তা থেকে মৃত্যু আসার আগেই ব্যয় কর। অন্যথায় সে বলবে, হে আমার পালনকর্তা, আমাকে আরও কিছুকাল অবকাশ দিলেন না কেন? তাহলে আমি সদকা করতাম এবং সৎ কর্মীদের অন্তর্ভুক্ত হতাম।’  (সূরা মুনাফিকুন : ৯-১০)
+                            </p>
+                            <p>
+                                Ma'assalam,
+                                Member Coordination Board<br/>
+                                BIMT Charity Foundation<br/>
+                            </p>";
+
+                $mailObject = [
+                    'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                    'to' => $model->email,
+                    'subject' => $subject,
+                    'html' => $mailDetails,
+                ];
+                \app\helpers\AppHelper::resendEmail($mailObject);
 
                 Yii::$app->session->setFlash('success', 'Registration successfully completed');
                 //
@@ -407,24 +459,70 @@ class SiteController extends Controller
             if (!empty($emails)) {
                 $fileName = !empty($sendMailForm['attachment']) ? 'uploads/' . $sendMailForm['attachment'] : "";
                 if (!empty($sendMailForm['attachment'])) {
-                    Yii::$app->mailer->compose('@app/mail/sent-email', [
-                                'message' => $sendMailForm['message'],
-                            ])
-                            ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                            ->setTo($emails)
-                            //->setBcc($emails)
-                            ->setSubject($sendMailForm['subject'])
-                            ->attach($fileName)
-                            ->send();
+                    /* Yii::$app->mailer->compose('@app/mail/sent-email', [
+                      'message' => $sendMailForm['message'],
+                      ])
+                      ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                      ->setTo($emails)
+                      //->setBcc($emails)
+                      ->setSubject($sendMailForm['subject'])
+                      ->attach($fileName)
+                      ->send(); */
+                    $subject = $sendMailForm['subject'];
+                    $mailDetails = "<p>
+                                        Assalamualaikum,<br/>
+                                    </p>
+                                    <div>
+                                        " . $sendMailForm['message'] . "
+                                    </div>
+                                    <p>
+                                        Ma'assalam,<br/>
+                                        BIMT Charity Foundation<br/>
+                                        Web portal link: <a href=\"http://bimtcharity.org/site/login\">http://bimtcharity.org/site/login</a>
+                                    </p>";
+
+                    $filePath = Yii::getAlias('@webroot/' . $fileName);
+                    $mailObject = [
+                        'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                        'to' => $emails,
+                        'subject' => $subject,
+                        'html' => $mailDetails,
+                        'attachments' => [
+                            [
+                                'filename' => $fileName,
+                                'content' => base64_encode(file_get_contents($filePath))
+                            ]
+                        ]
+                    ];
+                    \app\helpers\AppHelper::resendEmail($mailObject);
                 } else {
-                    Yii::$app->mailer->compose('@app/mail/sent-email', [
-                                'message' => $sendMailForm['message'],
-                            ])
-                            ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                            ->setTo($emails)
-                            //->setBcc($emails)
-                            ->setSubject($sendMailForm['subject'])
-                            ->send();
+                    /* Yii::$app->mailer->compose('@app/mail/sent-email', [
+                      'message' => $sendMailForm['message'],
+                      ])
+                      ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                      ->setTo($emails)
+                      //->setBcc($emails)
+                      ->setSubject($sendMailForm['subject'])
+                      ->send(); */
+                    $subject = $sendMailForm['subject'];
+                    $mailDetails = "<p>
+                                        Assalamualaikum,<br/>
+                                    </p>
+                                    <div>
+                                        " . $sendMailForm['message'] . "
+                                    </div>
+                                    <p>
+                                        Ma'assalam,<br/>
+                                        BIMT Charity Foundation<br/>
+                                        Web portal link: <a href=\"http://bimtcharity.org/site/login\">http://bimtcharity.org/site/login</a>
+                                    </p>";
+                    $mailObject = [
+                        'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                        'to' => $emails,
+                        'subject' => $subject,
+                        'html' => $mailDetails,
+                    ];
+                    \app\helpers\AppHelper::resendEmail($mailObject);
                 }
                 Yii::$app->session->setFlash('success', 'Mail successfully sent');
                 //
@@ -436,4 +534,18 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionSendPush($title, $body, $screen, $id = "") {
+        $pushHelper = new \app\helpers\PushHelper();
+
+        if (isset($title) && isset($body) && isset($screen)) {
+            $param = [
+                'title' => $title,
+                'body' => $body,
+                'screen' => $screen,
+                'id' => $id,
+            ];
+
+            return $pushHelper->sendPush($param);
+        }
+    }
 }

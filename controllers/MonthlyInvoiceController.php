@@ -135,13 +135,56 @@ class MonthlyInvoiceController extends Controller {
                         $msg1 = 'Invoice#' . $paymentReceived->received_invoice_number . ' generated for ' . $paymentReceived->instalment_month . ' ' . $paymentReceived->instalment_year . ' Donated By ' . $paymentReceived->donatedBy->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
                         \app\helpers\AppHelper::addActivity("PREC", $paymentReceived->payment_received_id, $msg1);
                         //
-                        Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
-                                    'model' => $paymentReceived,
-                                ])
-                                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                                ->setTo($paymentReceived->donatedBy->email)
-                                ->setSubject("Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")")
-                                ->send();
+                        /* Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
+                          'model' => $paymentReceived,
+                          ])
+                          ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                          ->setTo($paymentReceived->donatedBy->email)
+                          ->setSubject("Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")")
+                          ->send(); */
+                        $subject = "Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")";
+                        $mailDetails = "<p>
+                                            Assalamu Alaikum,
+                                        </p>
+                                        <p>
+                                            Dear Brother " . $paymentReceived->donatedBy->fullname . ",
+                                        </p>
+
+                                        <p>
+                                            We do confirm your following contribution for BIMT Charity Foundation:
+                                        </p>
+                                        <p>
+                                            Amount: " . $paymentReceived->amount . " " . $paymentReceived->currency->code . "<br/>
+                                            Received Date: " . date('d.m.Y', strtotime($paymentReceived->created_at)) . "<br/>
+                                            For Month(s): " . $paymentReceived->instalment_month . " " . $paymentReceived->instalment_year . "<br/>
+                                            Comments: " . $paymentReceived->comments . "
+                                        </p>
+
+                                        <p>
+                                            Your SADAKAH has been received with thanks. For details you can visit our web portal,<br/>
+                                            your SADAKAH has been documented under ‘+ Receive’ Menu
+                                        </p>
+                                        <p>
+
+                                            “কে আছে যে আল্লাহকে উত্তম ঋণ দিবে ? তাহলে  তিনি তা বহুগুনে তার জন্য বৃদ্ধি করবেন এবং তার জন্য উত্তম পুরস্কার রয়েছে।“  [সূরা হাদীদ ৫৭:১১]
+
+                                        </p>
+
+                                        <p>
+                                            M’assalam<br/>
+                                            Finance Control Board<br/>
+                                            BIMT Charity Foundation<br/>
+                                            Webportal Link: http://bimtcharity.org/site/login
+
+                                        </p>";
+
+                        $mailObject = [
+                            'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                            'to' => $paymentReceived->donatedBy->email,
+                            'subject' => $subject,
+                            'html' => $mailDetails,
+                        ];
+                        \app\helpers\AppHelper::resendEmail($mailObject);
                     }
                 }
                 return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
@@ -198,23 +241,22 @@ class MonthlyInvoiceController extends Controller {
                           ->setTo($paymentReceived->donatedBy->email)
                           ->setSubject("Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")")
                           ->send(); */
-                        $model = $paymentReceived;
                         $subject = "Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")";
                         $mailDetails = "<p>
                                             Assalamu Alaikum,
                                         </p>
                                         <p>
-                                            Dear Brother " . $model->donatedBy->fullname . ",
+                                            Dear Brother " . $paymentReceived->donatedBy->fullname . ",
                                         </p>
 
                                         <p>
                                             We do confirm your following contribution for BIMT Charity Foundation:
                                         </p>
                                         <p>
-                                            Amount: " . $model->amount . " " . $model->currency->code . "<br/>
-                                            Received Date: " . date('d.m.Y', strtotime($model->created_at)) . "<br/>
-                                            For Month(s): " . $model->instalment_month . " " . $model->instalment_year . "<br/>
-                                            Comments: " . $model->comments . "
+                                            Amount: " . $paymentReceived->amount . " " . $paymentReceived->currency->code . "<br/>
+                                            Received Date: " . date('d.m.Y', strtotime($paymentReceived->created_at)) . "<br/>
+                                            For Month(s): " . $paymentReceived->instalment_month . " " . $paymentReceived->instalment_year . "<br/>
+                                            Comments: " . $paymentReceived->comments . "
                                         </p>
 
                                         <p>
@@ -237,7 +279,7 @@ class MonthlyInvoiceController extends Controller {
 
                         $mailObject = [
                             'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
-                            'to' => $model->donatedBy->email,
+                            'to' => $paymentReceived->donatedBy->email,
                             'subject' => $subject,
                             'html' => $mailDetails,
                         ];
@@ -277,13 +319,78 @@ class MonthlyInvoiceController extends Controller {
     public function actionSendMail($id) {
         $model = $this->findModel($id);
         if ($model->is_paid != 1) {
-            Yii::$app->mailer->compose('@app/mail/invoice-mail', [
-                        'model' => $model,
-                    ])
-                    ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                    ->setTo($model->receiver->email)
-                    ->setSubject("Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')')
-                    ->send();
+            /* Yii::$app->mailer->compose('@app/mail/invoice-mail', [
+              'model' => $model,
+              ])
+              ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+              ->setTo($model->receiver->email)
+              ->setSubject("Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')')
+              ->send(); */
+            $subject = "Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')';
+
+            $$mailDetails = "<p>
+                                Assalamualaikum,<br/>
+                                Dear Brother, " . $model->receiver->fullname . "
+                            </p>
+                            <p>
+                                We hope by the mercy of almighty Allah (SW) you are doing well as well as your family members.<br/> 
+                                This is the beginning of " . $model->instalment_month . ". This is why we would like to cordially request you to contribute for 'BIMT Charity Foundation' with your SADAKAH.
+                            </p>
+                            <p>
+                                Proposed amount: " . $model->amount . " " . $model->currency->code . " (more or less amount is unquestionably acceptable)<br/>
+                                Proposed deadline: 15 " . $model->instalment_month . "," . $model->instalment_year . "
+                            </p>
+                            <p>
+                                In case you need to mention a SUBJECT during Transfer, just write FOR BCF as subject. 
+                                It is strongly recommended to inform corresponding account holder (mentioning your member ID, 
+                                if possible) after transferring the money so that we can track your transaction.
+                            </p>
+                            <p>
+                                Insha Allah we will try our level best to use your SADAKAH in right way. Verily, Allah is all knowing and all seeing.
+                            </p>
+
+                            <p>
+                                Bank Details:
+                            </p>
+                            <p>
+                                Bangladesh:<br/>
+                                Account Holder Name: Mahmud Arafat Bin Rafiq<br/>
+                                Account Number: 114.103.0383245<br/>
+                                Bank Name: Dutch Bangla Bank Limited
+                            </p>
+                            <p>
+                                Bikash: 008801719127039 (Mahbubur Rahman)
+                            </p>
+                            <p>
+                                Germany:<br/>
+                                Account Holder Name: MD Alif Khondokar<br/>
+                                IBAN: DE78 1007 0024 0214 2370 00<br/>
+                                BIC: DEUTDEDBBER
+                            </p>
+                            <p>
+                                Singapore:<br/>
+                                Account Holder Name: Mohin Md Rakibul Ahsun<br/>
+                                Bank Name: POSB<br/>
+                                Account Number: 248-85387-5 (Savings) 
+                            </p>
+                            <p>
+                                May Allah accept our SADAKAH, our all efforts and make these a good reason go acquire Allah's satisfaction in Dunya and in Akhira.
+                            </p>
+                            <p>
+                                M’assalam<br/>
+                                Finance Control Board<br/>
+                                BIMT Charity Foundation<br/>
+                                For detail please contact with Rafiq Bin Arafat, Rakibul Ahsun Mohin, Alif Khondokar.<br/>
+                                Web portal Link: http://bimtcharity.org/site/login
+                            </p>";
+
+            $mailObject = [
+                'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                'to' => $model->receiver->email,
+                'subject' => $subject,
+                'html' => $mailDetails,
+            ];
+            \app\helpers\AppHelper::resendEmail($mailObject);
         }
         Yii::$app->session->setFlash('success', 'Invoice successfully sent');
         return $this->redirect(['index']);

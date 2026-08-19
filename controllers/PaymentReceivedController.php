@@ -15,8 +15,7 @@ use app\components\AccessRule;
 /**
  * PaymentReceivedController implements the CRUD actions for PaymentReceived model.
  */
-class PaymentReceivedController extends Controller
-{
+class PaymentReceivedController extends Controller {
 
     /**
      * {@inheritdoc}
@@ -185,13 +184,57 @@ class PaymentReceivedController extends Controller
 
     public function actionSendMail($id) {
         $model = $this->findModel($id);
-        Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
-                    'model' => $model,
-                ])
-                ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                ->setTo($model->donatedBy->email)
-                ->setSubject("Confirmation of your BCF contribution (Invoice#" . $model->received_invoice_number . ")")
-                ->send();
+        /* Yii::$app->mailer->compose('@app/mail/receive-invoice-mail', [
+          'model' => $model,
+          ])
+          ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+          ->setTo($model->donatedBy->email)
+          ->setSubject("Confirmation of your BCF contribution (Invoice#" . $model->received_invoice_number . ")")
+          ->send(); */
+        $paymentReceived = $model;
+        $subject = "Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")";
+        $mailDetails = "<p>
+                                            Assalamu Alaikum,
+                                        </p>
+                                        <p>
+                                            Dear Brother " . $paymentReceived->donatedBy->fullname . ",
+                                        </p>
+
+                                        <p>
+                                            We do confirm your following contribution for BIMT Charity Foundation:
+                                        </p>
+                                        <p>
+                                            Amount: " . $paymentReceived->amount . " " . $paymentReceived->currency->code . "<br/>
+                                            Received Date: " . date('d.m.Y', strtotime($paymentReceived->created_at)) . "<br/>
+                                            For Month(s): " . $paymentReceived->instalment_month . " " . $paymentReceived->instalment_year . "<br/>
+                                            Comments: " . $paymentReceived->comments . "
+                                        </p>
+
+                                        <p>
+                                            Your SADAKAH has been received with thanks. For details you can visit our web portal,<br/>
+                                            your SADAKAH has been documented under ‘+ Receive’ Menu
+                                        </p>
+                                        <p>
+
+                                            “কে আছে যে আল্লাহকে উত্তম ঋণ দিবে ? তাহলে  তিনি তা বহুগুনে তার জন্য বৃদ্ধি করবেন এবং তার জন্য উত্তম পুরস্কার রয়েছে।“  [সূরা হাদীদ ৫৭:১১]
+
+                                        </p>
+
+                                        <p>
+                                            M’assalam<br/>
+                                            Finance Control Board<br/>
+                                            BIMT Charity Foundation<br/>
+                                            Webportal Link: http://bimtcharity.org/site/login
+
+                                        </p>";
+
+        $mailObject = [
+            'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+            'to' => $paymentReceived->donatedBy->email,
+            'subject' => $subject,
+            'html' => $mailDetails,
+        ];
+        \app\helpers\AppHelper::resendEmail($mailObject);
         Yii::$app->session->setFlash('success', 'Invoice successfully sent');
         return $this->redirect(['index']);
     }

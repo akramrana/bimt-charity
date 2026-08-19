@@ -255,7 +255,7 @@ class AppHelper {
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode($mailObject),
             CURLOPT_HTTPHEADER => array(
-                'Authorization: Bearer  ',
+                'Authorization: Bearer ' . $_ENV['RESEND_API_KEY'],
                 'Content-Type: application/json'
             ),
         ));

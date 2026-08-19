@@ -109,14 +109,68 @@ class UserController extends Controller {
             $model->password = Yii::$app->security->generatePasswordHash($password);
             if ($model->save()) {
                 //
-                Yii::$app->mailer->compose('@app/mail/register', [
-                            'model' => $model,
-                            'password' => $password,
-                        ])
-                        ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                        ->setTo($model->email)
-                        ->setSubject("Welcome to BIMT Charity Foundation")
-                        ->send();
+                /* Yii::$app->mailer->compose('@app/mail/register', [
+                  'model' => $model,
+                  'password' => $password,
+                  ])
+                  ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                  ->setTo($model->email)
+                  ->setSubject("Welcome to BIMT Charity Foundation")
+                  ->send(); */
+
+                $subject = "Welcome to BIMT Charity Foundation";
+
+                $mailDetails = "<p>
+                                Assalamualaikum,<br/>
+                                Dear Brother " . $model->fullname . ",
+                            </p>
+                            <p>
+                                Alhamdulillah! We are very much happy to hear that you are going to be a family member of our<br/> 
+                                'BIMT Charity Foundation' family. Our lots of good wishes and DUA for our brother, who has invited<br/> 
+                                you to such an organization which might bring for you and for us a way to acquire the satisfaction of<br/>
+                                almighty Allah in Dunya and in Akhira.
+                            </p>
+                            <p>
+                                Just now your necessary information has been submitted in our Web portal.
+                            </p>
+                            <div>
+                                <p>Next Step:</p>
+                                <ul>
+                                    <li style=\"list-style-type: decimal\">One of our admins will review your profile and then your profile shall be activated or rejected.</li>
+                                    <li style=\"list-style-type: decimal\">You will receive another email, regarding activation status of your profile</li>
+                                    <li style=\"list-style-type: decimal\">If your profile is activated, then you will receive all necessary information within a separate Email.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p>
+                                    Please store this credential in secure place, you can use this information to login our web portal<br/>
+                                    <b>after activation of your profile</b>.
+                                </p>
+                                <p>
+                                    User ID:" . $model->email . "<br/>
+                                    Password:" . $password . "
+                                </p>
+                            </div>
+                            <p>
+                                May Allah accept all our goodness and efforts and make these a good reason to achieve his<br/>
+                                satisfaction in Dunya and in Akhira.
+                            </p>
+                            <p>
+                                ‘মুমিনগণ! তোমাদের ধন-সম্পদ ও সন্তান-সন্ততি যেন তোমাদের আল্লাহর স্মরণ থেকে গাফেল না করে। যারা এ কারণে গাফেল হয়, তারাই তো ক্ষতিগ্রস্ত। আমি তোমাদের যা দিয়েছি তা থেকে মৃত্যু আসার আগেই ব্যয় কর। অন্যথায় সে বলবে, হে আমার পালনকর্তা, আমাকে আরও কিছুকাল অবকাশ দিলেন না কেন? তাহলে আমি সদকা করতাম এবং সৎ কর্মীদের অন্তর্ভুক্ত হতাম।’  (সূরা মুনাফিকুন : ৯-১০)
+                            </p>
+                            <p>
+                                Ma'assalam,
+                                Member Coordination Board<br/>
+                                BIMT Charity Foundation<br/>
+                            </p>";
+
+                $mailObject = [
+                    'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                    'to' => $model->email,
+                    'subject' => $subject,
+                    'html' => $mailDetails,
+                ];
+                \app\helpers\AppHelper::resendEmail($mailObject);
 
                 Yii::$app->session->setFlash('success', 'User successfully added');
                 //
@@ -198,13 +252,55 @@ class UserController extends Controller {
 
         if ($model->validate() && $model->save()) {
             if ($model->is_active == 1) {
-                Yii::$app->mailer->compose('@app/mail/activated', [
-                            'model' => $model,
-                        ])
-                        ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                        ->setTo($model->email)
-                        ->setSubject("BIMT Charity Foundation member account activated")
-                        ->send();
+                /* Yii::$app->mailer->compose('@app/mail/activated', [
+                  'model' => $model,
+                  ])
+                  ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+                  ->setTo($model->email)
+                  ->setSubject("BIMT Charity Foundation member account activated")
+                  ->send(); */
+                $subject = "BIMT Charity Foundation member account activated";
+
+                $mailDetails = "<p>
+                                    Assalamualaikum,<br/>
+                                    Dear Brother " . $model->fullname . ",
+                                </p>
+                                <p>
+                                    Alhamdulillah! Your profile has been reviewed and activated.<br/>
+                                    We are very much happy to announce that you are now a family member of our foundation.<br/>
+                                    Now you can log in to our Web portal. <br/>
+                                    Web portal Link: <a href=\"http://bimtcharity.org/site/login\">http://www.bimtcharity.org/site/login</a>
+                                </p>
+                                <p>
+                                    Username: " . $model->email . "
+                                </p>
+                                <p>
+                                    Messenger Group Link:  <a href=\"https://m.me/join/Abb39qbdwnJ7yvdg\">https://m.me/join/Abb39qbdwnJ7yvdg</a><br/>
+                                    Proposed Sadakah Amount: " . $model->recurring_amount . " " . $model->currency->code . " <br/>
+                                    We pray and hope for your regular contribution even if the amount is equal to 1 BDT.<br/>
+                                </p>
+                                <p>
+                                    InshaAllah from now on, we will work together for the betterment of our society, <br/>
+                                    to help needy people and to do all kind of possible good works.
+                                </p>
+                                <p>
+                                    ‘খেজুরের একটি টুকরা দান করে হলেও তোমরা জাহান্নামের আগুন থেকে বাঁচার চেষ্টা কর।’ (বোখারি ও মুসলিম)।
+                                </p>
+                                <p>
+                                    Ma'assalam,<br/>
+                                    Member Coordination Board<br/>
+                                    BIMT Charity Foundation<br/>
+                                    For details you can contact with Mohammad Abdul Motin, Kazi Symon Arif, Mustafizur Rahman, Ibrahim Ali.<br/>
+                                    Web portal link: <a href=\"http://bimtcharity.org/site/login\">http://bimtcharity.org/site/login</a>
+                                </p>";
+
+                $mailObject = [
+                    'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                    'to' => $model->email,
+                    'subject' => $subject,
+                    'html' => $mailDetails,
+                ];
+                \app\helpers\AppHelper::resendEmail($mailObject);
             }
             $msg = 'Profile of ' . $model->fullname . ' ' . $approvalText . ' by ' . Yii::$app->user->identity->fullname;
             \app\helpers\AppHelper::addActivity("US", $model->user_id, $msg);
@@ -220,14 +316,68 @@ class UserController extends Controller {
         $password = Yii::$app->security->generateRandomString(6);
         $model->password = Yii::$app->security->generatePasswordHash($password);
         if ($model->save()) {
-            Yii::$app->mailer->compose('@app/mail/register', [
-                        'model' => $model,
-                        'password' => $password,
-                    ])
-                    ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
-                    ->setTo($model->email)
-                    ->setSubject("Welcome to BIMT Charity Foundation")
-                    ->send();
+            /* Yii::$app->mailer->compose('@app/mail/register', [
+              'model' => $model,
+              'password' => $password,
+              ])
+              ->setFrom([Yii::$app->params['siteEmail'] => Yii::$app->params['appName']])
+              ->setTo($model->email)
+              ->setSubject("Welcome to BIMT Charity Foundation")
+              ->send(); */
+
+            $subject = "Welcome to BIMT Charity Foundation";
+
+            $mailDetails = "<p>
+                                Assalamualaikum,<br/>
+                                Dear Brother " . $model->fullname . ",
+                            </p>
+                            <p>
+                                Alhamdulillah! We are very much happy to hear that you are going to be a family member of our<br/> 
+                                'BIMT Charity Foundation' family. Our lots of good wishes and DUA for our brother, who has invited<br/> 
+                                you to such an organization which might bring for you and for us a way to acquire the satisfaction of<br/>
+                                almighty Allah in Dunya and in Akhira.
+                            </p>
+                            <p>
+                                Just now your necessary information has been submitted in our Web portal.
+                            </p>
+                            <div>
+                                <p>Next Step:</p>
+                                <ul>
+                                    <li style=\"list-style-type: decimal\">One of our admins will review your profile and then your profile shall be activated or rejected.</li>
+                                    <li style=\"list-style-type: decimal\">You will receive another email, regarding activation status of your profile</li>
+                                    <li style=\"list-style-type: decimal\">If your profile is activated, then you will receive all necessary information within a separate Email.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p>
+                                    Please store this credential in secure place, you can use this information to login our web portal<br/>
+                                    <b>after activation of your profile</b>.
+                                </p>
+                                <p>
+                                    User ID:" . $model->email . "<br/>
+                                    Password:" . $password . "
+                                </p>
+                            </div>
+                            <p>
+                                May Allah accept all our goodness and efforts and make these a good reason to achieve his<br/>
+                                satisfaction in Dunya and in Akhira.
+                            </p>
+                            <p>
+                                ‘মুমিনগণ! তোমাদের ধন-সম্পদ ও সন্তান-সন্ততি যেন তোমাদের আল্লাহর স্মরণ থেকে গাফেল না করে। যারা এ কারণে গাফেল হয়, তারাই তো ক্ষতিগ্রস্ত। আমি তোমাদের যা দিয়েছি তা থেকে মৃত্যু আসার আগেই ব্যয় কর। অন্যথায় সে বলবে, হে আমার পালনকর্তা, আমাকে আরও কিছুকাল অবকাশ দিলেন না কেন? তাহলে আমি সদকা করতাম এবং সৎ কর্মীদের অন্তর্ভুক্ত হতাম।’  (সূরা মুনাফিকুন : ৯-১০)
+                            </p>
+                            <p>
+                                Ma'assalam,
+                                Member Coordination Board<br/>
+                                BIMT Charity Foundation<br/>
+                            </p>";
+
+            $mailObject = [
+                'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                'to' => $model->email,
+                'subject' => $subject,
+                'html' => $mailDetails,
+            ];
+            \app\helpers\AppHelper::resendEmail($mailObject);
 
             Yii::$app->session->setFlash('success', 'User info successfully sent');
             return $this->redirect(['index']);
@@ -248,5 +398,4 @@ class UserController extends Controller {
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-
 }
