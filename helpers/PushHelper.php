@@ -6,7 +6,9 @@
  */
 
 namespace app\helpers;
+
 use Google\Auth\Credentials\ServiceAccountCredentials;
+
 /**
  * Description of PushHelper
  *
@@ -29,50 +31,54 @@ class PushHelper {
 
     public function sendPush($param) {
         $token = $this->generateAccessToken();
+
         $topic = 'all';
         $title = $param['title'];
         $body = $param['body'];
         $screen = $param['screen'];
-        $targetId = !empty($param['id']) ? $param['id']:"";
-        //        
+        $targetId = !empty($param['id']) ? $param['id'] : "";
+
         $url = 'https://fcm.googleapis.com/v1/projects/bimt-charity/messages:send';
-        $headers = array(
+
+        $headers = [
             'Authorization: Bearer ' . $token,
             'Content-Type: application/json'
-        );
-        
-        $payload = '{
-                                                        "message":{
-                                                            "topic": "' . $topic . '",
-                                                            "notification":{
-                                                                "title":"' . $title . '",
-                                                                "body":"' . $body . '"
-                                                            },
-                                                            "data":{
-                                                                "screen":"' . $screen . '",
-                                                                "id":"' . $targetId . '",
-                                                            }
-                                                        }
-                                                    }';
-        
-        debugPrint($payload);
-        // Open connection
+        ];
+
+        $payload = [
+            'message' => [
+                'topic' => $topic,
+                'data' => [
+					'title' => (string) $title,
+                    'body' => (string) $body,
+                    'screen' => (string) $screen,
+                    'id' => (string) $targetId,
+                ],
+                'android' => [
+                    'priority' => 'high'
+                ]
+            ]
+        ];
+
+        $payload = json_encode($payload);
+
         $ch = curl_init();
-        // Set the url, number of POST vars, POST data
+
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        // Disabling SSL Certificate support temporarily
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-        // Execute post
+
         $result = curl_exec($ch);
-        if ($result === FALSE) {
+
+        if ($result === false) {
             die('Curl failed: ' . curl_error($ch));
         }
-        // Close connection
+
         curl_close($ch);
+
         return $result;
     }
 }
