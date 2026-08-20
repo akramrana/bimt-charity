@@ -310,6 +310,14 @@ class UserController extends Controller {
                     'html' => $mailDetails,
                 ];
                 \app\helpers\AppHelper::resendEmail($mailObject);
+
+                $pushHelper = new \app\helpers\PushHelper();
+                $pushHelper->sendPushToUser($model->receiver_id, [
+                    'title' => 'Member account activated',
+                    'body' => $subject,
+                    'screen' => 'member',
+                    'id' => $model->user_id,
+                ]);
             }
             $msg = 'Profile of ' . $model->fullname . ' ' . $approvalText . ' by ' . Yii::$app->user->identity->fullname;
             \app\helpers\AppHelper::addActivity("US", $model->user_id, $msg);
@@ -387,6 +395,14 @@ class UserController extends Controller {
                 'html' => $mailDetails,
             ];
             \app\helpers\AppHelper::resendEmail($mailObject);
+
+            $pushHelper = new \app\helpers\PushHelper();
+            $pushHelper->sendPushToUser($model->receiver_id, [
+                'title' => 'Assalamualaikum!',
+                'body' => $subject,
+                'screen' => 'member',
+                'id' => $model->user_id,
+            ]);
 
             Yii::$app->session->setFlash('success', 'User info successfully sent');
             return $this->redirect(['index']);
