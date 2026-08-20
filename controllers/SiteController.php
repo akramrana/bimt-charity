@@ -407,7 +407,7 @@ class SiteController extends Controller {
                     'html' => $mailDetails,
                 ];
                 \app\helpers\AppHelper::resendEmail($mailObject);
-                
+
                 $pushHelper = new \app\helpers\PushHelper();
                 $pushHelper->sendPush([
                     'title' => 'New Member Added',
@@ -555,5 +555,21 @@ class SiteController extends Controller {
 
             return $pushHelper->sendPush($param);
         }
+    }
+
+    public function actionPrivacyPolicy() {
+        $this->layout = 'main-login';
+        $model = \app\models\Cms::findOne(2);
+        return $this->render('privacy-policy', [
+                    'model' => $model
+        ]);
+    }
+    
+    public function actionTermsConditions() {
+        $this->layout = 'main-login';
+        $model = \app\models\Cms::findOne(1);
+        return $this->render('terms-conditions', [
+                    'model' => $model
+        ]);
     }
 }
