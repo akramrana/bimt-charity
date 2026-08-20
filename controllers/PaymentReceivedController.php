@@ -117,6 +117,15 @@ class PaymentReceivedController extends Controller {
                 Yii::$app->session->setFlash('success', 'Payment Received invoice successfully added');
                 $msg = 'Invoice#' . $model->received_invoice_number . ' generated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' Donated By ' . $model->donatedBy->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
                 \app\helpers\AppHelper::addActivity("PREC", $model->payment_received_id, $msg);
+
+                $pushHelper = new \app\helpers\PushHelper();
+                $pushHelper->sendPush([
+                    'title' => 'New Sadaqah Received',
+                    'body' => 'A new payment '.$model->received_invoice_number.' has been submitted.',
+                    'screen' => 'sadaqah',
+                    'id' => $model->payment_received_id,
+                ]);
+
                 return $this->redirect(['view', 'id' => $model->payment_received_id]);
             } else {
                 echo json_encode($model->errors);

@@ -104,6 +104,14 @@ class DocumentController extends Controller {
             $msg = 'New document ' . $model->title . ' added by ' . Yii::$app->user->identity->fullname;
             \app\helpers\AppHelper::addActivity("D", $model->document_id, $msg);
 
+            $pushHelper = new \app\helpers\PushHelper();
+            $pushHelper->sendPush([
+                'title' => 'New Document',
+                'body' => 'A new "'.$model->title.'" document has been uploaded.',
+                'screen' => 'document',
+                'id' => $model->document_id,
+            ]);
+
             return $this->redirect(['view', 'id' => $model->document_id]);
         }
 

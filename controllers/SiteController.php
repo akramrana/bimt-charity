@@ -407,6 +407,14 @@ class SiteController extends Controller {
                     'html' => $mailDetails,
                 ];
                 \app\helpers\AppHelper::resendEmail($mailObject);
+                
+                $pushHelper = new \app\helpers\PushHelper();
+                $pushHelper->sendPush([
+                    'title' => 'New Member Added',
+                    'body' => $model->fullname . ' has joined BIMT Charity Foundation.',
+                    'screen' => 'member',
+                    'id' => $model->user_id,
+                ]);
 
                 Yii::$app->session->setFlash('success', 'Registration successfully completed');
                 //

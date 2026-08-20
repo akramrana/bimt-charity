@@ -102,6 +102,15 @@ class PaymentReleaseController extends Controller {
             $msg = 'Invoice#' . $model->release_invoice_number . ' generated against fund request #' . $model->fundRequest->fund_request_number . ' Created by ' . Yii::$app->user->identity->fullname;
             \app\helpers\AppHelper::addActivity("PREL", $model->payment_release_id, $msg);
             Yii::$app->session->setFlash('success', 'Payment Release invoice successfully added');
+
+            $pushHelper = new \app\helpers\PushHelper();
+            $pushHelper->sendPush([
+                'title' => 'New Donation',
+                'body' => 'A new donation has been recorded. Release Invoice Number: ' . $model->release_invoice_number,
+                'screen' => 'donation',
+                'id' => $model->payment_release_id,
+            ]);
+
             return $this->redirect(['view', 'id' => $model->payment_release_id]);
         }
 

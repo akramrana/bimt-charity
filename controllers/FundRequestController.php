@@ -123,6 +123,15 @@ class FundRequestController extends Controller {
             \app\helpers\AppHelper::addActivity("FR", $model->fund_request_id, $msg);
             //
             Yii::$app->session->setFlash('success', 'Fund request successfully added');
+
+            $pushHelper = new \app\helpers\PushHelper();
+            $pushHelper->sendPush([
+                'title' => 'New Fund Request',
+                'body' => 'Fund request ' . $model->fund_request_number . ' has been submitted. ',
+                'screen' => 'fund_request',
+                'id' => $model->fund_request_id,
+            ]);
+
             return $this->redirect(['view', 'id' => $model->fund_request_id]);
         }
 
@@ -250,6 +259,14 @@ class FundRequestController extends Controller {
                         $prModel->note = "System Added";
                         $prModel->release_invoice_number = \app\helpers\AppHelper::getReleaseInvoiceNumber();
                         $prModel->save();
+
+                        $pushHelper = new \app\helpers\PushHelper();
+                        $pushHelper->sendPush([
+                            'title' => 'Fund Request Approved',
+                            'body' => 'Fund request ' . $model->fund_request_number . ' has been approved.',
+                            'screen' => 'fund_request',
+                            'id' => $model->fund_request_id,
+                        ]);
                     }
                     return json_encode(['status' => 200, 'msg' => 'Fund status successfully updated.']);
                 } else {

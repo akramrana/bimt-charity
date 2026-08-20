@@ -30,14 +30,72 @@ class PushHelper {
     }
 
     public function sendPush($param) {
-        $token = $this->generateAccessToken();
-
-        $topic = 'all';
         $title = $param['title'];
         $body = $param['body'];
         $screen = $param['screen'];
         $targetId = !empty($param['id']) ? $param['id'] : "";
 
+        $message = [
+            'topic' => 'all',
+            'data' => [
+                'title' => (string) $title,
+                'body' => (string) $body,
+                'screen' => (string) $screen,
+                'id' => (string) $targetId,
+            ],
+            'android' => [
+                'priority' => 'high'
+            ]
+        ];
+
+        return $this->sendMessage($message);
+    }
+
+    public function sendPushToUser($userId, $param) {
+        $pushTokens = \app\models\DeviceTokens::find()
+                ->select('push_token')
+                ->where([
+                    'user_id' => $userId,
+                    'push_type' => 'fcm',
+                ])
+                ->andWhere(['not', ['push_token' => null]])
+                ->andWhere(['<>', 'push_token', ''])
+                ->distinct()
+                ->column();
+
+        if (empty($pushTokens)) {
+            return [];
+        }
+
+        $title = $param['title'];
+        $body = $param['body'];
+        $screen = $param['screen'];
+        $targetId = !empty($param['id']) ? $param['id'] : "";
+        $accessToken = $this->generateAccessToken();
+        $results = [];
+
+        foreach ($pushTokens as $pushToken) {
+            $message = [
+                'token' => $pushToken,
+                'data' => [
+                    'title' => (string) $title,
+                    'body' => (string) $body,
+                    'screen' => (string) $screen,
+                    'id' => (string) $targetId,
+                ],
+                'android' => [
+                    'priority' => 'high'
+                ]
+            ];
+
+            $results[$pushToken] = $this->sendMessage($message, $accessToken);
+        }
+
+        return $results;
+    }
+
+    private function sendMessage($message, $accessToken = null) {
+        $token = !empty($accessToken) ? $accessToken : $this->generateAccessToken();
         $url = 'https://fcm.googleapis.com/v1/projects/bimt-charity/messages:send';
 
         $headers = [
@@ -46,18 +104,7 @@ class PushHelper {
         ];
 
         $payload = [
-            'message' => [
-                'topic' => $topic,
-                'data' => [
-					'title' => (string) $title,
-                    'body' => (string) $body,
-                    'screen' => (string) $screen,
-                    'id' => (string) $targetId,
-                ],
-                'android' => [
-                    'priority' => 'high'
-                ]
-            ]
+            'message' => $message
         ];
 
         $payload = json_encode($payload);

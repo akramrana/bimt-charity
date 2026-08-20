@@ -185,6 +185,14 @@ class MonthlyInvoiceController extends Controller {
                             'html' => $mailDetails,
                         ];
                         \app\helpers\AppHelper::resendEmail($mailObject);
+
+                        $pushHelper = new \app\helpers\PushHelper();
+                        $pushHelper->sendPushToUser($model->receiver_id, [
+                            'title' => 'New Invoice',
+                            'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' has been generated.',
+                            'screen' => 'invoice',
+                            'id' => $model->monthly_invoice_id,
+                        ]);
                     }
                 }
                 return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
@@ -328,7 +336,7 @@ class MonthlyInvoiceController extends Controller {
               ->send(); */
             $subject = "Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')';
 
-            $$mailDetails = "<p>
+            $mailDetails = "<p>
                                 Assalamualaikum,<br/>
                                 Dear Brother, " . $model->receiver->fullname . "
                             </p>
@@ -391,6 +399,14 @@ class MonthlyInvoiceController extends Controller {
                 'html' => $mailDetails,
             ];
             \app\helpers\AppHelper::resendEmail($mailObject);
+
+            $pushHelper = new \app\helpers\PushHelper();
+            $pushHelper->sendPushToUser($model->receiver_id, [
+                'title' => 'New Invoice',
+                'body' => $subject,
+                'screen' => 'invoice',
+                'id' => $model->monthly_invoice_id,
+            ]);
         }
         Yii::$app->session->setFlash('success', 'Invoice successfully sent');
         return $this->redirect(['index']);
@@ -426,6 +442,14 @@ class MonthlyInvoiceController extends Controller {
                             \app\helpers\AppHelper::addActivity("MI", $model->monthly_invoice_id, $msg);
 
                             array_push($mailArr, $user->email);
+
+                            $pushHelper = new \app\helpers\PushHelper();
+                            $pushHelper->sendPushToUser($model->receiver_id, [
+                                'title' => 'New Invoice',
+                                'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' has been generated.',
+                                'screen' => 'invoice',
+                                'id' => $model->monthly_invoice_id,
+                            ]);
                             /* Yii::$app->mailer->compose('@app/mail/invoice-mail', [
                               'model' => $model,
                               ])
@@ -536,6 +560,14 @@ class MonthlyInvoiceController extends Controller {
 
             //debugPrint(json_encode($mailObject));
             \app\helpers\AppHelper::resendEmail($mailObject);
+
+            $pushHelper = new \app\helpers\PushHelper();
+            $pushHelper->sendPushToUser($model->receiver_id, [
+                'title' => 'New Invoice',
+                'body' => $subject,
+                'screen' => 'invoice',
+                'id' => $model->monthly_invoice_id,
+            ]);
         }
         Yii::$app->session->setFlash('success', 'Mail successfully sent');
         return $this->redirect(['index']);

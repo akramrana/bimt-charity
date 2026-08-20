@@ -176,6 +176,15 @@ class UserController extends Controller {
                 //
                 $msg = $model->fullname . ' has been added by ' . Yii::$app->user->identity->fullname;
                 \app\helpers\AppHelper::addActivity("US", $model->user_id, $msg);
+
+                $pushHelper = new \app\helpers\PushHelper();
+                $pushHelper->sendPush([
+                    'title' => 'New Member Added',
+                    'body' => $model->fullname . ' has joined BIMT Charity Foundation.',
+                    'screen' => 'member',
+                    'id' => $model->user_id,
+                ]);
+
                 return $this->redirect(['view', 'id' => $model->user_id]);
             } else {
                 echo json_encode($model->errors);

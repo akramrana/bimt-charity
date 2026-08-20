@@ -135,6 +135,14 @@ class HelloController extends Controller {
                                 'html' => $mailDetails,
                             ];
                             \app\helpers\AppHelper::resendEmail($mailObject);
+
+                            $pushHelper = new \app\helpers\PushHelper();
+                            $pushHelper->sendPushToUser($model->receiver_id, [
+                                'title' => 'New Invoice',
+                                'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' has been generated.',
+                                'screen' => 'invoice',
+                                'id' => $model->monthly_invoice_id,
+                            ]);
                         } else {
                             die(json_encode($model->errors));
                         }
@@ -218,6 +226,14 @@ class HelloController extends Controller {
                     'html' => $mailDetails,
                 ];
                 \app\helpers\AppHelper::resendEmail($mailObject);
+
+                $pushHelper = new \app\helpers\PushHelper();
+                $pushHelper->sendPushToUser($model->receiver_id, [
+                    'title' => 'Unpaid Invoice',
+                    'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' has been generated. Please complete the payment.',
+                    'screen' => 'invoice',
+                    'id' => $model->monthly_invoice_id,
+                ]);
             }
         }
     }
