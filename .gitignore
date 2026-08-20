@@ -35,3 +35,4 @@ tests/_support/_generated
 /web/uploads/
 /web/bimt-charity-firebase-adminsdk-fbsvc-03a9965c43.json
 /.env
+/vendor.zip
