@@ -56,7 +56,7 @@ class Users extends \yii\db\ActiveRecord
             [['address', 'user_type'], 'string'],
             [['enable_login', 'is_active', 'is_deleted'], 'integer'],
             [['recurring_amount'], 'number'],
-            [['created_at', 'updated_at', 'currency_id', 'member_code', 'invited_user_id', 'is_exception', 'is_approved', 'is_active_donor'], 'safe'],
+            [['created_at', 'updated_at', 'currency_id', 'member_code', 'invited_user_id', 'is_exception', 'is_approved', 'is_active_donor', 'logged_in_at'], 'safe'],
             [['fullname', 'email', 'phone', 'alt_phone', 'batch', 'department'], 'string', 'max' => 50],
             [['image'], 'string', 'max' => 250],
             ['email', 'email'],
@@ -98,6 +98,7 @@ class Users extends \yii\db\ActiveRecord
             'is_active_donor' => 'Active Donor',
             'is_approved' => 'Approve',
             'is_exception' => 'Special Member',
+            'logged_in_at' => 'Logged-In At',
         ];
     }
     

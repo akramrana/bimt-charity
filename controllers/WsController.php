@@ -104,6 +104,9 @@ class WsController extends Controller {
                 if (!empty($model)) {
                     $validate = Yii::$app->security->validatePassword($request['password'], $model->password);
                     if ($validate) {
+                        $model->logged_in_at = date("Y-m-d H:i:s");
+                        $model->save(false);
+                                
                         $this->data = [
                             'id' => (string) $model->user_id,
                             'fullname' => $model->fullname,
