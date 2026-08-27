@@ -43,6 +43,122 @@ class HelloController extends Controller {
         \app\helpers\AppHelper::resendEmail($mailObject);
     }
 
+    /**
+     * Emails the current month's received-payment report to every active,
+     * non-deleted user. The attached CSV can be opened directly in Excel.
+     *
+     * Usage: php yii hello/monthly-payment-report
+     *
+     * @return int Exit code
+     */
+    public function actionMonthlyPaymentReport() {
+        $monthStart = date('Y-m-01');
+        $nextMonthStart = date('Y-m-01', strtotime('+1 month'));
+        $monthLabel = date('F Y');
+
+        $payments = \app\models\PaymentReceived::find()
+                ->with(['donatedBy', 'receivedBy', 'currency'])
+                ->where(['payment_received.is_deleted' => 0])
+                ->andWhere(['>=', 'payment_received.received_date', $monthStart])
+                ->andWhere(['<', 'payment_received.received_date', $nextMonthStart])
+                ->orderBy(['payment_received.received_date' => SORT_ASC, 'payment_received.payment_received_id' => SORT_ASC])
+                ->all();
+
+        $users = \app\models\Users::find()
+                ->where(['is_active' => 1, 'is_deleted' => 0])
+                ->andWhere(['not', ['email' => null]])
+                ->andWhere(['<>', 'email', ''])
+                ->orderBy(['user_id' => SORT_ASC])
+                ->all();
+
+        if (empty($users)) {
+            $this->stderr("No active users with an email address were found.\n");
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+
+        $csv = fopen('php://temp', 'r+');
+        // UTF-8 BOM keeps names and comments readable when opened in Excel.
+        fwrite($csv, "\xEF\xBB\xBF");
+        fputcsv($csv, ['Invoice', 'Received Date', 'Donated By', 'Received By', 'Amount', 'Currency', 'Comments']);
+
+        $rows = '';
+        $totals = [];
+        foreach ($payments as $payment) {
+            $donor = $payment->donatedBy ? $payment->donatedBy->fullname : '';
+            $receiver = $payment->receivedBy ? $payment->receivedBy->fullname : '';
+            $currency = $payment->currency ? $payment->currency->code : '';
+            $comments = (string) $payment->comments;
+
+            fputcsv($csv, [
+                $payment->received_invoice_number,
+                $payment->received_date,
+                $donor,
+                $receiver,
+                $payment->amount,
+                $currency,
+                $comments,
+            ]);
+
+            if (!isset($totals[$currency])) {
+                $totals[$currency] = 0;
+            }
+            $totals[$currency] += (float) $payment->amount;
+
+            $rows .= '<tr>'
+                    . '<td>' . htmlspecialchars($payment->received_invoice_number, ENT_QUOTES, 'UTF-8') . '</td>'
+                    . '<td>' . htmlspecialchars($payment->received_date, ENT_QUOTES, 'UTF-8') . '</td>'
+                    . '<td>' . htmlspecialchars($donor, ENT_QUOTES, 'UTF-8') . '</td>'
+                    . '<td>' . htmlspecialchars($receiver, ENT_QUOTES, 'UTF-8') . '</td>'
+                    . '<td style="text-align:right">' . number_format((float) $payment->amount, 2) . '</td>'
+                    . '<td>' . htmlspecialchars($currency, ENT_QUOTES, 'UTF-8') . '</td>'
+                    . '<td>' . nl2br(htmlspecialchars($comments, ENT_QUOTES, 'UTF-8')) . '</td>'
+                    . '</tr>';
+        }
+
+        rewind($csv);
+        $csvContent = stream_get_contents($csv);
+        fclose($csv);
+
+        $totalParts = [];
+        foreach ($totals as $currency => $amount) {
+            $totalParts[] = number_format($amount, 2) . ($currency !== '' ? ' ' . $currency : ' (currency not set)');
+        }
+        $totalText = empty($totalParts) ? '0.00' : implode(', ', $totalParts);
+
+        if ($rows === '') {
+            $rows = '<tr><td colspan="7">No payments were received this month.</td></tr>';
+        }
+
+        $html = '<p>Assalamualaikum,</p>'
+                . '<p>Please find the payment received report for <strong>' . $monthLabel . '</strong>. '
+                . 'The Excel-compatible report is attached to this email.</p>'
+                . '<p><strong>Payments:</strong> ' . count($payments) . '<br><strong>Total:</strong> ' . htmlspecialchars($totalText, ENT_QUOTES, 'UTF-8') . '</p>'
+                . '<table cellpadding="6" cellspacing="0" border="1" style="border-collapse:collapse;width:100%">'
+                . '<thead><tr><th>Invoice</th><th>Received Date</th><th>Donated By</th><th>Received By</th><th>Amount</th><th>Currency</th><th>Comments</th></tr></thead>'
+                . '<tbody>' . $rows . '</tbody></table>'
+                . '<p>M&rsquo;assalam<br>Finance Control Board<br>BIMT Charity Foundation</p>';
+
+        $attachment = [
+            'filename' => 'payment-received-' . date('Y-m') . '.csv',
+            'content' => base64_encode($csvContent),
+        ];
+        $sent = 0;
+        foreach ($users as $user) {
+            $mailObject = [
+                'from' => 'BIMT Charity Foundation<communication@bimtcharity.org>',
+                'to' => $user->email,
+                'subject' => 'Payment Received Report - ' . $monthLabel,
+                'html' => '<p>Dear ' . htmlspecialchars($user->fullname, ENT_QUOTES, 'UTF-8') . ',</p>' . $html,
+                'attachments' => [$attachment],
+            ];
+            \app\helpers\AppHelper::resendEmail($mailObject);
+            $sent++;
+        }
+
+        $this->stdout('Sent the ' . $monthLabel . ' report (' . count($payments) . ' payments) to ' . $sent . " users.\n");
+        return ExitCode::OK;
+    }
+
     public function actionGenerate() {
         $users = \app\models\Users::find()
                 ->where(['is_deleted' => 0, 'is_active' => 1])
