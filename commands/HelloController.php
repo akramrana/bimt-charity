@@ -52,6 +52,9 @@ class HelloController extends Controller {
      * @return int Exit code
      */
     public function actionMonthlyPaymentReport() {
+        if (date('Y-m-d') !== date('Y-m-t')) {
+            return;
+        }
         $monthStart = date('Y-m-01');
         $nextMonthStart = date('Y-m-01', strtotime('+1 month'));
         $monthLabel = date('F Y');
