@@ -312,7 +312,7 @@ class UserController extends Controller {
                 \app\helpers\AppHelper::resendEmail($mailObject);
 
                 $pushHelper = new \app\helpers\PushHelper();
-                $pushHelper->sendPushToUser($model->receiver_id, [
+                $pushHelper->sendPushToUser($model->user_id, [
                     'title' => 'Member account activated',
                     'body' => $subject,
                     'screen' => 'member',
@@ -397,7 +397,7 @@ class UserController extends Controller {
             \app\helpers\AppHelper::resendEmail($mailObject);
 
             $pushHelper = new \app\helpers\PushHelper();
-            $pushHelper->sendPushToUser($model->receiver_id, [
+            $pushHelper->sendPushToUser($model->user_id, [
                 'title' => 'Assalamualaikum!',
                 'body' => $subject,
                 'screen' => 'member',
