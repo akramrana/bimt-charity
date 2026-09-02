@@ -409,6 +409,36 @@ class UserController extends Controller {
         }
     }
 
+    public function actionSendPush() {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $userId = Yii::$app->request->post('user_id');
+        $message = trim(Yii::$app->request->post('message', ''));
+        if (empty($userId) || empty($message)) {
+            return [
+                'success' => false,
+                'message' => 'User and message are required.'
+            ];
+        }
+        $user = \app\models\Users::findOne($userId);
+        if (empty($user)) {
+            return [
+                'success' => false,
+                'message' => 'User not found.'
+            ];
+        }
+        $pushHelper = new \app\helpers\PushHelper();
+        $pushHelper->sendPushToUser($user->user_id, [
+            'title' => 'Assalamualaikum!',
+            'body' => $message,
+            'screen' => 'member',
+            'id' => $user->user_id,
+        ]);
+        return [
+            'success' => true,
+            'message' => 'Push notification sent successfully.'
+        ];
+    }
+
     /**
      * Finds the Users model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

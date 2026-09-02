@@ -20,7 +20,7 @@ class PushHelper {
 
     private function generateAccessToken() {
         try {
-            $credentialsFilePath = 'bimt-charity-firebase-adminsdk-fbsvc-03a9965c43.json';
+            $credentialsFilePath = \Yii::getAlias('@webroot').'/bimt-charity-firebase-adminsdk-fbsvc-03a9965c43.json';
             $credentials = new ServiceAccountCredentials(['https://www.googleapis.com/auth/firebase.messaging'], $credentialsFilePath);
             $token = $credentials->fetchAuthToken();
             return $accessToken = $token['access_token'];

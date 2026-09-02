@@ -9,7 +9,7 @@ use yii\grid\GridView;
 
 $this->title = 'Members';
 $this->params['breadcrumbs'][] = $this->title;
-$actionBtn = '{view}{update}{reset}{delete}';
+$actionBtn = '{view}{update}{reset}{delete}{push}';
 $allowActivate = true;
 $allowCreate = true;
 if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
@@ -108,7 +108,17 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                             return Html::a('<i class="glyphicon glyphicon-refresh"></i>', ['user/resend', 'id' => $model->user_id], [
                                 'onclick' => 'return confirm("Are you sure you want to reset this user?")'
                             ]);
-                        }
+                        },
+                        'push' => function ($url, $model) {
+                            return Html::a(
+                                    '<i class="glyphicon glyphicon-bell"></i>',
+                                    'javascript:void(0)',
+                                    [
+                                        'title' => 'Send Push Notification',
+                                        'onclick' => 'app.sendPushNotification(' . $model->user_id . '); return false;',
+                                    ]
+                            );
+                        },
                     ],
                 ],
             ],
