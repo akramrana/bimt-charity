@@ -174,96 +174,94 @@ class HelloController extends Controller {
                         ->one();
                 if (empty($model)) {
                     $model = new \app\models\MonthlyInvoice();
-					$model->created_at = date('Y-m-d H:i:s');
-					$model->updated_at = date('Y-m-d H:i:s');
-					$model->monthly_invoice_number = \app\helpers\AppHelper::getNextMonthlyInvoiceNumber();
-					$model->receiver_id = $user->user_id;
-					$model->amount = $user->recurring_amount > 0 ? $user->recurring_amount:500;
-					$model->currency_id = $user->currency_id;
-					$model->instalment_month = date('F');
-					$model->instalment_year = date('Y');
-					$model->is_paid = 0;
-					$model->is_deleted = 0;
-					if ($model->save()) {
-						$proccessed = 1;
-						$msg = 'Invoice#' . $model->monthly_invoice_number . ' generated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' against receiver ' . $model->receiver->fullname;
-						\app\helpers\AppHelper::addActivityCron("MI", $model->monthly_invoice_id, $msg);
+                    $model->created_at = date('Y-m-d H:i:s');
+                    $model->updated_at = date('Y-m-d H:i:s');
+                    $model->monthly_invoice_number = \app\helpers\AppHelper::getNextMonthlyInvoiceNumber();
+                    $model->receiver_id = $user->user_id;
+                    $model->amount = $user->recurring_amount > 0 ? $user->recurring_amount : 500;
+                    $model->currency_id = $user->currency_id;
+                    $model->instalment_month = date('F');
+                    $model->instalment_year = date('Y');
+                    $model->is_paid = 0;
+                    $model->is_deleted = 0;
+                    if ($model->save()) {
+                        $proccessed = 1;
+                        $msg = 'Invoice#' . $model->monthly_invoice_number . ' generated for ' . $model->instalment_month . ' ' . $model->instalment_year . ' against receiver ' . $model->receiver->fullname;
+                        \app\helpers\AppHelper::addActivityCron("MI", $model->monthly_invoice_id, $msg);
 
-						$subject = "Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')';
-						$mailDetails = "<p>
-											Assalamualaikum,<br/>
-											Dear Brother, " . $user->fullname . "
-										</p>
-										<p>
-											We hope by the mercy of almighty Allah (SW) you are doing well as well as your family members.<br/> 
-											This is the beginning of " . $model->instalment_month . ". This is why we would like to cordially request you to contribute for 'BIMT Charity Foundation' with your SADAKAH.
-										</p>
-										<p>
-											Proposed amount: " . $model->amount . " " . $model->currency->code . " (more or less amount is unquestionably acceptable)<br/>
-											Proposed deadline: 15 " . $model->instalment_month . "," . $model->instalment_year . "
-										</p>
-										<p>
-											In case you need to mention a SUBJECT during Transfer, just write FOR BCF as subject. 
-											It is strongly recommended to inform corresponding account holder (mentioning your member ID, 
-											if possible) after transferring the money so that we can track your transaction.
-										</p>
-										<p>
-											Insha Allah we will try our level best to use your SADAKAH in right way. Verily, Allah is all knowing and all seeing.
-										</p>
+                        $subject = "Your Sadakah for " . $model->instalment_month . " " . $model->instalment_year . '(Invoice#' . $model->monthly_invoice_number . ')';
+                        $mailDetails = "<p>
+                                                Assalamualaikum,<br/>
+                                                Dear Brother, " . $user->fullname . "
+                                        </p>
+                                        <p>
+                                                We hope by the mercy of almighty Allah (SW) you are doing well as well as your family members.<br/> 
+                                                This is the beginning of " . $model->instalment_month . ". This is why we would like to cordially request you to contribute for 'BIMT Charity Foundation' with your SADAKAH.
+                                        </p>
+                                        <p>
+                                                Proposed amount: " . $model->amount . " " . $model->currency->code . " (more or less amount is unquestionably acceptable)<br/>
+                                                Proposed deadline: 15 " . $model->instalment_month . "," . $model->instalment_year . "
+                                        </p>
+                                        <p>
+                                                In case you need to mention a SUBJECT during Transfer, just write FOR BCF as subject. 
+                                                It is strongly recommended to inform corresponding account holder (mentioning your member ID, 
+                                                if possible) after transferring the money so that we can track your transaction.
+                                        </p>
+                                        <p>
+                                                Insha Allah we will try our level best to use your SADAKAH in right way. Verily, Allah is all knowing and all seeing.
+                                        </p>
 
-										<p>
-											Bank Details:
-										</p>
-										<p>
-											Bangladesh:<br/>
-											Account Holder Name: Mahmud Arafat Bin Rafiq<br/>
-											Account Number: 114.103.0383245<br/>
-											Bank Name: Dutch Bangla Bank Limited
-										</p>
-										<p>
-											Bikash: 008801719127039 (Mahbubur Rahman)
-										</p>
-										<p>
-											Germany:<br/>
-											Account Holder Name: MD Alif Khondokar<br/>
-											IBAN: DE78 1007 0024 0214 2370 00<br/>
-											BIC: DEUTDEDBBER
-										</p>
-										<p>
-											Singapore:<br/>
-											Account Holder Name: Mohin Md Rakibul Ahsun<br/>
-											Bank Name: POSB<br/>
-											Account Number: 248-85387-5 (Savings) 
-										</p>
-										<p>
-											May Allah accept our SADAKAH, our all efforts and make these a good reason go acquire Allah's satisfaction in Dunya and in Akhira.
-										</p>
-										<p>
-											M’assalam<br/>
-											Finance Control Board<br/>
-											BIMT Charity Foundation<br/>
-											For detail please contact with Rafiq Bin Arafat, Rakibul Ahsun Mohin, Alif Khondokar.<br/>
-											Web portal Link: http://bimtcharity.org/site/login
-										</p>";
+                                        <p>
+                                                Bank Details:
+                                        </p>
+                                        <p>
+                                                Bangladesh:<br/>
+                                                Account Holder Name: Mahmud Arafat Bin Rafiq<br/>
+                                                Account Number: 114.103.0383245<br/>
+                                                Bank Name: Dutch Bangla Bank Limited
+                                        </p>
+                                        <p>
+                                                Bikash: 008801719127039 (Mahbubur Rahman)
+                                        </p>
+                                        <p>
+                                                Germany:<br/>
+                                                Account Holder Name: MD Alif Khondokar<br/>
+                                                IBAN: DE78 1007 0024 0214 2370 00<br/>
+                                                BIC: DEUTDEDBBER
+                                        </p>
+                                        <p>
+                                                Singapore:<br/>
+                                                Account Holder Name: Mohin Md Rakibul Ahsun<br/>
+                                                Bank Name: POSB<br/>
+                                                Account Number: 248-85387-5 (Savings) 
+                                        </p>
+                                        <p>
+                                                May Allah accept our SADAKAH, our all efforts and make these a good reason go acquire Allah's satisfaction in Dunya and in Akhira.
+                                        </p>
+                                        <p>
+                                                M’assalam<br/>
+                                                Finance Control Board<br/>
+                                                BIMT Charity Foundation<br/>
+                                                For detail please contact with Rafiq Bin Arafat, Rakibul Ahsun Mohin, Alif Khondokar.<br/>
+                                                Web portal Link: http://bimtcharity.org/site/login
+                                        </p>";
 
-						$mailObject = [
-							'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
-							'to' => $user->email,
-							'subject' => $subject,
-							'html' => $mailDetails,
-						];
-						\app\helpers\AppHelper::resendEmail($mailObject);
+                        $mailObject = [
+                            'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                            'to' => $user->email,
+                            'subject' => $subject,
+                            'html' => $mailDetails,
+                        ];
+                        \app\helpers\AppHelper::resendEmail($mailObject);
 
-						$pushHelper = new \app\helpers\PushHelper();
-						$pushHelper->sendPushToUser($model->receiver_id, [
-							'title' => 'New Invoice',
-							'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' has been generated.',
-							'screen' => 'invoice',
-							'id' => $model->monthly_invoice_id,
-						]);
-					} else {
-						die(json_encode($model->errors));
-					}
+                        $pushHelper = new \app\helpers\PushHelper();
+                        $pushHelper->sendPushToUser($model->receiver_id, [
+                            'title' => 'New Invoice',
+                            'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' has been generated.',
+                            'screen' => 'invoice',
+                            'id' => $model->monthly_invoice_id,
+                        ]);
+                    }
                 }
             }
         }
