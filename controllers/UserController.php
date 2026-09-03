@@ -430,7 +430,7 @@ class UserController extends Controller {
         $pushHelper->sendPushToUser($user->user_id, [
             'title' => 'Assalamualaikum!',
             'body' => $message,
-            'screen' => 'member',
+            'screen' => 'dashboard',
             'id' => $user->user_id,
         ]);
         return [
