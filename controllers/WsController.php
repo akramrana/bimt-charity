@@ -642,6 +642,17 @@ class WsController extends Controller {
                 }
             }
             if ($paymentReceived->save()) {
+                $msg = 'New Sadaqah Received. Donated By ' . $paymentReceived->donatedBy->fullname;
+                \app\helpers\AppHelper::addActivity("PREC", $paymentReceived->payment_received_id, $msg);
+                
+                $pushHelper = new \app\helpers\PushHelper();
+                $pushHelper->sendPush([
+                    'title' => 'New Sadaqah Received',
+                    'body' => 'A new payment '.$paymentReceived->received_invoice_number.' has been submitted.',
+                    'screen' => 'sadaqah',
+                    'id' => $paymentReceived->payment_received_id,
+                ]);
+                
                 $this->message = 'Payment Received invoice successfully added.';
                 $this->data = [
                     'payment_received_id' => (string) $paymentReceived->payment_received_id,

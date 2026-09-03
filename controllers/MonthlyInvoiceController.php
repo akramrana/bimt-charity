@@ -292,6 +292,14 @@ class MonthlyInvoiceController extends Controller {
                             'html' => $mailDetails,
                         ];
                         \app\helpers\AppHelper::resendEmail($mailObject);
+                        
+                        $pushHelper = new \app\helpers\PushHelper();
+                        $pushHelper->sendPushToUser($model->receiver_id, [
+                            'title' => 'Updated Invoice:'.$model->monthly_invoice_number,
+                            'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' has been updated.',
+                            'screen' => 'invoice',
+                            'id' => $model->monthly_invoice_id,
+                        ]);
                     }
                 }
                 return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
@@ -542,6 +550,15 @@ class MonthlyInvoiceController extends Controller {
                     ->all();
             $emailList = [];
             foreach ($users as $user) {
+                
+                $pushHelper = new \app\helpers\PushHelper();
+                $pushHelper->sendPushToUser($user->receiver_id, [
+                    'title' => 'New Invoice',
+                    'body' => $subject,
+                    'screen' => 'invoice',
+                    'id' => "",
+                ]);
+                
                 array_push($emailList, $user->email);
             }
 
@@ -560,14 +577,6 @@ class MonthlyInvoiceController extends Controller {
 
             //debugPrint(json_encode($mailObject));
             \app\helpers\AppHelper::resendEmail($mailObject);
-
-            $pushHelper = new \app\helpers\PushHelper();
-            $pushHelper->sendPushToUser($model->receiver_id, [
-                'title' => 'New Invoice',
-                'body' => $subject,
-                'screen' => 'invoice',
-                'id' => $model->monthly_invoice_id,
-            ]);
         }
         Yii::$app->session->setFlash('success', 'Mail successfully sent');
         return $this->redirect(['index']);
