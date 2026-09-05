@@ -23,12 +23,18 @@ class AppHelper {
         return $types[$type];
     }
 
-    static function addActivity($type, $type_id, $msg) {
+    static function addActivity($type, $type_id, $msg, $user_id = "") {
         $model = new \app\models\Notifications();
         $model->type = $type;
         $model->type_id = $type_id;
         $model->comments = $msg;
-        $model->added_by = Yii::$app->user->identity->user_id;
+        if (!empty($user_id)) {
+            $model->added_by = $user_id;
+        } elseif (!empty(Yii::$app->user->identity)) {
+            $model->added_by = Yii::$app->user->identity->user_id;
+        } else {
+            $model->added_by = null;
+        }
         $model->created_at = date("Y-m-d H:i:s");
         $model->save();
     }
@@ -258,7 +264,6 @@ class AppHelper {
                 'Authorization: Bearer ' . $_ENV['RESEND_API_KEY'],
                 'Content-Type: application/json'
             ),
-            
         ));
         $response = curl_exec($curl);
         //debugPrint($response);

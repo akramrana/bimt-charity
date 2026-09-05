@@ -187,14 +187,22 @@ class MonthlyInvoiceController extends Controller {
                         \app\helpers\AppHelper::resendEmail($mailObject);
 
                         $pushHelper = new \app\helpers\PushHelper();
-                        $pushHelper->sendPushToUser($model->receiver_id, [
-                            'title' => 'New Invoice',
-                            'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' has been generated.',
-                            'screen' => 'invoice',
-                            'id' => $model->monthly_invoice_id,
+                        $pushHelper->sendPush([
+                            'title' => 'New Sadaqah Received',
+                            'body' => 'A new payment ' . $paymentReceived->received_invoice_number . ' has been submitted.',
+                            'screen' => 'sadaqah',
+                            'id' => $paymentReceived->payment_received_id,
                         ]);
                     }
                 }
+                $pushHelper = new \app\helpers\PushHelper();
+                $pushHelper->sendPushToUser($model->receiver_id, [
+                    'title' => 'New Invoice',
+                    'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' has been generated.',
+                    'screen' => 'invoice',
+                    'id' => $model->monthly_invoice_id,
+                ]);
+
                 return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
             } else {
                 return $this->render('create', [
@@ -292,16 +300,23 @@ class MonthlyInvoiceController extends Controller {
                             'html' => $mailDetails,
                         ];
                         \app\helpers\AppHelper::resendEmail($mailObject);
-                        
+
                         $pushHelper = new \app\helpers\PushHelper();
-                        $pushHelper->sendPushToUser($model->receiver_id, [
-                            'title' => 'Updated Invoice:'.$model->monthly_invoice_number,
-                            'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' has been updated.',
-                            'screen' => 'invoice',
-                            'id' => $model->monthly_invoice_id,
+                        $pushHelper->sendPush([
+                            'title' => 'New Sadaqah Received',
+                            'body' => 'A new payment ' . $paymentReceived->received_invoice_number . ' has been submitted.',
+                            'screen' => 'sadaqah',
+                            'id' => $paymentReceived->payment_received_id,
                         ]);
                     }
                 }
+                $pushHelper = new \app\helpers\PushHelper();
+                $pushHelper->sendPushToUser($model->receiver_id, [
+                    'title' => 'Updated Invoice:' . $model->monthly_invoice_number,
+                    'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' has been updated.',
+                    'screen' => 'invoice',
+                    'id' => $model->monthly_invoice_id,
+                ]);
                 return $this->redirect(['view', 'id' => $model->monthly_invoice_id]);
             } else {
                 return $this->render('update', [
@@ -550,7 +565,7 @@ class MonthlyInvoiceController extends Controller {
                     ->all();
             $emailList = [];
             foreach ($users as $user) {
-                
+
                 $pushHelper = new \app\helpers\PushHelper();
                 $pushHelper->sendPushToUser($user->receiver_id, [
                     'title' => 'New Invoice',
@@ -558,7 +573,7 @@ class MonthlyInvoiceController extends Controller {
                     'screen' => 'invoice',
                     'id' => "",
                 ]);
-                
+
                 array_push($emailList, $user->email);
             }
 

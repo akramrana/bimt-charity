@@ -106,7 +106,7 @@ class WsController extends Controller {
                     if ($validate) {
                         $model->logged_in_at = date("Y-m-d H:i:s");
                         $model->save(false);
-                                
+
                         $this->data = [
                             'id' => (string) $model->user_id,
                             'fullname' => $model->fullname,
@@ -643,16 +643,60 @@ class WsController extends Controller {
             }
             if ($paymentReceived->save()) {
                 $msg = 'New Sadaqah Received. Donated By ' . $paymentReceived->donatedBy->fullname;
-                \app\helpers\AppHelper::addActivity("PREC", $paymentReceived->payment_received_id, $msg);
-                
+                \app\helpers\AppHelper::addActivity("PREC", $paymentReceived->payment_received_id, $msg, $model->user_id);
+
+                $subject = "Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")";
+                $mailDetails = "<p>
+                                            Assalamu Alaikum,
+                                        </p>
+                                        <p>
+                                            Dear Brother " . $paymentReceived->donatedBy->fullname . ",
+                                        </p>
+
+                                        <p>
+                                            We do confirm your following contribution for BIMT Charity Foundation:
+                                        </p>
+                                        <p>
+                                            Amount: " . $paymentReceived->amount . " " . $paymentReceived->currency->code . "<br/>
+                                            Received Date: " . date('d.m.Y', strtotime($paymentReceived->created_at)) . "<br/>
+                                            For Month(s): " . $paymentReceived->instalment_month . " " . $paymentReceived->instalment_year . "<br/>
+                                            Comments: " . $paymentReceived->comments . "
+                                        </p>
+
+                                        <p>
+                                            Your SADAKAH has been received with thanks. For details you can visit our web portal,<br/>
+                                            your SADAKAH has been documented under ‘+ Receive’ Menu
+                                        </p>
+                                        <p>
+
+                                            “কে আছে যে আল্লাহকে উত্তম ঋণ দিবে ? তাহলে  তিনি তা বহুগুনে তার জন্য বৃদ্ধি করবেন এবং তার জন্য উত্তম পুরস্কার রয়েছে।“  [সূরা হাদীদ ৫৭:১১]
+
+                                        </p>
+
+                                        <p>
+                                            M’assalam<br/>
+                                            Finance Control Board<br/>
+                                            BIMT Charity Foundation<br/>
+                                            Webportal Link: http://bimtcharity.org/site/login
+
+                                        </p>";
+
+                $mailObject = [
+                    'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                    'to' => $paymentReceived->donatedBy->email,
+                    'subject' => $subject,
+                    'html' => $mailDetails,
+                ];
+                \app\helpers\AppHelper::resendEmail($mailObject);
+
                 $pushHelper = new \app\helpers\PushHelper();
                 $pushHelper->sendPush([
                     'title' => 'New Sadaqah Received',
-                    'body' => 'A new payment '.$paymentReceived->received_invoice_number.' has been submitted.',
+                    'body' => 'A new payment ' . $paymentReceived->received_invoice_number . ' has been submitted.',
                     'screen' => 'sadaqah',
                     'id' => $paymentReceived->payment_received_id,
                 ]);
-                
+
                 $this->message = 'Payment Received invoice successfully added.';
                 $this->data = [
                     'payment_received_id' => (string) $paymentReceived->payment_received_id,
@@ -762,7 +806,7 @@ class WsController extends Controller {
             return $this->response();
         }
         $userId = $request['userId'] ?? null;
-        
+
         $deviceId = $request['deviceId'] ?? null;
         $pushType = $request['pushType'] ?? null;
         $pushToken = $request['pushToken'] ?? null;
