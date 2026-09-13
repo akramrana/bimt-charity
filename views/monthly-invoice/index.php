@@ -27,6 +27,8 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
         <p>
 
             <?= ($allowCreate) ? Html::a('Create Monthly Invoice', ['create'], ['class' => 'btn btn-success']) : "" ?>
+            
+            <?= ($allowCreate) ? Html::a('Create Monthly Invoice(Bulk)', ['create-bulk'], ['class' => 'btn btn-warning']) : "" ?>
 
             <?= ($allowGenerate) ? Html::a('Generate Monthly Invoice', ['generate'], ['class' => 'btn btn-info pull-right', 'onclick' => 'return confirm("Are you sure want to generate monthly invoice?")']) : "" ?>
 

@@ -598,6 +598,156 @@ class MonthlyInvoiceController extends Controller {
     }
 
     /**
+     * Creates a new MonthlyInvoice model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreateBulk() {
+        $model = new MonthlyInvoice();
+        $model->scenario = 'on-create-bulk';
+        $model->currency_id = 13;
+        $model->created_at = date('Y-m-d H:i:s');
+        $model->updated_at = date('Y-m-d H:i:s');
+        if ($model->load(Yii::$app->request->post())) {
+            $post = Yii::$app->request->bodyParams;
+            //debugPrint($post);
+            if (isset($post['MonthlyInvoice'])) {
+                $data = $post['MonthlyInvoice'];
+                $months = $data['instalment_month_arr'] ?? [];
+
+                $createdCount = 0;
+                $skippedCount = 0;
+
+                foreach ($months as $month) {
+                    $check = MonthlyInvoice::find()
+                            ->where([
+                                'receiver_id' => $data['receiver_id'],
+                                'instalment_month' => $month,
+                                'instalment_year' => $data['instalment_year'],
+                            ])
+                            ->one();
+                    if (!empty($check)) {
+                        $skippedCount++;
+                        continue;
+                    }
+                    $invoice = new MonthlyInvoice();
+                    $invoice->monthly_invoice_number = \app\helpers\AppHelper::getNextMonthlyInvoiceNumber();
+                    $invoice->receiver_id = $data['receiver_id'];
+                    $invoice->currency_id = $data['currency_id'];
+                    $invoice->is_paid = $data['is_paid'];
+                    $invoice->amount = $data['amount'];
+                    $invoice->instalment_month = $month;
+                    $invoice->instalment_year = $data['instalment_year'];
+                    $invoice->invoice_received_by = $data['invoice_received_by'];
+                    $invoice->invoice_received_date = $data['invoice_received_date'];
+                    $invoice->created_at = date('Y-m-d H:i:s');
+                    $invoice->updated_at = date('Y-m-d H:i:s');
+                    if (!$invoice->save()) {
+                        Yii::error($invoice->errors);
+                    } else {
+                        $createdCount++;
+
+                        $msg = 'Invoice#' . $invoice->monthly_invoice_number . ' has been modified by ' . Yii::$app->user->identity->fullname;
+                        \app\helpers\AppHelper::addActivity("MI", $invoice->monthly_invoice_id, $msg);
+                        //
+                        if ($invoice->is_paid == 1 && $invoice->invoice_received_by != null && $invoice->invoice_received_date != null) {
+                            $paymentReceived = new \app\models\PaymentReceived();
+                            $paymentReceived->received_invoice_number = \app\helpers\AppHelper::getReceivePayInvoiceNumber();
+                            $paymentReceived->donated_by = $invoice->receiver_id;
+                            $paymentReceived->received_by = $invoice->invoice_received_by;
+                            $paymentReceived->amount = $invoice->amount;
+                            $paymentReceived->currency_id = $invoice->currency_id;
+                            $paymentReceived->instalment_month = $invoice->instalment_month;
+                            $paymentReceived->instalment_year = $invoice->instalment_year;
+                            $paymentReceived->has_invoice = 1;
+                            $paymentReceived->monthly_invoice_id = $invoice->monthly_invoice_id;
+                            $paymentReceived->received_date = $invoice->invoice_received_date;
+                            $paymentReceived->created_at = date('Y-m-d H:i:s');
+                            $paymentReceived->updated_at = date('Y-m-d H:i:s');
+                            if ($paymentReceived->save()) {
+                                $msg1 = 'Invoice#' . $paymentReceived->received_invoice_number . ' generated for ' . $paymentReceived->instalment_month . ' ' . $paymentReceived->instalment_year . ' Donated By ' . $paymentReceived->donatedBy->fullname . '. Created by ' . Yii::$app->user->identity->fullname;
+                                \app\helpers\AppHelper::addActivity("PREC", $paymentReceived->payment_received_id, $msg1);
+                                //
+                                $subject = "Confirmation of your BCF contribution (Invoice#" . $paymentReceived->received_invoice_number . ")";
+                                $mailDetails = "<p>
+                                            Assalamu Alaikum,
+                                        </p>
+                                        <p>
+                                            Dear Brother " . $paymentReceived->donatedBy->fullname . ",
+                                        </p>
+
+                                        <p>
+                                            We do confirm your following contribution for BIMT Charity Foundation:
+                                        </p>
+                                        <p>
+                                            Amount: " . $paymentReceived->amount . " " . $paymentReceived->currency->code . "<br/>
+                                            Received Date: " . date('d.m.Y', strtotime($paymentReceived->created_at)) . "<br/>
+                                            For Month(s): " . $paymentReceived->instalment_month . " " . $paymentReceived->instalment_year . "<br/>
+                                            Comments: " . $paymentReceived->comments . "
+                                        </p>
+
+                                        <p>
+                                            Your SADAKAH has been received with thanks. For details you can visit our web portal,<br/>
+                                            your SADAKAH has been documented under ‘+ Receive’ Menu
+                                        </p>
+                                        <p>
+
+                                            “কে আছে যে আল্লাহকে উত্তম ঋণ দিবে ? তাহলে  তিনি তা বহুগুনে তার জন্য বৃদ্ধি করবেন এবং তার জন্য উত্তম পুরস্কার রয়েছে।“  [সূরা হাদীদ ৫৭:১১]
+
+                                        </p>
+
+                                        <p>
+                                            M’assalam<br/>
+                                            Finance Control Board<br/>
+                                            BIMT Charity Foundation<br/>
+                                            Webportal Link: http://bimtcharity.org/site/login
+
+                                        </p>";
+
+                                $mailObject = [
+                                    'from' => "BIMT Charity Foundation<communication@bimtcharity.org>",
+                                    'to' => $paymentReceived->donatedBy->email,
+                                    'subject' => $subject,
+                                    'html' => $mailDetails,
+                                ];
+                                \app\helpers\AppHelper::resendEmail($mailObject);
+                                //
+                                $pushHelper = new \app\helpers\PushHelper();
+                                $pushHelper->sendPush([
+                                    'title' => 'New Sadaqah Received',
+                                    'body' => 'A new payment ' . $paymentReceived->received_invoice_number . ' has been submitted.',
+                                    'screen' => 'sadaqah',
+                                    'id' => $paymentReceived->payment_received_id,
+                                ]);
+                            }
+                        }
+                    }
+                }
+                if ($createdCount > 0) {
+                    $pushHelper = new \app\helpers\PushHelper();
+                    $pushHelper->sendPushToUser($data['receiver_id'], [
+                        'title' => 'Bulk Invoice created',
+                        'body' => 'Multiple monthly invoice has been created against your member ID.',
+                        'screen' => 'invoice',
+                        'id' => "",
+                    ]);
+                }
+                $message = $createdCount . ' invoice(s) successfully created';
+                if ($skippedCount > 0) {
+                    $message .= ', ' .
+                            $skippedCount .
+                            ' already existed and were skipped';
+                }
+                Yii::$app->session->setFlash('success', $message);
+                return $this->redirect(['index']);
+            }
+        }
+        return $this->render('create-bulk', [
+                    'model' => $model,
+        ]);
+    }
+
+    /**
      * Finds the MonthlyInvoice model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id

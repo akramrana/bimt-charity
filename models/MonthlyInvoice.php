@@ -23,7 +23,7 @@ use Yii;
  */
 class MonthlyInvoice extends \yii\db\ActiveRecord {
 
-    public $invoice_received_by, $invoice_received_date;
+    public $invoice_received_by, $invoice_received_date, $instalment_month_arr;
 
     /**
      * {@inheritdoc}
@@ -44,6 +44,7 @@ class MonthlyInvoice extends \yii\db\ActiveRecord {
             [['instalment_month', 'instalment_year'], 'string', 'max' => 50],
             [['monthly_invoice_number'], 'unique'],
             [['receiver_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['receiver_id' => 'user_id']],
+            [['instalment_month_arr'], 'required', 'on' => 'on-create-bulk']
         ];
     }
 
@@ -65,6 +66,7 @@ class MonthlyInvoice extends \yii\db\ActiveRecord {
             'currency_id' => 'Currency',
             'invoice_received_by' => 'Payment Received By',
             'invoice_received_date' => 'Payment Received Date',
+            'instalment_month_arr' => 'Instalment Month(s)'
         ];
     }
 
