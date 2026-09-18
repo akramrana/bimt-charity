@@ -266,7 +266,22 @@ class AppHelper {
             ),
         ));
         $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($curl);
         //debugPrint($response);
         curl_close($curl);
+
+        if ($response === false || !empty($curlError)) {
+            \Yii::error('Resend cURL error: ' . $curlError, 'resend');
+            return false;
+        }
+
+        if ($httpCode >= 200 && $httpCode < 300) {
+            return true;
+        }
+
+        \Yii::error('Resend API error. HTTP ' . $httpCode . ': ' . $response,'resend');
+
+        return false;
     }
 }

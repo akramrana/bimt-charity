@@ -38,9 +38,9 @@ class MonthlyInvoice extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['monthly_invoice_number', 'receiver_id', 'amount', 'instalment_month', 'instalment_year', 'created_at', 'updated_at'], 'required'],
-            [['receiver_id', 'is_paid', 'is_deleted'], 'integer'],
+            [['receiver_id', 'is_paid', 'is_deleted', 'generation_email_sent'], 'integer'],
             [['amount'], 'number'],
-            [['created_at', 'updated_at', 'currency_id', 'invoice_received_date', 'invoice_received_by'], 'safe'],
+            [['created_at', 'updated_at', 'currency_id', 'invoice_received_date', 'invoice_received_by', 'generation_email_sent'], 'safe'],
             [['instalment_month', 'instalment_year'], 'string', 'max' => 50],
             [['monthly_invoice_number'], 'unique'],
             [['receiver_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['receiver_id' => 'user_id']],
@@ -66,7 +66,8 @@ class MonthlyInvoice extends \yii\db\ActiveRecord {
             'currency_id' => 'Currency',
             'invoice_received_by' => 'Payment Received By',
             'invoice_received_date' => 'Payment Received Date',
-            'instalment_month_arr' => 'Instalment Month(s)'
+            'instalment_month_arr' => 'Instalment Month(s)',
+            'generation_email_sent' => 'Generation Email Sent'
         ];
     }
 
