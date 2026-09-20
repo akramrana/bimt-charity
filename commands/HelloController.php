@@ -52,12 +52,28 @@ class HelloController extends Controller {
      * @return int Exit code
      */
     public function actionMonthlyPaymentReport() {
-        if (date('Y-m-d') !== date('Y-m-t')) {
-            return;
+        /*
+          if (date('Y-m-d') !== date('Y-m-t')) {
+          return;
+          }
+          $monthStart = date('Y-m-01');
+          $nextMonthStart = date('Y-m-01', strtotime('+1 month'));
+          $monthLabel = date('F Y'); */
+
+        // Start on the last day of the month.
+        // Continue during the first 10 days of the following month.
+        if (date('Y-m-d') === date('Y-m-t')) {
+            $reportTimestamp = time();
+        } elseif ((int) date('j') <= 10) {
+            $reportTimestamp = strtotime('first day of last month');
+        } else {
+            return ExitCode::OK;
         }
-        $monthStart = date('Y-m-01');
-        $nextMonthStart = date('Y-m-01', strtotime('+1 month'));
-        $monthLabel = date('F Y');
+
+        $reportMonth = date('Y-m', $reportTimestamp);
+        $monthStart = date('Y-m-01', $reportTimestamp);
+        $nextMonthStart = date('Y-m-01', strtotime('+1 month', $reportTimestamp));
+        $monthLabel = date('F Y', $reportTimestamp);
 
         $payments = \app\models\PaymentReceived::find()
                 ->with(['donatedBy', 'receivedBy', 'currency'])
@@ -67,11 +83,30 @@ class HelloController extends Controller {
                 ->orderBy(['payment_received.received_date' => SORT_ASC, 'payment_received.payment_received_id' => SORT_ASC])
                 ->all();
 
+        /* $users = \app\models\Users::find()
+          ->where(['is_active' => 1, 'is_deleted' => 0])
+          ->andWhere(['not', ['email' => null]])
+          ->andWhere(['<>', 'email', ''])
+          ->orderBy(['user_id' => SORT_ASC])
+          ->all(); */
+        $alreadySentUserIds = \app\models\MonthlyReportDelivery::find()
+                ->select('user_id')
+                ->where(['report_month' => $reportMonth]);
+
         $users = \app\models\Users::find()
-                ->where(['is_active' => 1, 'is_deleted' => 0])
+                ->where([
+                    'is_active' => 1,
+                    'is_deleted' => 0
+                ])
                 ->andWhere(['not', ['email' => null]])
                 ->andWhere(['<>', 'email', ''])
+                ->andWhere([
+                    'not in',
+                    'user_id',
+                    $alreadySentUserIds
+                ])
                 ->orderBy(['user_id' => SORT_ASC])
+                ->limit(90)
                 ->all();
 
         if (empty($users)) {
@@ -154,8 +189,16 @@ class HelloController extends Controller {
                 'html' => '<p>Dear ' . htmlspecialchars($user->fullname, ENT_QUOTES, 'UTF-8') . ',</p>' . $html,
                 'attachments' => [$attachment],
             ];
-            \app\helpers\AppHelper::resendEmail($mailObject);
-            $sent++;
+            $success = \app\helpers\AppHelper::resendEmail($mailObject);
+            if ($success) {
+                $delivery = new \app\models\MonthlyReportDelivery();
+                $delivery->user_id = $user->user_id;
+                $delivery->report_month = $reportMonth;
+                $delivery->sent_at = date('Y-m-d H:i:s');
+                $delivery->save(false);
+
+                $sent++;
+            }
         }
 
         $this->stdout('Sent the ' . $monthLabel . ' report (' . count($payments) . ' payments) to ' . $sent . " users.\n");
@@ -284,7 +327,7 @@ class HelloController extends Controller {
                 $pushHelper = new \app\helpers\PushHelper();
                 $pushHelper->sendPushToUser($model->receiver_id, [
                     'title' => 'Unpaid Invoice',
-                    'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' has been generated. Please complete the payment.',
+                    'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' is unpaid. Please complete the payment.',
                     'screen' => 'invoice',
                     'id' => $model->monthly_invoice_id,
                 ]);
@@ -369,7 +412,7 @@ class HelloController extends Controller {
                 'subject' => $subject,
                 'html' => $mailDetails,
             ];
-            
+
             $result = \app\helpers\AppHelper::resendEmail($mailObject);
             if ($result) {
                 $model->generation_email_sent = 1;
