@@ -34,23 +34,22 @@ use Yii;
  * @property PaymentReceived[] $paymentReceiveds0
  * @property PaymentRelease[] $paymentReleases
  */
-class Users extends \yii\db\ActiveRecord
-{
+class Users extends \yii\db\ActiveRecord {
+
     public $password_hash;
     public $confirm_password;
+
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'users';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             [['fullname', 'email', 'phone', 'password', 'user_type', 'created_at', 'updated_at', 'recurring_amount'], 'required'],
             [['address', 'user_type'], 'string'],
@@ -70,8 +69,7 @@ class Users extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'user_id' => 'User ID',
             'member_code' => 'Member ID',
@@ -101,7 +99,7 @@ class Users extends \yii\db\ActiveRecord
             'logged_in_at' => 'Logged-In At',
         ];
     }
-    
+
     public function fields() {
         $fields = parent::fields();
         $fields['invited_user'] = function ($model) {
@@ -116,75 +114,66 @@ class Users extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getExpenses()
-    {
+    public function getExpenses() {
         return $this->hasMany(Expenses::className(), ['user_id' => 'user_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getFundRequestStatuses()
-    {
+    public function getFundRequestStatuses() {
         return $this->hasMany(FundRequestStatus::className(), ['user_id' => 'user_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getFundRequests()
-    {
+    public function getFundRequests() {
         return $this->hasMany(FundRequests::className(), ['request_user_id' => 'user_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getLoginHistories()
-    {
+    public function getLoginHistories() {
         return $this->hasMany(LoginHistory::className(), ['user_id' => 'user_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getMonthlyInvoices()
-    {
+    public function getMonthlyInvoices() {
         return $this->hasMany(MonthlyInvoice::className(), ['receiver_id' => 'user_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPaymentReceiveds()
-    {
+    public function getPaymentReceiveds() {
         return $this->hasMany(PaymentReceived::className(), ['donated_by' => 'user_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPaymentReceiveds0()
-    {
+    public function getPaymentReceiveds0() {
         return $this->hasMany(PaymentReceived::className(), ['received_by' => 'user_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPaymentReleases()
-    {
+    public function getPaymentReleases() {
         return $this->hasMany(PaymentRelease::className(), ['release_by' => 'user_id']);
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
-    {
+    public function getCurrency() {
         return $this->hasOne(Currencies::className(), ['currency_id' => 'currency_id']);
     }
-    
+
     public function checkUniqueEmail($attribute, $params) {
         $query = Users::find()
                 ->where(['email' => $this->email, 'is_deleted' => 0]);
@@ -196,12 +185,18 @@ class Users extends \yii\db\ActiveRecord
             $this->addError($attribute, Yii::t('app', 'This email has already been taken.'));
         }
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getInvitedBy()
-    {
+    public function getInvitedBy() {
         return $this->hasOne(Users::className(), ['user_id' => 'invited_user_id']);
+    }
+
+    public static function setActiveDonor($userId, $status = 1) {
+        return self::updateAll(
+                        ['is_active_donor' => $status],
+                        ['user_id' => $userId]
+                );
     }
 }

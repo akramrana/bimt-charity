@@ -125,6 +125,8 @@ class PaymentReceivedController extends Controller {
                     'screen' => 'sadaqah',
                     'id' => $model->payment_received_id,
                 ]);
+                
+                \app\models\Users::setActiveDonor($model->donated_by, 1);
 
                 return $this->redirect(['view', 'id' => $model->payment_received_id]);
             } else {

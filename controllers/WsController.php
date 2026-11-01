@@ -696,6 +696,8 @@ class WsController extends Controller {
                     'screen' => 'sadaqah',
                     'id' => $paymentReceived->payment_received_id,
                 ]);
+                
+                \app\models\Users::setActiveDonor($paymentReceived->donated_by, 1);
 
                 $this->message = 'Payment Received invoice successfully added.';
                 $this->data = [

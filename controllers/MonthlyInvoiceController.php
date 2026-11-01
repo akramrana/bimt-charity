@@ -193,6 +193,8 @@ class MonthlyInvoiceController extends Controller {
                             'screen' => 'sadaqah',
                             'id' => $paymentReceived->payment_received_id,
                         ]);
+                        
+                        \app\models\Users::setActiveDonor($paymentReceived->donated_by, 1);
                     }
                 }
                 $pushHelper = new \app\helpers\PushHelper();
@@ -308,6 +310,8 @@ class MonthlyInvoiceController extends Controller {
                             'screen' => 'sadaqah',
                             'id' => $paymentReceived->payment_received_id,
                         ]);
+                        
+                        \app\models\Users::setActiveDonor($paymentReceived->donated_by, 1);
                     }
                 }
                 $pushHelper = new \app\helpers\PushHelper();
