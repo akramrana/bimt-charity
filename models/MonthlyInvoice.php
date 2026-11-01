@@ -40,7 +40,7 @@ class MonthlyInvoice extends \yii\db\ActiveRecord {
             [['monthly_invoice_number', 'receiver_id', 'amount', 'instalment_month', 'instalment_year', 'created_at', 'updated_at'], 'required'],
             [['receiver_id', 'is_paid', 'is_deleted', 'generation_email_sent'], 'integer'],
             [['amount'], 'number'],
-            [['created_at', 'updated_at', 'currency_id', 'invoice_received_date', 'invoice_received_by', 'generation_email_sent'], 'safe'],
+            [['created_at', 'updated_at', 'currency_id', 'invoice_received_date', 'invoice_received_by', 'generation_email_sent', 'unpaid_notification_sent_at'], 'safe'],
             [['instalment_month', 'instalment_year'], 'string', 'max' => 50],
             [['monthly_invoice_number'], 'unique'],
             [['receiver_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['receiver_id' => 'user_id']],
@@ -67,7 +67,8 @@ class MonthlyInvoice extends \yii\db\ActiveRecord {
             'invoice_received_by' => 'Payment Received By',
             'invoice_received_date' => 'Payment Received Date',
             'instalment_month_arr' => 'Instalment Month(s)',
-            'generation_email_sent' => 'Generation Email Sent'
+            'generation_email_sent' => 'Generation Email Sent',
+            'unpaid_notification_sent_at' => 'Unpaid Notification Sent At',
         ];
     }
 

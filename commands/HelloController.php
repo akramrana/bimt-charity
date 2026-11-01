@@ -247,13 +247,15 @@ class HelloController extends Controller {
     }
 
     public function actionNotifyUnpaid() {
-        if ((int) date('j') > 20) {
-            return ExitCode::OK;
-        }
+        /* if ((int) date('j') > 20) {
+          return ExitCode::OK;
+          } */
 
         $models = \app\models\MonthlyInvoice::find()
                 ->where(['instalment_month' => date('F'), 'instalment_year' => date('Y')])
                 ->andWhere(['is_paid' => 0, 'is_deleted' => 0])
+                ->andWhere(['unpaid_notification_sent_at' => null])
+                ->limit(90)
                 ->all();
 
         if (!empty($models)) {
@@ -266,11 +268,11 @@ class HelloController extends Controller {
                                 </p>
                                 <p>
                                     We hope by the mercy of almighty Allah (SW) you are doing well as well as your family members.<br/> 
-                                    This is the beginning of " . $model->instalment_month . ". This is why we would like to cordially request you to contribute for 'BIMT Charity Foundation' with your SADAKAH.
+                                    We would like to kindly remind you about your SADAKAH contribution for " . $model->instalment_month . ". This is why we would like to cordially request you to contribute for 'BIMT Charity Foundation' with your SADAKAH.
                                 </p>
                                 <p>
                                     Proposed amount: " . $model->amount . " " . $model->currency->code . " (more or less amount is unquestionably acceptable)<br/>
-                                    Proposed deadline: 15 " . $model->instalment_month . "," . $model->instalment_year . "
+                                    We kindly request you to complete your contribution at your earliest convenience.
                                 </p>
                                 <p>
                                     In case you need to mention a SUBJECT during Transfer, just write FOR BCF as subject. 
@@ -330,6 +332,10 @@ class HelloController extends Controller {
                     'body' => 'Monthly invoice ' . $model->monthly_invoice_number . ' is unpaid. Please complete the payment.',
                     'screen' => 'invoice',
                     'id' => $model->monthly_invoice_id,
+                ]);
+
+                $model->updateAttributes([
+                    'unpaid_notification_sent_at' => date('Y-m-d H:i:s'),
                 ]);
             }
         }
