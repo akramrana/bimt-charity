@@ -247,14 +247,18 @@ class HelloController extends Controller {
     }
 
     public function actionNotifyUnpaid() {
-        /* if ((int) date('j') > 20) {
-          return ExitCode::OK;
-          } */
+        if ((int) date('j') <= 5) {
+            return ExitCode::OK;
+        }
 
         $models = \app\models\MonthlyInvoice::find()
                 ->where(['instalment_month' => date('F'), 'instalment_year' => date('Y')])
                 ->andWhere(['is_paid' => 0, 'is_deleted' => 0])
                 ->andWhere(['unpaid_notification_sent_at' => null])
+                ->orderBy([
+                    'receiver_id' => SORT_ASC,
+                    'monthly_invoice_id' => SORT_ASC,
+                ])
                 ->limit(90)
                 ->all();
 
@@ -342,6 +346,9 @@ class HelloController extends Controller {
     }
 
     public function actionSendInvoiceEmails() {
+        if ((int) date('j') > 5) {
+            return ExitCode::OK;
+        }
         $models = \app\models\MonthlyInvoice::find()
                 ->where([
                     'instalment_month' => date('F'),
