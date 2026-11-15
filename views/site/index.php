@@ -50,6 +50,11 @@ foreach ($paymentProviders as $currency => $provider) {
                 'label' => 'Total',
                 'format' => ['decimal', 2],
             ],
+            [
+                'attribute' => 'last_payment_at',
+                'label' => 'Last Payment At',
+                'format' => ['date', 'php:d M Y'],
+            ],
         ],
     ]);
 

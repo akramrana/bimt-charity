@@ -257,7 +257,8 @@ class SiteController extends Controller {
                         u.batch,
                         u.department,
                         COUNT(pr.payment_received_id) AS payment_count,
-                        COALESCE(SUM(pr.amount), 0) AS total_amount
+                        COALESCE(SUM(pr.amount), 0) AS total_amount,
+                        MAX(pr.received_date) AS last_payment_at
                     FROM users u
                     LEFT JOIN payment_received pr
                         ON pr.donated_by = u.user_id
@@ -292,6 +293,7 @@ class SiteController extends Controller {
                         'department',
                         'payment_count',
                         'total_amount',
+                        'last_payment_at',
                     ],
                     'defaultOrder' => [
                         'total_amount' => SORT_DESC,
