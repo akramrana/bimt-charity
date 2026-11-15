@@ -1,9 +1,69 @@
 <?php
 /* @var $this yii\web\View */
 
+use yii\grid\GridView;
+use yii\widgets\Pjax;
+use yii\helpers\Html;
+use yii\bootstrap\Tabs;
+
 $this->title = 'Dashboard';
 $user_id = \Yii::$app->user->identity->user_id;
 $hasPaidInvoiceWithinLastTwoMonths = \app\helpers\AppHelper::hasPaidInvoiceWithinLastTwoMonths($user_id);
+
+$tabs = [];
+
+foreach ($paymentProviders as $currency => $provider) {
+
+    ob_start();
+
+    Pjax::begin([
+        'id' => 'payment-pjax-' . strtolower($currency),
+        'timeout' => 10000,
+        'enablePushState' => false,
+        'enableReplaceState' => false,
+    ]);
+
+    echo GridView::widget([
+        'dataProvider' => $provider,
+        'tableOptions' => [
+            'class' => 'table table-striped table-bordered',
+        ],
+        'columns' => [
+            [
+                'attribute' => 'member_name',
+                'label' => 'Member',
+            ],
+            [
+                'attribute' => 'batch',
+                'label' => 'Batch',
+            ],
+            [
+                'attribute' => 'department',
+                'label' => 'Department',
+            ],
+            [
+                'attribute' => 'payment_count',
+                'label' => 'Payments',
+            ],
+            [
+                'attribute' => 'total_amount',
+                'label' => 'Total',
+                'format' => ['decimal', 2],
+            ],
+        ],
+    ]);
+
+    Pjax::end();
+
+    $tabs[] = [
+        'label' => $currency,
+        'content' => ob_get_clean(),
+        'active' => $currency === 'BDT',
+        'options' => [
+            'id' => 'tab-' . strtolower($currency),
+        ],
+    ];
+}
 ?>
 <div class="row">
     <?php
@@ -175,7 +235,7 @@ $hasPaidInvoiceWithinLastTwoMonths = \app\helpers\AppHelper::hasPaidInvoiceWithi
 
 </div>
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="box box-info">
             <div class="box-header with-border">
                 <h3 class="box-title">Login History(last 10)</h3>
@@ -218,7 +278,22 @@ $hasPaidInvoiceWithinLastTwoMonths = \app\helpers\AppHelper::hasPaidInvoiceWithi
             </div>
         </div>
     </div>
-    <div class="col-md-8">
+    <div class="col-md-5">
+        <div class="box box-success">
+            <div class="box-header with-border">
+                <h3 class="box-title">Member Payment Summary</h3>
+            </div>
+
+            <div class="box-body">
+                <?=
+                Tabs::widget([
+                    'items' => $tabs,
+                ])
+                ?>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
         <div class="box box-success">
             <div class="box-header with-border">
                 <h3 class="box-title">Activity Log(last 10)</h3>

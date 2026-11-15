@@ -312,6 +312,13 @@ class HelloController extends Controller {
                                     Account Number: 248-85387-5 (Savings) 
                                 </p>
                                 <p>
+                                    Paypal:<br/>
+                                    galivefuad94@gmail.com<br/>
+                                    Receiver Name: Galive Fuad<br/>
+                                    <b>Instruction: Please do not write any subject for Sadakah transfer. 
+                                    If it is mendatory then please write as Personal loan.</b>
+                                </p>
+                                <p>
                                     May Allah accept our SADAKAH, our all efforts and make these a good reason go acquire Allah's satisfaction in Dunya and in Akhira.
                                 </p>
                                 <p>
@@ -407,6 +414,13 @@ class HelloController extends Controller {
                                                 Account Holder Name: Mohin Md Rakibul Ahsun<br/>
                                                 Bank Name: POSB<br/>
                                                 Account Number: 248-85387-5 (Savings) 
+                                        </p>
+                                        <p>
+                                            Paypal:<br/>
+                                            galivefuad94@gmail.com<br/>
+                                            Receiver Name: Galive Fuad<br/>
+                                            <b>Instruction: Please do not write any subject for Sadakah transfer. 
+                                            If it is mendatory then please write as Personal loan.</b>
                                         </p>
                                         <p>
                                                 May Allah accept our SADAKAH, our all efforts and make these a good reason go acquire Allah's satisfaction in Dunya and in Akhira.

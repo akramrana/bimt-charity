@@ -11,6 +11,8 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\components\UserIdentity;
 use app\components\AccessRule;
+use yii\db\Query;
+use yii\data\SqlDataProvider;
 
 class SiteController extends Controller {
 
@@ -99,7 +101,7 @@ class SiteController extends Controller {
                 ->groupBy('monthly_invoice.currency_id')
                 ->asArray()
                 ->all();
-        //
+//
         $payment_received = \app\models\PaymentReceived::find()
                 ->select(['COUNT(payment_received_id) as receive_count'])
                 ->where(['is_deleted' => 0])
@@ -114,7 +116,7 @@ class SiteController extends Controller {
                 ->groupBy('payment_received.currency_id')
                 ->asArray()
                 ->all();
-        //
+//
         $payment_release = \app\models\PaymentRelease::find()
                 ->select(['COUNT(payment_release_id) as release_count'])
                 ->where(['is_deleted' => 0])
@@ -129,7 +131,7 @@ class SiteController extends Controller {
                 ->groupBy('payment_release.currency_id')
                 ->asArray()
                 ->all();
-        //
+//
         $expenses = \app\models\Expenses::find()
                 ->select(['COUNT(expense_id) as expense_count'])
                 ->where(['is_deleted' => 0])
@@ -144,7 +146,7 @@ class SiteController extends Controller {
                 ->groupBy('expenses.currency_id')
                 ->asArray()
                 ->all();
-        //
+//
         $fund_request = \app\models\FundRequests::find()
                 ->select(['COUNT(fund_request_id) as fund_request_count'])
                 ->where(['is_deleted' => 0])
@@ -161,7 +163,7 @@ class SiteController extends Controller {
                 ->asArray()
                 ->all();
 
-        //
+//
         $status = \app\models\Status::find()
                 ->where(['is_deleted' => 0])
                 ->all();
@@ -228,6 +230,76 @@ class SiteController extends Controller {
                 ->where(['is_deleted' => 0])
                 ->orderBy(['notification_id' => SORT_DESC])
                 ->all();
+
+        $currencies = (new Query())
+                ->select(['c.currency_id', 'c.code', 'c.name'])
+                ->from(['c' => 'currencies'])
+                ->innerJoin(
+                        ['pr' => 'payment_received'],
+                        'pr.currency_id = c.currency_id'
+                )
+                ->where(['pr.is_deleted' => 0])
+                ->distinct()
+                ->orderBy(['c.code' => SORT_ASC])
+                ->all();
+
+        $paymentProviders = [];
+
+        foreach ($currencies as $currency) {
+
+            $code = $currency['code'];
+            $currencyId = $currency['currency_id'];
+
+            $sql = "
+                    SELECT
+                        u.user_id AS member_id,
+                        u.fullname AS member_name,
+                        u.batch,
+                        u.department,
+                        COUNT(pr.payment_received_id) AS payment_count,
+                        COALESCE(SUM(pr.amount), 0) AS total_amount
+                    FROM users u
+                    LEFT JOIN payment_received pr
+                        ON pr.donated_by = u.user_id
+                        AND pr.is_deleted = 0
+                        AND pr.currency_id = :currencyId
+                    GROUP BY
+                        u.user_id,
+                        u.fullname,
+                        u.batch,
+                        u.department
+                    HAVING total_amount > 0
+                ";
+
+            $paymentProviders[$code] = new SqlDataProvider([
+                'sql' => $sql,
+                'params' => [
+                    ':currencyId' => $currencyId,
+                ],
+                'totalCount' => (int) Yii::$app->db
+                        ->createCommand("SELECT COUNT(*) FROM ($sql) AS payment_summary", [
+                            ':currencyId' => $currencyId,
+                        ])
+                        ->queryScalar(),
+                'pagination' => [
+                    'pageSize' => 10,
+                    'pageParam' => 'payment-page-' . strtolower($code),
+                ],
+                'sort' => [
+                    'attributes' => [
+                        'member_name',
+                        'batch',
+                        'department',
+                        'payment_count',
+                        'total_amount',
+                    ],
+                    'defaultOrder' => [
+                        'total_amount' => SORT_DESC,
+                    ],
+                    'sortParam' => 'payment-sort-' . strtolower($code),
+                ],
+            ]);
+        }
         return $this->render('index', [
                     'users' => $users,
                     'monthlyInvoice' => $monthlyInvoice,
@@ -243,6 +315,7 @@ class SiteController extends Controller {
                     'stats' => $stats,
                     'login_history' => $login_history,
                     'activity_log' => $activity_log,
+                    'paymentProviders' => $paymentProviders,
         ]);
     }
 
@@ -340,7 +413,7 @@ class SiteController extends Controller {
         $model->recurring_amount = 500;
         $model->currency_id = 13;
         $model->user_type = 'G';
-        //
+//
         if ($model->load(Yii::$app->request->post())) {
             $request = Yii::$app->request->bodyParams;
             $password = $request['Users']['password_hash'];
@@ -417,7 +490,7 @@ class SiteController extends Controller {
                 ]);
 
                 Yii::$app->session->setFlash('success', 'Registration successfully completed');
-                //
+//
                 return $this->redirect(['register']);
             } else {
                 echo json_encode($model->errors);
@@ -440,8 +513,8 @@ class SiteController extends Controller {
         $model = new \app\models\SendMailForm();
         if ($model->load(Yii::$app->request->post())) {
             $request = Yii::$app->request->bodyParams;
-            //debugPrint($request);
-            //exit;
+//debugPrint($request);
+//exit;
             $emails = [];
             $sendMailForm = $request['SendMailForm'];
             if (!empty($sendMailForm['userIds'])) {
@@ -533,7 +606,7 @@ class SiteController extends Controller {
                     \app\helpers\AppHelper::resendEmail($mailObject);
                 }
                 Yii::$app->session->setFlash('success', 'Mail successfully sent');
-                //
+//
                 return $this->redirect(['send-mail']);
             }
         }
@@ -564,7 +637,7 @@ class SiteController extends Controller {
                     'model' => $model
         ]);
     }
-    
+
     public function actionTermsConditions() {
         $this->layout = 'main-login';
         $model = \app\models\Cms::findOne(1);
