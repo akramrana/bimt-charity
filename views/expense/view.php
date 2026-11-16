@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Expenses */
 
-$this->title = $model->purpose;
+$this->title = 'Expense ID:'.$model->expense_id;
 $this->params['breadcrumbs'][] = ['label' => 'Expenses', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -49,7 +49,11 @@ else if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                     'attribute' => 'user_id',
                     'value' => ($model->user->fullname)
                 ],
-                'purpose:ntext',
+                [
+					'attribute' => 'purpose',
+					'label' => 'Description',
+					'format' => 'raw',
+				],
                 'amount',
                 'currency.code',
                 'created_at',

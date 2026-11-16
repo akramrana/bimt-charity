@@ -39,9 +39,18 @@ if (\Yii::$app->session['__bimtCharityUserRole'] == 3) {
                     },
                     'filter' => Html::activeDropDownList($searchModel, 'user_id', \app\helpers\AppHelper::getAllUsers(), ['class' => 'form-control', 'prompt' => 'Filter']),
                 ],
-                'amount',
                 'currency.code',
-                'purpose:ntext',
+                 [
+					'attribute' => 'purpose',
+					'label' => 'Description',
+					'format' => 'raw',
+				],
+
+				[
+					'attribute' => 'amount',
+					'label' => 'Amount',
+					'format' => 'decimal',
+				],
                 ['class' => 'yii\grid\ActionColumn', 'template' => $actionBtn],
             ],
         ]);
